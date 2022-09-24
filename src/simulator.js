@@ -16,12 +16,14 @@ class Simulator {
   }
 
   nextDay() {
-    this.#currentDay++;
-    // return this.today();
+    if (this.hasData()) {
+      this.#currentDay++;
+      return this.today();
+    }
   }
 
   dataOfLast(days) {
-    const data = this.#pastData.slice(0, this.#currentDay + 1).slice(-days);
+    const data = this.#pastData.slice(0, this.#currentDay).slice(-days);
     return new Simulator(data);
   }
 
@@ -29,8 +31,7 @@ class Simulator {
     const stock = this.dataOfLast(days);
 
     let highestDay = stock.today();
-    while (stock.hasData()) {
-      stock.nextDay();
+    while (stock.nextDay()) {
       if (stock.today().High > highestDay.High) {
         highestDay = stock.today();
       }
@@ -43,8 +44,7 @@ class Simulator {
     const stock = this.dataOfLast(days);
 
     let lowestDay = stock.today();
-    while (stock.hasData()) {
-      stock.nextDay();
+    while (stock.nextDay()) {
       if (stock.today().Low < lowestDay.Low) {
         lowestDay = stock.today();
       }

@@ -2,13 +2,12 @@ const { parse } = require("./parseData");
 const { Simulator } = require("./simulator");
 
 const oneTrade = (stock) => {
-  while (stock.hasData()) {
+  while (stock.nextDay()) {
     const last20DayLow = stock.lowOfLast(20);
     const today = stock.today();
     if (today.Low <= last20DayLow.Low) {
       return { sellingDay: today };
     }
-    stock.nextDay();
   }
 
   return {};
