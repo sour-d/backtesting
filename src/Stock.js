@@ -1,30 +1,30 @@
-class Simulator {
+class Stock {
   #pastData;
-  #currentDay;
+  #currentDayIndex;
 
   constructor(data, currentDay = 1) {
     this.#pastData = data;
-    this.#currentDay = currentDay - 1;
+    this.#currentDayIndex = currentDay - 1;
   }
 
   hasData() {
-    return this.#pastData.length - 1 > this.#currentDay;
+    return this.#pastData.length - 1 > this.#currentDayIndex;
   }
 
   today() {
-    return this.#pastData[this.#currentDay];
+    return this.#pastData[this.#currentDayIndex];
   }
 
   nextDay() {
     if (this.hasData()) {
-      this.#currentDay++;
+      this.#currentDayIndex++;
       return this.today();
     }
   }
 
   dataOfLast(days) {
-    const data = this.#pastData.slice(0, this.#currentDay).slice(-days);
-    return new Simulator(data);
+    const data = this.#pastData.slice(0, this.#currentDayIndex).slice(-days);
+    return new Stock(data);
   }
 
   highOfLast(days) {
@@ -54,4 +54,4 @@ class Simulator {
   }
 }
 
-module.exports = { Simulator };
+module.exports = { Stock };
