@@ -5,8 +5,10 @@ const { FortyTwentyStrategy } = require("./src/strategy/FortyTwentyStrategy");
 const stockSymbols = ["TCS", "NIFTY"];
 
 stockSymbols.forEach((symbol) => {
-  const stock = new Stock(parse(symbol).data);
+  const { data } = parse(symbol);
+  const stock = new Stock(data);
   const strategy = new FortyTwentyStrategy(stock);
 
+  console.log(symbol);
   strategy.execute();
 });

@@ -32,12 +32,13 @@ class FortyTwentyStrategy {
 
   execute() {
     while (this.#stock.hasData() && this.#stock.nextDay()) {
-      const highestDay = this.#stock.highOfLast(40);
+      const lastFortyDayHigh = this.#stock.highOfLast(40);
       const today = this.#stock.today();
 
-      if (this.#isHighBroke(today, highestDay)) {
-        const lowestDay = this.#stock.lowOfLast(20);
-        const risk = today.High - lowestDay.Low;
+      if (this.#isHighBroke(today, lastFortyDayHigh)) {
+        const lastTwentyDayLow = this.#stock.lowOfLast(20);
+        const risk = today.High - lastTwentyDayLow.Low;
+
         this.#buyStock(risk);
       }
     }
