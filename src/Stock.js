@@ -29,10 +29,9 @@ class Stock {
 
   highOfLast(days) {
     const stock = this.dataOfLast(days);
-
     let highestDay = stock.today();
-    while (stock.nextDay()) {
-      if (stock.today().High > highestDay.High) {
+    while (stock.hasData()) {
+      if (stock.nextDay().High > highestDay.High) {
         highestDay = stock.today();
       }
     }
@@ -44,8 +43,8 @@ class Stock {
     const stock = this.dataOfLast(days);
 
     let lowestDay = stock.today();
-    while (stock.nextDay()) {
-      if (stock.today().Low < lowestDay.Low) {
+    while (stock.hasData()) {
+      if (stock.nextDay().Low < lowestDay.Low) {
         lowestDay = stock.today();
       }
     }
