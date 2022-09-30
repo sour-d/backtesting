@@ -1,12 +1,12 @@
 class FortyTwentyStrategy {
   #stock;
-  // #capital;
-  // #riskPercentage;
+  #capital;
+  #riskPercentage;
 
   constructor(stock, capital, riskPercentage) {
     this.#stock = stock;
-    // this.#capital = capital;
-    // this.#riskPercentage = riskPercentage;
+    this.#capital = capital;
+    this.#riskPercentage = riskPercentage;
   }
 
   #checkForStopLossHit() {
@@ -24,11 +24,32 @@ class FortyTwentyStrategy {
     return today.High > highestDay.High;
   }
 
-  #trade(risk) { //renamed
+  #getRisk() {
+    return this.#capital * this.#riskPercentage;
+  }
+
+  #getTotalStocks(riskForOneStock, buyingPrice) {
+    const risk = this.#getRisk();
+    const numberOfStocksUnderRisk = Math.floor(risk / riskForOneStock); // get a better name if possible.
+    const totalCost = numberOfStocksUnderRisk * buyingPrice;
+    if (totalCost <= this.#capital) {
+      return numberOfStocksUnderRisk;
+    }
+
+    return Math.floor(this.#capital / buyingPrice);
+  }
+
+  #trade() { //renamed
     const buyingDay = this.#stock.today();
+    const initialStopLoss = this.#stock.lowOfLast(20);
+    const riskForOneStock = buyingDay.High - initialStopLoss.Low;
+    const totalStocks = this.#getTotalStocks(riskForOneStock, buyingDay.High);
+
     const sellingDay = this.#checkForStopLossHit();
-    const profitOrLoss = sellingDay.Low - buyingDay.High;
-    const riskMultiple = profitOrLoss / risk;
+    const oneStockProfitOrLoss = sellingDay.Low - buyingDay.High;
+    const totalProfitOrLoss = oneStockProfitOrLoss * totalStocks;
+    const riskMultiple = totalProfitOrLoss / this.#getRisk();
+
     // store data
     return riskMultiple;
 
@@ -41,10 +62,7 @@ class FortyTwentyStrategy {
       const lastFortyDayHigh = this.#stock.highOfLast(40);
 
       if (this.#isHighBroke(today, lastFortyDayHigh)) {
-        const lastTwentyDayLow = this.#stock.lowOfLast(20);
-        const risk = today.High - lastTwentyDayLow.Low;
-
-        tradeOutcomes.push(this.#trade(risk));
+        tradeOutcomes.push(this.#trade());
       }
     }
     return tradeOutcomes;
