@@ -6,6 +6,8 @@ class FortyTwentyStrategy {
   constructor(stock, capital, riskPercentage) {
     this.#stock = stock;
     this.#capital = capital;
+
+    // riskPercentage stored as fraction like 2/100, not 2%
     this.#riskPercentage = riskPercentage;
   }
 
@@ -39,6 +41,10 @@ class FortyTwentyStrategy {
     return Math.floor(this.#capital / buyingPrice);
   }
 
+  #updateCapital(amountGainOrLoss) {
+    this.#capital += amountGainOrLoss;
+  }
+
   #trade() { //renamed
     const buyingDay = this.#stock.today();
     const initialStopLoss = this.#stock.lowOfLast(20);
@@ -51,6 +57,7 @@ class FortyTwentyStrategy {
     const riskMultiple = totalProfitOrLoss / this.#getRisk();
 
     // store data
+    this.#updateCapital(totalProfitOrLoss);
     return riskMultiple;
 
   }
@@ -71,9 +78,13 @@ class FortyTwentyStrategy {
   getExpectancy() {
     const tradeOutcomes = this.execute();
     const aggregateExpectancy = tradeOutcomes.reduce(
-      (sum, tradeOutcomes) => sum + tradeOutcomes
+      (sum, tradeOutcome) => sum + tradeOutcome
     );
     return aggregateExpectancy / tradeOutcomes.length;
+  }
+
+  getCapital() {
+    return this.#capital;
   }
 }
 
