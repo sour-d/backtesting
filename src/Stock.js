@@ -51,6 +51,18 @@ class Stock {
 
     return lowestDay;
   }
+
+  simpleMovingAverage(days) {
+    const previousDays = this.dataOfLast(days);
+    let sumOfDayCloses = this.today().Close;
+    let totalDays = 0;
+    while (previousDays.hasData()) {
+      sumOfDayCloses += previousDays.today().Close;
+      totalDays++;
+      previousDays.nextDay();
+    }
+    return sumOfDayCloses / totalDays;
+  }
 }
 
 module.exports = { Stock };
