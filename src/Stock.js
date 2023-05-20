@@ -1,4 +1,4 @@
-class Stock {
+class StockSimulator {
   #pastData;
   #currentDayIndex;
 
@@ -24,7 +24,7 @@ class Stock {
 
   dataOfLast(days) {
     const data = this.#pastData.slice(0, this.#currentDayIndex).slice(-days);
-    return new Stock(data);
+    return new StockSimulator(data);
   }
 
   highOfLast(days) {
@@ -65,4 +65,4 @@ class Stock {
   }
 }
 
-module.exports = { Stock };
+module.exports = { StockSimulator };
