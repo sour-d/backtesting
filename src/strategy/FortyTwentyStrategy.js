@@ -2,13 +2,17 @@ class FortyTwentyStrategy {
   #stock;
   #capital;
   #riskPercentage;
+  #trades;
+  #persistTradesFn;
 
-  constructor(stock, capital, riskPercentage) {
+  constructor(stock, capital, riskPercentage, persistTradesFn) {
     this.#stock = stock;
     this.#capital = capital;
 
     // riskPercentage stored as fraction like 2/100, not 2%
     this.#riskPercentage = riskPercentage;
+    this.#trades = [];
+    this.#persistTradesFn = persistTradesFn;
   }
 
   #checkForStopLossHit() {
@@ -58,6 +62,11 @@ class FortyTwentyStrategy {
 
     // store data
     this.#updateCapital(totalProfitOrLoss);
+    this.#trades.push({
+      buyingDay, initialStopLoss, riskForOneStock, totalStocks,
+      sellingDay, oneStockProfitOrLoss, totalProfitOrLoss, riskMultiple
+    });
+
     return riskMultiple;
 
   }
@@ -72,6 +81,7 @@ class FortyTwentyStrategy {
         tradeOutcomes.push(this.#trade());
       }
     }
+    this.#persistTradesFn(JSON.stringify(this.#trades));
     return tradeOutcomes;
   }
 
@@ -85,6 +95,10 @@ class FortyTwentyStrategy {
 
   getCapital() {
     return this.#capital;
+  }
+
+  saveDataInJSON() {
+
   }
 }
 

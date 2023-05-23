@@ -1,4 +1,5 @@
 // Import starts
+const fs = require('fs');
 const { parse } = require("./src/parser.js");
 const { StockSimulator } = require("./src/Stock.js");
 const { FortyTwentyStrategy } = require("./src/strategy/FortyTwentyStrategy.js");
@@ -12,6 +13,10 @@ const STOCKSYMBOLS = ["TCS", "NIFTY", "BAJFINANCE"];
 // Global flags
 
 
+const persistTrades = (stockName) => (data) => {
+  fs.writeFileSync(`result/${stockName}.json`, data, "utf-8");
+};
+
 // Main logic to get the result
 const runStrategy = (symbol) => {
   const { data: stockData } = parse(symbol);
@@ -19,7 +24,8 @@ const runStrategy = (symbol) => {
   const stock = new StockSimulator(stockData, startingDay);
   const capital = 100000;
   const riskFactor = 0.02;
-  const strategy = new STRATEGY(stock, capital, riskFactor);
+  const fileName = Date.now().toLocaleString();
+  const strategy = new STRATEGY(stock, capital, riskFactor, persistTrades(symbol));
 
   console.log(`Expectancy of ${symbol} is ${strategy.getExpectancy()}`);
 };
