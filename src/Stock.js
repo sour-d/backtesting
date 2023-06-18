@@ -30,8 +30,8 @@ class StockSimulator {
   highOfLast(days) {
     const stock = this.dataOfLast(days);
     let highestDay = stock.today();
-    while (stock.hasData()) {
-      if (stock.nextDay().High > highestDay.High) {
+    while (stock.nextDay()) {
+      if (stock.today().High > highestDay.High) {
         highestDay = stock.today();
       }
     }

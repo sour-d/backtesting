@@ -9,7 +9,7 @@ const { MovingAverageStrategy } = require("./src/strategy/MovingAverageStrategy.
 
 // Global flags
 const STRATEGY = FortyTwentyStrategy;
-const STOCKSYMBOLS = ["TCS", "NIFTY", "BAJFINANCE"];
+const STOCKSYMBOLS = ["TCS", "NIFTY", "BAJFINANCE", "BTC-USD", "BNB-USD"];
 // Global flags
 
 
@@ -23,8 +23,7 @@ const runStrategy = (symbol) => {
   const startingDay = 40; // choose according to strategy
   const stock = new StockSimulator(stockData, startingDay);
   const capital = 100000;
-  const riskFactor = 0.02;
-  const fileName = Date.now().toLocaleString();
+  const riskFactor = 0.05;
   const strategy = new STRATEGY(stock, capital, riskFactor, persistTrades(symbol));
 
   console.log(`Expectancy of ${symbol} is ${strategy.getExpectancy()}`);

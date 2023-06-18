@@ -26,7 +26,7 @@ class FortyTwentyStrategy {
     return this.#stock.today();
   }
 
-  #isHighBroke(today, highestDay) {
+  #isHighBroken(today, highestDay) {
     return today.High > highestDay.High;
   }
 
@@ -77,7 +77,7 @@ class FortyTwentyStrategy {
       const today = this.#stock.nextDay();
       const lastFortyDayHigh = this.#stock.highOfLast(40);
 
-      if (this.#isHighBroke(today, lastFortyDayHigh)) {
+      if (this.#isHighBroken(today, lastFortyDayHigh)) {
         tradeOutcomes.push(this.#trade());
       }
     }
