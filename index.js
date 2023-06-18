@@ -1,5 +1,6 @@
 // Import starts
 const fs = require('fs');
+const symbolList = require("./src/symbolList.json");
 const { parse } = require("./src/parser.js");
 const { StockSimulator } = require("./src/Stock.js");
 const { FortyTwentyStrategy } = require("./src/strategy/FortyTwentyStrategy.js");
@@ -9,7 +10,6 @@ const { MovingAverageStrategy } = require("./src/strategy/MovingAverageStrategy.
 
 // Global flags
 const STRATEGY = FortyTwentyStrategy;
-const STOCKSYMBOLS = ["TCS", "NIFTY", "BAJFINANCE", "BTC-USD", "BNB-USD"];
 // Global flags
 
 
@@ -18,15 +18,18 @@ const persistTrades = (stockName) => (data) => {
 };
 
 // Main logic to get the result
-const runStrategy = (symbol) => {
-  const { data: stockData } = parse(symbol);
+const runStrategy = ({ name: stockName, symbol }) => {
+  const { data: stockData } = parse(stockName);
   const startingDay = 40; // choose according to strategy
   const stock = new StockSimulator(stockData, startingDay);
   const capital = 100000;
   const riskFactor = 0.05;
-  const strategy = new STRATEGY(stock, capital, riskFactor, persistTrades(symbol));
+  const strategy = new STRATEGY(stock, capital, riskFactor, persistTrades(stockName));
 
-  console.log(`Expectancy of ${symbol} is ${strategy.getExpectancy()}`);
+  console.log(`\tExpectancy of ${stockName} is ${strategy.getExpectancy()}`);
 };
 
-STOCKSYMBOLS.forEach(runStrategy);
+Object.keys(symbolList).forEach((catergotyName) => {
+  console.log(catergotyName);
+  symbolList[catergotyName].forEach(runStrategy);
+});

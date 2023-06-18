@@ -19,7 +19,7 @@ const drawProfitLossChart = async () => {
     }
   };
 
-  const data = await fetch("/result/BNB-USD.json")
+  const data = await fetch("/result/Binance Coin.json")
     .then(res => res.json())
     .then(res => {
       return res.map(({ buyingDay, totalProfitOrLoss, sellingDay }) =>
@@ -51,7 +51,7 @@ const drawTotalProfitOverTime = async () => {
 
 
   const data = [];
-  await fetch("/result/BNB-USD.json")
+  await fetch("/result/Binance Coin.json")
     .then(res => res.json())
     .then(res => {
       res.reduce((total, { buyingDay, totalProfitOrLoss }) => {

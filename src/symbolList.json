@@ -20,5 +20,15 @@
       "name": "ICICI Bank Limited",
       "symbol": "ICICIBANK.NS"
     }
+  ],
+  "Cryto Currencies": [
+    {
+      "name": "Bitcoin",
+      "symbol": "BTC-USD"
+    },
+    {
+      "name": "Binance Coin",
+      "symbol": "BNB-USD"
+    }
   ]
 }
