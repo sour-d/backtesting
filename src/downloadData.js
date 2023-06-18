@@ -32,9 +32,10 @@ const clearPastData = () => {
 };
 
 const downloadData = () => {
-  clearPastData(); // clearing all data at first
+  console.log("Clearing past data...");
+  clearPastData();
 
-  // downloading data
+  console.log("Downloading data...");
   Object.keys(symbolList).forEach(categoryName => {
     const symbolsInfo = symbolList[categoryName];
     symbolsInfo.forEach(({ name, symbol }) => {
@@ -45,6 +46,7 @@ const downloadData = () => {
         .on('error', onErrorReciveOf(name));
     });
   });
+  console.log("Done!");
 };
 
 downloadData();

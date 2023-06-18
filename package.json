@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ."
+    "start": "node .",
+    "setup": "npm install; rm -rf ./data ./result; mkdir data && mkdir result",
+    "download": "node src/downloadData.js"
   },
   "keywords": [],
   "author": "",
