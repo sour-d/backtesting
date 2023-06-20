@@ -1,15 +1,15 @@
 {
   "Nifty 50": [
     {
-      "name": "UltraTech Cement Limited",
+      "name": "UltraTech",
       "symbol": "ULTRACEMCO.NS"
     },
     {
-      "name": "Tata Consultancy Services Limited",
+      "name": "Tata Consultancy",
       "symbol": "TCS.NS"
     },
     {
-      "name": "Bajaj Finance Limited",
+      "name": "Bajaj Finance",
       "symbol": "BAJFINANCE.NS"
     },
     {
@@ -17,7 +17,7 @@
       "symbol": "ITC.NS"
     },
     {
-      "name": "ICICI Bank Limited",
+      "name": "ICICI Bank",
       "symbol": "ICICIBANK.NS"
     }
   ],
