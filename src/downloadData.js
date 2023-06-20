@@ -31,6 +31,24 @@ const clearPastData = () => {
   }
 };
 
+const getUNIXTime = (date) => {
+  if (date instanceof Date) {
+    return Math.round(date.getTime() / 1000);
+  }
+  return Math.round(Date.now() / 1000);
+};
+
+const getEndPoint = (symbol) => {
+  const period1 = getUNIXTime(new Date("2000-01-01"));
+  const period2 = getUNIXTime();
+
+  const hostname = `https://query1.finance.yahoo.com`;
+  const url = `/v7/finance/download/${symbol}`;
+  const query = `?interval=1d&period1=${period1}&period2=${period2}`;
+
+  return hostname + url + query;
+};
+
 const downloadData = () => {
   console.log("Clearing past data...");
   clearPastData();
@@ -39,8 +57,8 @@ const downloadData = () => {
   Object.keys(symbolList).forEach(categoryName => {
     const symbolsInfo = symbolList[categoryName];
     symbolsInfo.forEach(({ name, symbol }) => {
-      const url = `https://query1.finance.yahoo.com/v7/finance/download/${symbol}?interval=1d&range=max`;
-      https.get(url, (res) => {
+
+      https.get(getEndPoint(symbol), (res) => {
         res.on('data', onDataReciveOf(name));
       })
         .on('error', onErrorReciveOf(name));
