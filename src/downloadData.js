@@ -9,14 +9,14 @@ const writeIntoFile = (filename, data) => {
   fs.writeFileSync(filename, data, { flag: 'a', encoding: 'utf8' });
 };
 
-const onErrorReciveOf = (name) =>
+const onErrorReceiveOf = (name) =>
   (error) => {
     console.error("Got error");
     console.error("Name:", name);
     console.error("Error is:", error);
   };
 
-const onDataReciveOf = (name) =>
+const onDataReceiveOf = (name) =>
   (data) => {
     writeIntoFile(`./${DIR_PATH}/${name}.csv`, data);
 };
@@ -55,16 +55,15 @@ const downloadData = () => {
 
   console.log("Downloading data...");
   Object.keys(symbolList).forEach(categoryName => {
-    const symbolsInfo = symbolList[categoryName];
-    symbolsInfo.forEach(({ name, symbol }) => {
+    const categorySymbolList = symbolList[categoryName];
 
+    categorySymbolList.forEach(({ name, symbol }, index) => {
       https.get(getEndPoint(symbol), (res) => {
-        res.on('data', onDataReciveOf(name));
-      })
-        .on('error', onErrorReciveOf(name));
+        res.on('data', onDataReceiveOf(name));
+        res.on('end', () => console.log(`${name} download complete`));
+      }).on('error', onErrorReceiveOf(name));
     });
   });
-  console.log("Done!");
 };
 
 downloadData();

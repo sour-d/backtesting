@@ -29,7 +29,7 @@ const runStrategy = ({ name: stockName, symbol }) => {
   console.log(`\tExpectancy of ${stockName} is ${strategy.getExpectancy()}`);
 };
 
-Object.keys(symbolList).forEach((catergotyName) => {
-  console.log(catergotyName);
-  symbolList[catergotyName].forEach(runStrategy);
+Object.keys(symbolList).forEach((categoryName) => {
+  console.log(categoryName);
+  symbolList[categoryName].forEach(runStrategy);
 });
