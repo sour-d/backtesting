@@ -1,5 +1,6 @@
 const Papa = require('papaparse');
 const fs = require('fs');
+const dayjs = require('dayjs');
 
 const CONFIG = {
   delimiter: ",",	// auto-detect
@@ -33,13 +34,18 @@ const CONFIG = {
 const parse = (filename) => {
   const CSVString = fs.readFileSync(`./data/${filename}.csv`, 'utf8');
 
-  const parsedData = Papa.parse(CSVString, CONFIG);
+  let { data, errors } = Papa.parse(CSVString, CONFIG);
 
-  if (parsedData.errors.length > 0) {
-    throw new Error("Failed to parse", { cause: parsedData.errors });
+  data = data.map(stock => {
+    stock.Date = new Date(stock.Date);
+    return stock;
+  });
+
+  if (errors.length > 0) {
+    throw new Error("Failed to parse", { cause: errors });
   }
 
-  return parsedData;
+  return data;
 };
 
 module.exports = { parse };

@@ -19,10 +19,19 @@ class Strategy {
 
   getExpectancy() {
     const tradeOutcomes = this.execute();
+    const totalCount = tradeOutcomes.length;
     const aggregateExpectancy = tradeOutcomes.reduce(
-      (sum, tradeOutcome) => sum + tradeOutcome
+      (sum, tradeOutcome) => {
+        sum.totalExpectancy += tradeOutcome.riskMultiple;
+        sum.totalReturn += tradeOutcome.returnPercentage;
+        return sum;
+      },
+      { totalExpectancy: 0, totalReturn: 0 }
     );
-    return aggregateExpectancy / tradeOutcomes.length;
+    return {
+      averageExpectancy: aggregateExpectancy.totalExpectancy / totalCount,
+      averageReturn: aggregateExpectancy.totalReturn / totalCount
+    };
   }
 }
 

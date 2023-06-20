@@ -19,14 +19,16 @@ const persistTrades = (stockName) => (data) => {
 
 // Main logic to get the result
 const runStrategy = ({ name: stockName, symbol }) => {
-  const { data: stockData } = parse(stockName);
+  const stockData = parse(stockName);
   const startingDay = 40; // choose according to strategy
   const stock = new StockSimulator(stockData, startingDay);
   const capital = 100000;
   const riskFactor = 0.05;
   const strategy = new STRATEGY(stock, capital, riskFactor, persistTrades(stockName));
+  const aggregates = strategy.getExpectancy();
 
-  console.log(`\tExpectancy of ${stockName} is ${strategy.getExpectancy()}`);
+  console.log(`\tExpectancy of ${stockName} is ${aggregates.averageExpectancy}`);
+  console.log(`\tAverage return of ${stockName} is ${aggregates.averageReturn}`);
 };
 
 Object.keys(symbolList).forEach((categoryName) => {
