@@ -34,6 +34,9 @@ class MovingAverageStrategy extends Strategy{
     const buyingDay = this.stock.today();
     const initialStopLoss = this.stock.simpleMovingAverage(lowerLimit);
     const riskForOneStock = buyingDay.High - initialStopLoss;
+    if (riskForOneStock <= 0) {
+      return { riskMultiple: 0, returnPercentage: 0 };
+    }
     const totalStocks = this.#getTotalStocks(riskForOneStock, buyingDay.High);
 
     const sellingDay = this.#checkForStopLossHit();
