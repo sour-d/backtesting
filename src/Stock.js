@@ -23,7 +23,7 @@ class StockSimulator {
   }
 
   dataOfLast(days) {
-    const data = this.#pastData.slice(0, this.#currentDayIndex).slice(-days);
+    const data = this.#pastData.slice(0, this.#currentDayIndex + 1).slice(-days);
     return new StockSimulator(data);
   }
 
@@ -55,7 +55,7 @@ class StockSimulator {
   simpleMovingAverage(days) {
     const previousDays = this.dataOfLast(days);
     let sumOfDayCloses = this.today().Close;
-    let totalDays = 0;
+    let totalDays = 1;
     while (previousDays.hasData()) {
       sumOfDayCloses += previousDays.today().Close;
       totalDays++;

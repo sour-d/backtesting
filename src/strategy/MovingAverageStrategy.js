@@ -1,4 +1,6 @@
 const { Strategy } = require("../Strategy");
+const lowerLimit = 40;
+const upperLimit = 200;
 
 class MovingAverageStrategy extends Strategy{
   constructor(stock, capital, riskPercentage, persistTradesFn) {
@@ -8,8 +10,9 @@ class MovingAverageStrategy extends Strategy{
   #checkForStopLossHit() {
     while (this.stock.hasData()) {
       const today = this.stock.nextDay();
-      const fiftyDayMovingAverage = this.stock.simpleMovingAverage(50);
-      if (today.Low <= fiftyDayMovingAverage) {
+      const fortyDayMA = this.stock.simpleMovingAverage(lowerLimit);
+      const twoHundredDayMA = this.stock.simpleMovingAverage(upperLimit);
+      if (today.Low <= fortyDayMA || twoHundredDayMA >= fortyDayMA) {
         return today;
       }
     }
@@ -29,8 +32,8 @@ class MovingAverageStrategy extends Strategy{
 
   #trade() {
     const buyingDay = this.stock.today();
-    const initialStopLoss = this.stock.simpleMovingAverage(50);
-    const riskForOneStock = buyingDay.High - initialStopLoss.Low;
+    const initialStopLoss = this.stock.simpleMovingAverage(lowerLimit);
+    const riskForOneStock = buyingDay.High - initialStopLoss;
     const totalStocks = this.#getTotalStocks(riskForOneStock, buyingDay.High);
 
     const sellingDay = this.#checkForStopLossHit();
@@ -50,11 +53,15 @@ class MovingAverageStrategy extends Strategy{
   execute() {
     const tradeOutcomes = [];
     while (this.stock.hasData()) {
+      const previousDayUpperLimitMA = this.stock.simpleMovingAverage(upperLimit);
+      const previousDayLowerLimitMA = this.stock.simpleMovingAverage(lowerLimit);
       const today = this.stock.nextDay();
-      const twoHundredDayMovingAverage = this.stock.simpleMovingAverage(200);
-      const hundredDayMovingAverage = this.stock.simpleMovingAverage(100);
-      if (twoHundredDayMovingAverage < today.High && hundredDayMovingAverage < today.High) {
-         tradeOutcomes.push(this.#trade());
+      if (previousDayUpperLimitMA > previousDayLowerLimitMA) {
+        const upperLimitMA = this.stock.simpleMovingAverage(upperLimit);
+        const lowerLimitMA = this.stock.simpleMovingAverage(lowerLimit);
+        if (lowerLimitMA >= upperLimitMA) {
+          tradeOutcomes.push(this.#trade());
+        }  
       }
     }
     this.persistTradesFn(JSON.stringify(this.trades));

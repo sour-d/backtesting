@@ -50,7 +50,6 @@ class FortyTwentyStrategy extends Strategy {
     });
 
     return riskMultiple;
-
   }
 
   execute() {
@@ -65,10 +64,6 @@ class FortyTwentyStrategy extends Strategy {
     }
     this.persistTradesFn(JSON.stringify(this.trades));
     return tradeOutcomes;
-  }
-
-  getCapital() {
-    return this.capital;
   }
 }
 

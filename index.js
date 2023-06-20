@@ -9,7 +9,7 @@ const { MovingAverageStrategy } = require("./src/strategy/MovingAverageStrategy.
 
 
 // Global flags
-const STRATEGY = FortyTwentyStrategy;
+const STRATEGY = MovingAverageStrategy;
 // Global flags
 
 
