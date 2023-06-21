@@ -29,9 +29,21 @@ const runStrategy = ({ name: stockName, symbol }) => {
 
   console.log(`\tExpectancy of ${stockName} is ${aggregates.averageExpectancy}`);
   console.log(`\tAverage return of ${stockName} is ${aggregates.averageReturn}`);
+  return { averageExpectancy: aggregates.averageExpectancy, averageReturn: aggregates.averageReturn };
 };
 
 Object.keys(symbolList).forEach((categoryName) => {
   console.log(categoryName);
-  symbolList[categoryName].forEach(runStrategy);
+  let totalExpectancy = 0;
+  let totalReturn = 0;
+  const category = symbolList[categoryName];
+  const totalSymbol = category.length;
+  category.forEach((x) => {
+    const { averageExpectancy, averageReturn } = runStrategy(x);
+    totalExpectancy += averageExpectancy;
+    totalReturn += averageReturn;
+  });
+
+  console.log(`\n\tAverage Expectancy of ${categoryName} is ${totalExpectancy/totalSymbol}`);
+  console.log(`\tAverage Return of ${categoryName} is ${totalReturn/totalSymbol}\n`);
 });
