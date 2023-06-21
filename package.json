@@ -9,7 +9,7 @@
     "setup": "npm install; rm -rf ./data ./result; mkdir data && mkdir result; brew install serve",
     "download": "node src/downloadData.js",
     "clean": "rm -rf ./data/* ./result/*",
-    "serve": "serve -port 1234 -dir ."
+    "serve": "npx http-server  --no-dotfiles -a 'localhost' -o 'src/web'"
   },
   "keywords": [],
   "author": "",
@@ -17,5 +17,8 @@
   "dependencies": {
     "dayjs": "^1.11.8",
     "papaparse": "^5.3.2"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
   }
 }
