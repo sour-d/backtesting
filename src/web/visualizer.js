@@ -14,16 +14,20 @@ const drawProfitLossChart = async () => {
       tooltip: true,
     },
     encoding: {
-      x: { field: "buyingDate", type: "ordinal" },
-      y: { field: "totalProfitOrLoss", type: "quantitative" },
+      x: { field: "buyingDate", type: "ordinal", title: "Buying Date" },
+      y: {
+        field: "totalProfitOrLoss",
+        type: "quantitative",
+        title: "Profit Or Loss",
+      },
       tooltip: [
-        { field: "buyingDate", type: "ordinal", title: "buyingDate" },
+        { field: "buyingDate", type: "ordinal", title: "Buying Date" },
         {
           field: "totalProfitOrLoss",
           type: "quantitative",
-          title: "totalProfitOrLoss",
+          title: "Profit Or Loss",
         },
-        { field: "sellingDate", type: "ordinal", title: "sellingDate" },
+        { field: "sellingDate", type: "ordinal", title: "Selling Date" },
       ],
     },
   };
@@ -34,9 +38,9 @@ const drawProfitLossChart = async () => {
       return res.map(
         ({ buyingDay, totalProfitOrLoss, sellingDay }) =>
           new Object({
-            buyingDate: buyingDay.Date,
+            buyingDate: dayjs(buyingDay.Date).format("YYYY-MM-DD"),
             totalProfitOrLoss,
-            sellingDate: sellingDay.Date,
+            sellingDate: dayjs(sellingDay.Date).format("YYYY-MM-DD"),
           })
       );
     });
@@ -54,13 +58,22 @@ const drawTotalProfitOverTime = async () => {
     },
     $schema: "https://vega.github.io/schema/vega-lite/v5.json",
     description: "Profit over time.",
-    mark: {
-      type: "line",
-      interpolate: "step-after",
-    },
+    mark: { type: "line" },
     encoding: {
-      x: { field: "date", type: "ordinal" },
-      y: { field: "totalProfitOrLoss", type: "quantitative" },
+      x: { field: "date", type: "ordinal", title: "Date" },
+      y: {
+        field: "totalProfitOrLoss",
+        type: "quantitative",
+        title: "Total Profit Or Loss",
+      },
+      tooltip: [
+        { field: "date", type: "ordinal", title: "Selling Date" },
+        {
+          field: "totalProfitOrLoss",
+          type: "quantitative",
+          title: "Total Profit or Loss",
+        },
+      ],
     },
   };
 
@@ -68,8 +81,11 @@ const drawTotalProfitOverTime = async () => {
   await fetch(`/result/${stockName}.json`)
     .then((res) => res.json())
     .then((res) => {
-      res.reduce((total, { buyingDay, totalProfitOrLoss }) => {
-        data.push({ date: buyingDay.Date, totalProfitOrLoss: total });
+      res.reduce((total, { sellingDay, totalProfitOrLoss }) => {
+        data.push({
+          date: dayjs(sellingDay.Date).format("YYYY-MM-DD"),
+          totalProfitOrLoss: total,
+        });
         return total + totalProfitOrLoss;
       }, 0);
     });

@@ -31,7 +31,8 @@ class FortyTwentyStrategy extends Strategy {
     return Math.floor(this.capital / buyingPrice);
   }
 
-  #trade() { //renamed
+  #trade() {
+    //renamed
     const buyingDay = this.stock.today();
     const initialStopLoss = this.stock.lowOfLast(20);
     const riskForOneStock = buyingDay.High - initialStopLoss.Low;
@@ -43,16 +44,23 @@ class FortyTwentyStrategy extends Strategy {
     const riskMultiple = totalProfitOrLoss / this.getRisk();
     const noOfMillis = sellingDay.Date.getTime() - buyingDay.Date.getTime();
     const noOfYrs = noOfMillis / (1000 * 60 * 60 * 24 * 365);
-    const returnPercentage = (totalProfitOrLoss * 100) / (this.capital * noOfYrs);
+    const returnPercentage =
+      (totalProfitOrLoss * 100) / (this.capital * noOfYrs);
 
     // store data
-    this.updateCapital(totalProfitOrLoss);
     this.trades.push({
-      buyingDay, initialStopLoss, riskForOneStock, totalStocks,
-      sellingDay, oneStockProfitOrLoss, totalProfitOrLoss, riskMultiple, returnPercentage
+      buyingDay,
+      initialStopLoss,
+      riskForOneStock,
+      totalStocks,
+      sellingDay,
+      oneStockProfitOrLoss,
+      totalProfitOrLoss,
+      riskMultiple,
+      returnPercentage,
     });
 
-    return {riskMultiple, returnPercentage};
+    return { riskMultiple, returnPercentage };
   }
 
   execute() {

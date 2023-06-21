@@ -13,10 +13,6 @@ class Strategy {
     return this.capital * this.riskPercentage;
   }
 
-  updateCapital(amountGainOrLoss) {
-    this.capital += amountGainOrLoss;
-  }
-
   getExpectancy() {
     const tradeOutcomes = this.execute();
     const totalCount = tradeOutcomes.length;

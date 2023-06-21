@@ -47,10 +47,16 @@ class MovingAverageStrategy extends Strategy{
     const noOfYrs = noOfMillis / (1000 * 60 * 60 * 24 * 365);
     const returnPercentage = (totalProfitOrLoss * 100) / (this.capital * noOfYrs);
 
-    this.updateCapital(totalProfitOrLoss);
     this.trades.push({
-      buyingDay, initialStopLoss, riskForOneStock, totalStocks,
-      sellingDay, oneStockProfitOrLoss, totalProfitOrLoss, riskMultiple, returnPercentage
+      buyingDay,
+      initialStopLoss,
+      riskForOneStock,
+      totalStocks,
+      sellingDay,
+      oneStockProfitOrLoss,
+      totalProfitOrLoss,
+      riskMultiple,
+      returnPercentage,
     });
 
     return {riskMultiple, returnPercentage};
