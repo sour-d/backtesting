@@ -1,7 +1,6 @@
 const searchQueryString = location.search;
 const searchQuery = new URLSearchParams(searchQueryString);
-const name = decodeURI(searchQuery.get("name"));
-console.log(name);
+const stockName = decodeURI(searchQuery.get("name"));
 
 const drawProfitLossChart = async () => {
   var chartData = {
@@ -29,7 +28,7 @@ const drawProfitLossChart = async () => {
     },
   };
 
-  const data = await fetch(`/result/${name}.json`)
+  const data = await fetch(`/result/${stockName}.json`)
     .then((res) => res.json())
     .then((res) => {
       return res.map(
@@ -66,7 +65,7 @@ const drawTotalProfitOverTime = async () => {
   };
 
   const data = [];
-  await fetch(`/result/${name}.json`)
+  await fetch(`/result/${stockName}.json`)
     .then((res) => res.json())
     .then((res) => {
       res.reduce((total, { buyingDay, totalProfitOrLoss }) => {

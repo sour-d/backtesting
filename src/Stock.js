@@ -23,7 +23,7 @@ class StockSimulator {
   }
 
   dataOfLast(days) {
-    const data = this.#pastData.slice(0, this.#currentDayIndex + 1).slice(-days);
+    const data = this.#pastData.slice(0, this.#currentDayIndex).slice(-days);
     return new StockSimulator(data);
   }
 
