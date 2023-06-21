@@ -31,6 +31,7 @@ const createSymbolRow = (name, symbol) => {
   });
   tr.onclick = () =>
     (window.location.href = `${location.origin}/src/web/TradeResult.html?name=${name}`);
+
   return tr;
 };
 
