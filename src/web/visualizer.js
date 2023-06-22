@@ -27,6 +27,11 @@ const drawProfitLossChart = async () => {
           type: "quantitative",
           title: "Profit Or Loss",
         },
+        {
+          field: "transactionAmount",
+          type: "quantitative",
+          title: "Transaction Amount",
+        },
         { field: "sellingDate", type: "ordinal", title: "Selling Date" },
       ],
     },
@@ -36,11 +41,12 @@ const drawProfitLossChart = async () => {
     .then((res) => res.json())
     .then((res) => {
       return res.map(
-        ({ buyingDay, totalProfitOrLoss, sellingDay }) =>
+        ({ buyingDay, totalProfitOrLoss, sellingDay, totalStocks }) =>
           new Object({
             buyingDate: dayjs(buyingDay.Date).format("YYYY-MM-DD"),
             totalProfitOrLoss,
             sellingDate: dayjs(sellingDay.Date).format("YYYY-MM-DD"),
+            transactionAmount: totalStocks * buyingDay.High,
           })
       );
     });
@@ -58,7 +64,7 @@ const drawTotalProfitOverTime = async () => {
     },
     $schema: "https://vega.github.io/schema/vega-lite/v5.json",
     description: "Profit over time.",
-    mark: { type: "line" },
+    mark: { type: "line", point: true },
     encoding: {
       x: { field: "date", type: "ordinal", title: "Date" },
       y: {
