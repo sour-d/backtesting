@@ -1,11 +1,12 @@
 import { ITradeOutcome } from "./ITradeOutcome";
 import { Day, StockSimulator } from "./Stock";
+import { TradeOutcomes } from "./TradeOutcome";
 
 class Strategy {
   stock: StockSimulator;
   capital: number;
   riskPercentage: number;
-  trades: ITradeOutcome[];
+  trades: TradeOutcomes;
   persistTradesFn: Function;
 
   constructor(
@@ -18,7 +19,7 @@ class Strategy {
     this.capital = capital;
 
     this.riskPercentage = riskPercentage; // riskPercentage stored as fraction like 2/100, not 2%
-    this.trades = [];
+    this.trades = new TradeOutcomes();
     this.persistTradesFn = persistTradesFn;
   }
 
@@ -66,26 +67,18 @@ class Strategy {
 
   protected updateTrades(
     buyingDay: Day,
-    initialStopLoss: Day,
-    riskForOneStock: number,
-    totalStocks: number,
     sellingDay: Day,
-    oneStockProfitOrLoss: number,
-    totalProfitOrLoss: number,
-    riskMultiple: number,
-    returnPercentage: number
+    initialStopLoss: Day,
+    totalStocks: number
   ): void {
-    this.trades.push({
+    this.trades.addTradeResult(
       buyingDay,
-      initialStopLoss,
-      riskForOneStock,
-      totalStocks,
       sellingDay,
-      oneStockProfitOrLoss,
-      totalProfitOrLoss,
-      riskMultiple,
-      returnPercentage,
-    });
+      initialStopLoss,
+      totalStocks,
+      this.getRisk(),
+      this.capital
+    );
   }
 
   // needs to implement
@@ -93,7 +86,7 @@ class Strategy {
   // checkForStopLossHit() and
   // execute()
 
-  protected trade(): ITradeOutcome {
+  protected trade(): void {
     throw new Error("Method not implemented.");
   }
 

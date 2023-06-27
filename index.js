@@ -3,11 +3,14 @@ const fs = require('fs');
 const symbolList = require("./src/symbolList.json");
 const { parse } = require("./src/parser.js");
 const { StockSimulator } = require("./src/Stock.js");
-const { FortyTwentyStrategy } = require("./src/strategy/FortyTwentyStrategy.js");
-const { MovingAverageStrategy } = require("./src/strategy/MovingAverageStrategy.js");
-const { table } = require('console');
+const {
+  FortyTwentyStrategy,
+} = require("./src/strategy/FortyTwentyStrategy.js");
+const {
+  MovingAverageStrategy,
+} = require("./src/strategy/MovingAverageStrategy.js");
+const { table } = require("console");
 // Import ends
-
 
 // Global flags
 const STRATEGY = FortyTwentyStrategy;

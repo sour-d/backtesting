@@ -1,6 +1,5 @@
 import * as Papa from "papaparse";
 import * as fs from "fs";
-import * as dayjs from "dayjs";
 
 const CONFIG: Papa.ParseConfig = {
   delimiter: ",", // auto-detect
@@ -42,4 +41,4 @@ const parse = (filename: string): Stock[] => {
   return data;
 };
 
-export default { parse };
+export { parse };
