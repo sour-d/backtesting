@@ -1,5 +1,5 @@
 import { ITradeOutcome } from "./ITradeOutcome";
-import { Day, StockFeedSimulator } from "./StockFeedSimulator";
+import { Quote, StockFeedSimulator } from "./StockFeedSimulator";
 import { TradeOutcomes } from "./TradeOutcome";
 
 class Strategy {
@@ -66,9 +66,9 @@ class Strategy {
   }
 
   protected updateTrades(
-    buyingDay: Day,
-    sellingDay: Day,
-    initialStopLoss: Day,
+    buyingDay: Quote,
+    sellingDay: Quote,
+    initialStopLoss: number,
     totalStocks: number
   ): void {
     this.trades.addTradeResult(
@@ -90,7 +90,7 @@ class Strategy {
     throw new Error("Method not implemented.");
   }
 
-  protected checkForStopLossHit(): boolean {
+  protected checkForStopLossHit(): Quote {
     throw new Error("Method not implemented.");
   }
 

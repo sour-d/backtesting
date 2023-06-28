@@ -1,5 +1,5 @@
 import { ITradeOutcome } from "./ITradeOutcome";
-import { Day } from "./StockFeedSimulator";
+import { Quote } from "./StockFeedSimulator";
 
 export class TradeOutcomes {
   private tradeResults: ITradeOutcome[] = [];
@@ -25,14 +25,14 @@ export class TradeOutcomes {
   }
 
   public addTradeResult(
-    buyingDay: Day,
-    sellingDay: Day,
-    initialStopLoss: Day,
+    buyingDay: Quote,
+    sellingDay: Quote,
+    initialStopLoss: number,
     totalStocks: number,
     risk: number,
     capital: number
   ): void {
-    const riskForOneStock: number = buyingDay.High - initialStopLoss.Low;
+    const riskForOneStock: number = buyingDay.High - initialStopLoss;
     const oneStockProfitOrLoss: number = sellingDay.Low - buyingDay.High;
     const totalProfitOrLoss: number = oneStockProfitOrLoss * totalStocks;
     const riskMultiple: number = totalProfitOrLoss / risk;
@@ -57,8 +57,8 @@ export class TradeOutcomes {
   }
 
   private returnPercentage(
-    sellingDay: Day,
-    buyingDay: Day,
+    sellingDay: Quote,
+    buyingDay: Quote,
     totalProfitOrLoss: number,
     capital: number
   ) {

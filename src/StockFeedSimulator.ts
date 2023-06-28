@@ -77,4 +77,4 @@ class StockFeedSimulator {
   }
 }
 
-export { StockFeedSimulator , Quote as Day };
+export { StockFeedSimulator, Quote };

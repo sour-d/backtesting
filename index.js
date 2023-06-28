@@ -6,11 +6,14 @@ const { StockFeedSimulator } = require("./build/StockFeedSimulator.js");
 const {
   FortyTwentyStrategy,
 } = require("./build/strategy/FortyTwentyStrategy.js");
+const {
+  MovingAverageStrategy,
+} = require("./build/strategy/MovingAverageStrategy.js");
 const { table } = require("console");
 // Import ends
 
 // Global flags
-const STRATEGY = FortyTwentyStrategy;
+const STRATEGY = MovingAverageStrategy;
 // Global flags
 
 

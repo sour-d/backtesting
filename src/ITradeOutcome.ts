@@ -1,11 +1,11 @@
-import { Day } from "./StockFeedSimulator";
+import { Quote } from "./StockFeedSimulator";
 
 export interface ITradeOutcome {
-  buyingDay: Day;
-  initialStopLoss: Day;
+  buyingDay: Quote;
+  initialStopLoss: number;
   riskForOneStock: number;
   totalStocks: number;
-  sellingDay: Day;
+  sellingDay: Quote;
   oneStockProfitOrLoss: number;
   totalProfitOrLoss: number;
   riskMultiple: number;
