@@ -39,20 +39,27 @@ const runStrategy = (analyzedResult, { name: stockName, symbol }) => {
   return analyzedResult;
 };
 
-Object.keys(symbolList).forEach((categoryName) => {
-  console.log(categoryName);
-  const category = symbolList[categoryName];
-  const totalSymbol = category.length;
-  const categoryResult = category.reduce(
-    (analyzedResult, x) => runStrategy(analyzedResult, x),
-    { totalExpectancy: 0, totalReturn: 0 });
-  
-  categoryResult.averages = {};
-  categoryResult.averages.averageExpectancy = categoryResult.totalExpectancy / totalSymbol;
-  categoryResult.averages.averageReturn = categoryResult.totalReturn / totalSymbol;
+const main = () => {
+  Object.keys(symbolList).forEach((categoryName) => {
+    console.log(categoryName);
+    const category = symbolList[categoryName];
+    const totalSymbol = category.length;
+    const categoryResult = category.reduce(
+      (analyzedResult, x) => runStrategy(analyzedResult, x),
+      { totalExpectancy: 0, totalReturn: 0 }
+    );
 
-  delete categoryResult.totalExpectancy;
-  delete categoryResult.totalReturn;
-  
-  table(categoryResult);
-});
+    categoryResult.averages = {};
+    categoryResult.averages.averageExpectancy =
+      categoryResult.totalExpectancy / totalSymbol;
+    categoryResult.averages.averageReturn =
+      categoryResult.totalReturn / totalSymbol;
+
+    delete categoryResult.totalExpectancy;
+    delete categoryResult.totalReturn;
+
+    table(categoryResult);
+  });
+};
+
+main();
