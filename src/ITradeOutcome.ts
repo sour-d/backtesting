@@ -1,4 +1,4 @@
-import { Day } from "./Stock";
+import { Day } from "./StockFeedSimulator";
 
 export interface ITradeOutcome {
   buyingDay: Day;

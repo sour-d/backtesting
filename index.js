@@ -2,7 +2,7 @@
 const fs = require('fs');
 const symbolList = require("./symbolList.json");
 const { parse } = require("./build/parser.js");
-const { StockSimulator } = require("./build/Stock.js");
+const { StockFeedSimulator } = require("./build/StockFeedSimulator.js");
 const {
   FortyTwentyStrategy,
 } = require("./build/strategy/FortyTwentyStrategy.js");
@@ -22,7 +22,7 @@ const persistTrades = (stockName) => (data) => {
 const runStrategy = (analyzedResult, { name: stockName, symbol }) => {
   const stockData = parse(stockName);
   const startingDay = 40; // choose according to strategy
-  const stock = new StockSimulator(stockData, startingDay);
+  const stock = new StockFeedSimulator(stockData, startingDay);
   const capital = 100000;
   const riskFactor = 0.05;
   const strategy = new STRATEGY(stock, capital, riskFactor, persistTrades(stockName));

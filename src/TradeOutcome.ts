@@ -1,5 +1,5 @@
 import { ITradeOutcome } from "./ITradeOutcome";
-import { Day } from "./Stock";
+import { Day } from "./StockFeedSimulator";
 
 export class TradeOutcomes {
   private tradeResults: ITradeOutcome[] = [];

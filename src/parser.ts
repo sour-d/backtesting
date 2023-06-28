@@ -2,22 +2,8 @@ import * as Papa from "papaparse";
 import * as fs from "fs";
 
 const CONFIG: Papa.ParseConfig = {
-  delimiter: ",", // auto-detect
-  newline: "\n", // auto-detect
-  quoteChar: '"',
-  escapeChar: '"',
   header: true,
-  transformHeader: undefined,
   dynamicTyping: true,
-  preview: 0,
-  comments: false,
-  step: undefined,
-  complete: undefined,
-  skipEmptyLines: false,
-  fastMode: undefined,
-  beforeFirstChunk: undefined,
-  transform: undefined,
-  delimitersToGuess: [",", "\t", "|", ";", Papa.RECORD_SEP, Papa.UNIT_SEP],
 };
 
 interface Stock {

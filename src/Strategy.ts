@@ -1,16 +1,16 @@
 import { ITradeOutcome } from "./ITradeOutcome";
-import { Day, StockSimulator } from "./Stock";
+import { Day, StockFeedSimulator } from "./StockFeedSimulator";
 import { TradeOutcomes } from "./TradeOutcome";
 
 class Strategy {
-  stock: StockSimulator;
+  stock: StockFeedSimulator;
   capital: number;
   riskPercentage: number;
   trades: TradeOutcomes;
   persistTradesFn: Function;
 
   constructor(
-    stock: StockSimulator,
+    stock: StockFeedSimulator,
     capital: number,
     riskPercentage: number,
     persistTradesFn: Function

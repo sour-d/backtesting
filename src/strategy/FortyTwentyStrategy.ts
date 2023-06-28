@@ -1,10 +1,10 @@
-import { StockSimulator } from "../Stock";
+import { StockFeedSimulator } from "../StockFeedSimulator";
 import { Strategy } from "../Strategy";
 import { ITradeOutcome } from "../ITradeOutcome";
 
 class FortyTwentyStrategy extends Strategy {
   constructor(
-    stock: StockSimulator,
+    stock: StockFeedSimulator,
     capital: number,
     riskPercentage: number,
     persistTradesFn: Function
