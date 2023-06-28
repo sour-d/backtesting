@@ -1,10 +1,10 @@
-class StockSimulator {
+class StockFeedSimulator {
   #pastData;
   #currentDayIndex;
 
-  constructor(data, currentDay = 1) {
+  constructor(data, startingQuoteDay = 1) {
     this.#pastData = data;
-    this.#currentDayIndex = currentDay - 1;
+    this.#currentDayIndex = startingQuoteDay - 1;
   }
 
   hasData() {
@@ -24,7 +24,7 @@ class StockSimulator {
 
   dataOfLast(days) {
     const data = this.#pastData.slice(0, this.#currentDayIndex).slice(-days);
-    return new StockSimulator(data);
+    return new StockFeedSimulator(data);
   }
 
   highOfLast(days) {
@@ -65,4 +65,4 @@ class StockSimulator {
   }
 }
 
-module.exports = { StockSimulator };
+module.exports = { StockFeedSimulator };
