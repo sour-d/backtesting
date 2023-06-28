@@ -1,7 +1,7 @@
 // Import starts
 const fs = require('fs');
 const symbolList = require("./symbolList.json");
-const { parse } = require("./build/parser.js");
+const { parseQuotes } = require("./build/parser.js");
 const { StockFeedSimulator } = require("./build/StockFeedSimulator.js");
 const {
   FortyTwentyStrategy,
@@ -20,7 +20,7 @@ const persistTrades = (stockName) => (data) => {
 
 // Main logic to get the result
 const runStrategy = (analyzedResult, { name: stockName, symbol }) => {
-  const stockData = parse(stockName);
+  const stockData = parseQuotes(stockName);
   const startingDay = 40; // choose according to strategy
   const stock = new StockFeedSimulator(stockData, startingDay);
   const capital = 100000;

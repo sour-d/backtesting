@@ -10,21 +10,18 @@ interface Stock {
   Date: Date;
 }
 
-const parse = (filename: string): Stock[] => {
+const parseQuotes = (filename: string): Stock[] => {
   const CSVString = fs.readFileSync(`./data/${filename}.csv`, "utf8");
 
-  let { data, errors } = Papa.parse(CSVString, CONFIG);
+  let { data : quotes, errors } = Papa.parse(CSVString, CONFIG);
 
-  data = data.map((stock: Stock) => {
-    stock.Date = new Date(stock.Date);
-    return stock;
-  });
+  quotes.forEach((quote: Stock) => quote.Date = new Date(quote.Date));
 
   if (errors.length > 0) {
     throw new Error("Failed to parse: " + { cause: errors });
   }
 
-  return data;
+  return quotes;
 };
 
-export { parse };
+export { parseQuotes };
