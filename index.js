@@ -1,14 +1,11 @@
 // Import starts
 const fs = require('fs');
-const symbolList = require("./src/symbolList.json");
-const { parse } = require("./src/parser.js");
-const { StockSimulator } = require("./src/Stock.js");
+const symbolList = require("./symbolList.json");
+const { parse } = require("./build/parser.js");
+const { StockSimulator } = require("./build/Stock.js");
 const {
   FortyTwentyStrategy,
-} = require("./src/strategy/FortyTwentyStrategy.js");
-const {
-  MovingAverageStrategy,
-} = require("./src/strategy/MovingAverageStrategy.js");
+} = require("./build/strategy/FortyTwentyStrategy.js");
 const { table } = require("console");
 // Import ends
 
