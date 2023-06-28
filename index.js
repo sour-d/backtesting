@@ -1,7 +1,7 @@
 // Import starts
 const fs = require('fs');
 const symbolList = require("./src/symbolList.json");
-const { parse } = require("./src/parser.js");
+const { parseQuotes } = require("./src/parser.js");
 const { StockSimulator } = require("./src/Stock.js");
 const { FortyTwentyStrategy } = require("./src/strategy/FortyTwentyStrategy.js");
 const { MovingAverageStrategy } = require("./src/strategy/MovingAverageStrategy.js");
@@ -20,7 +20,7 @@ const persistTrades = (stockName) => (data) => {
 
 // Main logic to get the result
 const runStrategy = (analyzedResult, { name: stockName, symbol }) => {
-  const stockData = parse(stockName);
+  const stockData = parseQuotes(stockName);
   const startingDay = 40; // choose according to strategy
   const stock = new StockSimulator(stockData, startingDay);
   const capital = 100000;
@@ -39,20 +39,24 @@ const runStrategy = (analyzedResult, { name: stockName, symbol }) => {
   return analyzedResult;
 };
 
-Object.keys(symbolList).forEach((categoryName) => {
-  console.log(categoryName);
-  const category = symbolList[categoryName];
-  const totalSymbol = category.length;
-  const categoryResult = category.reduce(
-    (analyzedResult, x) => runStrategy(analyzedResult, x),
-    { totalExpectancy: 0, totalReturn: 0 });
+const main = () => {
+  Object.keys(symbolList).forEach((categoryName) => {
+    console.log(categoryName);
+    const category = symbolList[categoryName];
+    const totalSymbol = category.length;
+    const categoryResult = category.reduce(
+      (analyzedResult, x) => runStrategy(analyzedResult, x),
+      { totalExpectancy: 0, totalReturn: 0 });
   
-  categoryResult.averages = {};
-  categoryResult.averages.averageExpectancy = categoryResult.totalExpectancy / totalSymbol;
-  categoryResult.averages.averageReturn = categoryResult.totalReturn / totalSymbol;
+    categoryResult.averages = {};
+    categoryResult.averages.averageExpectancy = categoryResult.totalExpectancy / totalSymbol;
+    categoryResult.averages.averageReturn = categoryResult.totalReturn / totalSymbol;
 
-  delete categoryResult.totalExpectancy;
-  delete categoryResult.totalReturn;
+    delete categoryResult.totalExpectancy;
+    delete categoryResult.totalReturn;
   
-  table(categoryResult);
-});
+    table(categoryResult);
+  });
+};
+
+main();
