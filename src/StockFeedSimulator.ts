@@ -8,34 +8,34 @@ interface Quote {
 
 class StockFeedSimulator {
   #quotes: Quote[];
-  #currentDayIndex: number;
+  #currentQuoteIndex: number;
 
   constructor(data: Quote[], startingQuoteDay: number = 1) {
     if (data.length < 1) {
       throw new Error("Data must be at least 1 day long for stock simulator");
     }
     this.#quotes = data;
-    this.#currentDayIndex = startingQuoteDay - 1;
+    this.#currentQuoteIndex = startingQuoteDay - 1;
   }
 
   hasData(): boolean {
-    return this.#quotes.length - 1 > this.#currentDayIndex;
+    return this.#quotes.length - 1 > this.#currentQuoteIndex;
   }
 
-  today(): Quote {
-    return this.#quotes[this.#currentDayIndex];
+  now(): Quote {
+    return this.#quotes[this.#currentQuoteIndex];
   }
 
-  nextDay(): Quote | undefined {
+  move(): Quote | undefined {
     if (this.hasData()) {
-      this.#currentDayIndex++;
-      return this.today();
+      this.#currentQuoteIndex++;
+      return this.now();
     }
   }
 
   dataOfLast(days: number): StockFeedSimulator {
     const data: any[] = this.#quotes
-      .slice(0, this.#currentDayIndex)
+      .slice(0, this.#currentQuoteIndex)
       .slice(-days);
     return new StockFeedSimulator(data);
   }
@@ -43,10 +43,10 @@ class StockFeedSimulator {
   highOfLast(days: number): Quote {
     const stock: StockFeedSimulator = this.dataOfLast(days);
 
-    let highestDay: any = stock.today();
-    while (stock.nextDay()) {
-      if (stock.today().High > highestDay.High) {
-        highestDay = stock.today();
+    let highestDay: any = stock.now();
+    while (stock.move()) {
+      if (stock.now().High > highestDay.High) {
+        highestDay = stock.now();
       }
     }
 
@@ -56,10 +56,10 @@ class StockFeedSimulator {
   lowOfLast(days: number): Quote {
     const stock: StockFeedSimulator = this.dataOfLast(days);
 
-    let lowestDay: Quote = stock.today();
-    while (stock.nextDay()) {
-      if (stock.today().Low < lowestDay.Low) {
-        lowestDay = stock.today();
+    let lowestDay: Quote = stock.now();
+    while (stock.move()) {
+      if (stock.now().Low < lowestDay.Low) {
+        lowestDay = stock.now();
       }
     }
 
@@ -69,9 +69,9 @@ class StockFeedSimulator {
   simpleMovingAverage(days: number): number {
     const stock: StockFeedSimulator = this.dataOfLast(days);
 
-    let sumOfDayCloses: number = this.today().Close;
-    while (stock.nextDay()) {
-      sumOfDayCloses += stock.today().Close;
+    let sumOfDayCloses: number = this.now().Close;
+    while (stock.move()) {
+      sumOfDayCloses += stock.now().Close;
     }
     return sumOfDayCloses / days;
   }

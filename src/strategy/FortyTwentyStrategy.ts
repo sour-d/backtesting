@@ -13,14 +13,14 @@ class FortyTwentyStrategy extends Strategy {
   }
 
   protected override checkForStopLossHit(): Quote {
-    while (this.stock.nextDay()) {
-      const today = this.stock.today();
+    while (this.stock.move()) {
+      const today = this.stock.now();
       const lastTwentyDayLow = this.stock.lowOfLast(20);
       if (today.Low <= lastTwentyDayLow.Low) {
         return today;
       }
     }
-    return this.stock.today();
+    return this.stock.now();
   }
 
   private isHighBroken(today: Quote, highestDay: Quote): boolean {
@@ -28,7 +28,7 @@ class FortyTwentyStrategy extends Strategy {
   }
 
   protected override trade(): void {
-    const buyingDay = this.stock.today();
+    const buyingDay = this.stock.now();
     const initialStopLoss = this.stock.lowOfLast(20).Low;
     const sellingDay = this.checkForStopLossHit();
 
@@ -41,8 +41,8 @@ class FortyTwentyStrategy extends Strategy {
 
   public override execute(): ITradeOutcome[] {
     const tradeOutcomes: ITradeOutcome[] = [];
-    while (this.stock.nextDay()) {
-      const today = this.stock.today();
+    while (this.stock.move()) {
+      const today = this.stock.now();
       const lastFortyDayHigh = this.stock.highOfLast(40);
 
       if (this.isHighBroken(today, lastFortyDayHigh)) this.trade();

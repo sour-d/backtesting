@@ -1,6 +1,6 @@
 import { ITradeOutcome } from "./ITradeOutcome";
 import { Quote, StockFeedSimulator } from "./StockFeedSimulator";
-import { TradeOutcomes } from "./TradeOutcome";
+import { TradeOutcomes } from "./TradeOutcomes";
 
 class Strategy {
   stock: StockFeedSimulator;
