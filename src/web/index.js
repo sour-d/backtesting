@@ -47,7 +47,7 @@ const createCategoryHeading = (categoryName) => {
 };
 
 const makeTable = () => {
-  fetch("/src/symbolList.json")
+  fetch("/symbolList.json")
     .then((res) => res.json())
     .then((symbolInfo) => {
       const tbody = document.getElementById("TradedResultTbody");

@@ -2,7 +2,7 @@ interface Quote {
   High: number;
   Low: number;
   Close: number;
-  Date: Date;
+  Date: string;
   Volume: number;
 }
 

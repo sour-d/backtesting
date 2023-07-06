@@ -62,8 +62,9 @@ export class TradeOutcomes {
     totalProfitOrLoss: number,
     capital: number
   ) {
-    const noOfMillis: number =
-      sellingDay.Date.getTime() - buyingDay.Date.getTime();
+    const buyingDate = new Date(buyingDay.Date);
+    const sellingDate = new Date(sellingDay.Date);
+    const noOfMillis: number = sellingDate.getTime() - buyingDate.getTime();
     const noOfYrs: number = noOfMillis / (1000 * 60 * 60 * 24 * 365);
     const returnPercentage: number =
       (totalProfitOrLoss * 100) / (capital * noOfYrs);
