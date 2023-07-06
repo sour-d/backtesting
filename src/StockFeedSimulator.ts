@@ -36,9 +36,14 @@ class StockFeedSimulator {
   }
 
   dataOfLast(days: number): StockFeedSimulator {
-    const data: any[] = this.#quotes
+    let data: any[] = this.#quotes.slice(0, this.#currentQuoteIndex);
+
+    if (days < this.#currentQuoteIndex) {
+      data = this.#quotes
       .slice(0, this.#currentQuoteIndex)
       .slice(-days);
+    }
+
     return new StockFeedSimulator(data);
   }
 
