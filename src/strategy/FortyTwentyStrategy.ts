@@ -1,6 +1,7 @@
 import { Quote, StockFeedSimulator } from "../StockFeedSimulator";
 import { Strategy } from "../Strategy";
 import { ITradeOutcome } from "../ITradeOutcome";
+import { Trades } from "../Trades";
 
 class FortyTwentyStrategy extends Strategy {
   constructor(
@@ -39,8 +40,7 @@ class FortyTwentyStrategy extends Strategy {
     this.updateTrades(buyingDay, sellingDay, initialStopLoss, totalStocks);
   }
 
-  public override execute(): ITradeOutcome[] {
-    const tradeOutcomes: ITradeOutcome[] = [];
+  public override execute(): Trades {
     while (this.stock.move()) {
       const today = this.stock.now();
       const lastFortyDayHigh = this.stock.highOfLast(40);
@@ -48,7 +48,7 @@ class FortyTwentyStrategy extends Strategy {
       if (this.isHighBroken(today, lastFortyDayHigh)) this.trade();
     }
     this.persistTradesFn(JSON.stringify(this.trades));
-    return tradeOutcomes;
+    return this.trades;
   }
 }
 

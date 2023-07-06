@@ -1,6 +1,7 @@
 import { ITradeOutcome } from "../ITradeOutcome";
 import { Quote, StockFeedSimulator } from "../StockFeedSimulator";
 import { Strategy } from "../Strategy";
+import { Trades } from "../Trades";
 
 const LOWER_LIMIT = 40;
 const UPPER_LIMIT = 200;
@@ -38,8 +39,7 @@ class MovingAverageStrategy extends Strategy {
     this.updateTrades(buyingDay, sellingDay, initialStopLoss, totalStocks);
   }
 
-  public override execute(): ITradeOutcome[] {
-    const tradeOutcomes: ITradeOutcome[] = [];
+  public override execute(): Trades {
     while (this.stock.hasData()) {
       const previousDayUpperLimitMA =
         this.stock.simpleMovingAverage(UPPER_LIMIT);
@@ -53,7 +53,7 @@ class MovingAverageStrategy extends Strategy {
       }
     }
     this.persistTradesFn(JSON.stringify(this.trades));
-    return tradeOutcomes;
+    return this.trades;
   }
 }
 

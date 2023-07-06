@@ -1,11 +1,12 @@
 import fs from "fs";
-// import { table } from "console";
+import { table } from "console";
 import { parseQuotes } from "./parser";
 import { StockFeedSimulator } from "./StockFeedSimulator";
 import { FortyTwentyStrategy } from "./strategy/FortyTwentyStrategy";
 import { MovingAverageStrategy } from "./strategy/MovingAverageStrategy";
+import { Trades } from "./Trades";
 
-const STRATEGY = MovingAverageStrategy;
+const STRATEGY = FortyTwentyStrategy;
 
 const persistTrades = (stockName: string) => (data: string) => {
   fs.writeFileSync(`result/${stockName}.json`, data, "utf-8");
@@ -23,34 +24,25 @@ const runStrategy = ({ name: stockName, symbol }: any) => {
     riskFactor,
     persistTrades(stockName)
   );
-  const aggregates = strategy.getExpectancy();
-  // analyzedResult[stockName] = {
-  //   averageExpectancy: aggregates.averageExpectancy,
-  //   averageReturn: aggregates.averageReturn,
-  // };
-  // analyzedResult.totalExpectancy += aggregates.averageExpectancy;
-  // analyzedResult.totalReturn += aggregates.averageReturn;
-  // return analyzedResult;
+  const outcomes: Trades = strategy.execute();
+  return {
+    averageExpectancy: outcomes.averageExpectancy(),
+    averageReturn: outcomes.averageReturn(),
+  };
 };
 
 const app = (symbolList: any) => {
+  console.log("Strategy used :", STRATEGY.name);
+
   Object.keys(symbolList).forEach((categoryName) => {
     console.log(categoryName);
-    const category = symbolList[categoryName];
-    category.forEach(runStrategy);
-    // const totalSymbol = category.length;
-    // const categoryResult = category.reduce(
-    //   (analyzedResult, x) => runStrategy(analyzedResult, x),
-    //   { totalExpectancy: 0, totalReturn: 0 }
-    // );
-    // categoryResult.averages = {};
-    // categoryResult.averages.averageExpectancy =
-    //   categoryResult.totalExpectancy / totalSymbol;
-    // categoryResult.averages.averageReturn =
-    //   categoryResult.totalReturn / totalSymbol;
-    // delete categoryResult.totalExpectancy;
-    // delete categoryResult.totalReturn;
-    // table(categoryResult);
+    const stockList = symbolList[categoryName];
+    const results: any = {};
+    stockList.forEach((stock: any) => {
+      const result = runStrategy(stock);
+      results[stock.name] = result;
+    });
+    table(results);
   });
 };
 

@@ -1,12 +1,12 @@
 import { ITradeOutcome } from "./ITradeOutcome";
 import { Quote, StockFeedSimulator } from "./StockFeedSimulator";
-import { TradeOutcomes } from "./TradeOutcomes";
+import { Trades } from "./Trades";
 
 class Strategy {
   stock: StockFeedSimulator;
   capital: number;
   riskPercentage: number;
-  trades: TradeOutcomes;
+  trades: Trades;
   persistTradesFn: Function;
 
   constructor(
@@ -19,7 +19,7 @@ class Strategy {
     this.capital = capital;
 
     this.riskPercentage = riskPercentage; // riskPercentage stored as fraction like 2/100, not 2%
-    this.trades = new TradeOutcomes();
+    this.trades = new Trades();
     this.persistTradesFn = persistTradesFn;
   }
 
@@ -43,26 +43,6 @@ class Strategy {
 
   getRisk(): number {
     return this.capital * this.riskPercentage;
-  }
-
-  getExpectancy(): { averageExpectancy: number; averageReturn: number } {
-    const tradeOutcomes = this.execute();
-    const totalCount = tradeOutcomes.length;
-    const aggregateExpectancy = tradeOutcomes.reduce(
-      (result, tradeOutcome) => {
-        result.totalExpectancy += tradeOutcome.riskMultiple;
-        result.totalReturn += tradeOutcome.returnPercentage;
-        return result;
-      },
-      { totalExpectancy: 0, totalReturn: 0 } as {
-        totalExpectancy: number;
-        totalReturn: number;
-      }
-    );
-    return {
-      averageExpectancy: aggregateExpectancy.totalExpectancy / totalCount,
-      averageReturn: aggregateExpectancy.totalReturn / totalCount,
-    };
   }
 
   protected updateTrades(
@@ -94,7 +74,7 @@ class Strategy {
     throw new Error("Method not implemented.");
   }
 
-  execute(): ITradeOutcome[] {
+  execute(): Trades {
     throw new Error("Method not implemented.");
   }
 }

@@ -1,27 +1,51 @@
 import { ITradeOutcome } from "./ITradeOutcome";
 import { Quote } from "./StockFeedSimulator";
 
-export class TradeOutcomes {
-  private tradeResults: ITradeOutcome[] = [];
+export class Trades {
+  private tradeResults: ITradeOutcome[];
 
-  public totalProfitLoss(): number {
+  constructor() {
+    this.tradeResults = [];
+  }
+
+  public totalTrades(): number {
+    return this.tradeResults.length;
+  }
+
+  private totalExpectancy(): number {
     return this.tradeResults.reduce(
-      (result, { totalProfitOrLoss }) => result + totalProfitOrLoss,
+      (result, { riskMultiple }) => result + riskMultiple,
       0
     );
   }
 
   public averageExpectancy(): number {
-    return this.totalProfitLoss() / this.tradeResults.length;
+    return this.totalExpectancy() / this.totalTrades();
   }
 
-  public averageReturn(): number {
-    const totalReturn = this.tradeResults.reduce(
+  private totalReturnPercentage(): number {
+    return this.tradeResults.reduce(
       (result, { returnPercentage }) => result + returnPercentage,
       0
     );
+  }
 
-    return totalReturn / this.tradeResults.length;
+  public averageReturn(): number {
+    return this.totalReturnPercentage() / this.totalTrades();
+  }
+
+  private returnPercentage(
+    sellingDay: Quote,
+    buyingDay: Quote,
+    totalProfitOrLoss: number,
+    capital: number
+  ) {
+    const buyingDate = new Date(buyingDay.Date);
+    const sellingDate = new Date(sellingDay.Date);
+    const noOfMilliseconds = sellingDate.getTime() - buyingDate.getTime();
+    const noOfYrs: number = noOfMilliseconds / (1000 * 60 * 60 * 24 * 365);
+    const returnPercentage = (totalProfitOrLoss * 100) / (capital * noOfYrs);
+    return returnPercentage;
   }
 
   public addTradeResult(
@@ -54,20 +78,5 @@ export class TradeOutcomes {
       oneStockProfitOrLoss,
       totalProfitOrLoss,
     });
-  }
-
-  private returnPercentage(
-    sellingDay: Quote,
-    buyingDay: Quote,
-    totalProfitOrLoss: number,
-    capital: number
-  ) {
-    const buyingDate = new Date(buyingDay.Date);
-    const sellingDate = new Date(sellingDay.Date);
-    const noOfMillis: number = sellingDate.getTime() - buyingDate.getTime();
-    const noOfYrs: number = noOfMillis / (1000 * 60 * 60 * 24 * 365);
-    const returnPercentage: number =
-      (totalProfitOrLoss * 100) / (capital * noOfYrs);
-    return returnPercentage;
   }
 }
