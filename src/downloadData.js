@@ -39,7 +39,7 @@ const getUNIXTime = (date) => {
 };
 
 const getEndPoint = (symbol) => {
-  const period1 = getUNIXTime(new Date("2000-01-01"));
+  const period1 = getUNIXTime(new Date("2005-01-01"));
   const period2 = getUNIXTime();
 
   const hostname = `https://query1.finance.yahoo.com`;
