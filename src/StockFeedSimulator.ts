@@ -1,9 +1,11 @@
 interface Quote {
+  Open: number;
   High: number;
   Low: number;
   Close: number;
   Date: string;
   Volume: number;
+  "Adj Close": number;
 }
 
 class StockFeedSimulator {
