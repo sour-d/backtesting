@@ -10,7 +10,7 @@ import { transformStockData } from "./restructureData";
 const STRATEGY = FortyTwentyStrategy;
 
 const persistTrades = (stockName: string) => (data: string) => {
-  fs.writeFileSync(`result/${stockName}.json`, data, "utf-8");
+  fs.writeFileSync(`result/${stockName}.csv`, data, "utf-8");
 };
 
 const runStrategy = ({ name: stockName, symbol }: any) => {

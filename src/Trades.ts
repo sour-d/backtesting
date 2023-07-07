@@ -79,4 +79,26 @@ export class Trades {
       totalProfitOrLoss,
     });
   }
+
+  public toCSV(): string {
+    const headers = [
+      "Buying Date",
+      "Buying Price",
+      "Selling Date",
+      "Selling Price",
+      "Total Stocks",
+    ];
+    const tradesCSV = this.tradeResults.map((trade) => {
+      const row = [
+        new Date(trade.buyingDay.Date).toLocaleDateString(),
+        trade.buyingDay.High,
+        new Date(trade.sellingDay.Date).toLocaleDateString(),
+        trade.sellingDay.Low,
+        trade.totalStocks,
+      ];
+      return row.join(",");
+    });
+
+    return headers.join(",") + "\n" + tradesCSV.join("\n");
+  }
 }

@@ -16,7 +16,7 @@ const parseQuotes = (filename: string): Quote[] => {
 
   let { data: quotes, errors } = Papa.parse(CSVString, CONFIG);
 
-  quotes.forEach((quote: Stock) => quote.Date = new Date(quote.Date));
+  // quotes.forEach((quote: Stock) => quote.Date = new Date(quote.Date));
 
   if (errors.length > 0) {
     throw new Error("Failed to parse: " + errors[0].message );

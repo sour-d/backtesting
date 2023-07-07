@@ -47,7 +47,7 @@ class FortyTwentyStrategy extends Strategy {
 
       if (this.isHighBroken(today, lastFortyDayHigh)) this.trade();
     }
-    this.persistTradesFn(JSON.stringify(this.trades));
+    this.persistTradesFn(this.trades.toCSV());
     return this.trades;
   }
 }
