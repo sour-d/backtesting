@@ -1,12 +1,5 @@
 import { Quote } from "../StockFeedSimulator";
-
-const dataOfLast = (quotes: Quote[], days: number): Quote[] => {
-  if (quotes.length <= days) {
-    return quotes;
-  }
-
-  return quotes.slice(-days);
-};
+import { dataOfLast } from "./utils";
 
 const highOfLast = (quotes: Quote[], days: number): number => {
   const lastNDayQuotes: Quote[] = dataOfLast(quotes, days);

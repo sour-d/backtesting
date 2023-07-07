@@ -1,6 +1,7 @@
 import { Quote, StockFeedSimulator } from "./StockFeedSimulator";
 import { parseQuotes } from "./parser";
 import { highOfLast } from "./technical/nDaysHigh";
+import { lowOfLast } from "./technical/nDaysLow";
 
 interface TechnicalQuote {
   Open: number;
@@ -11,6 +12,7 @@ interface TechnicalQuote {
   Volume: number;
   "Adj Close": number;
   "FortyDayHigh": number;
+  "TwentyDayLow": number;
 }
 
 const removeNulls = (quotes: Quote[]) => {
@@ -24,7 +26,13 @@ const addTechnicalData = (processedData: Quote[]) => {
   while (processedData.length !== 0) {
     const currentQuote = processedData[processedData.length - 1];
     const fortyDayHigh = highOfLast(processedData, 40);
-    const quote: TechnicalQuote = { ...currentQuote, FortyDayHigh: fortyDayHigh };
+    const twentyDayLow = lowOfLast(processedData, 20);
+    const quote: TechnicalQuote = {
+      ...currentQuote,
+      FortyDayHigh: fortyDayHigh,
+      TwentyDayLow: twentyDayLow
+    };
+
     technicalData.push(quote);
     processedData.pop();
   }

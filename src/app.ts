@@ -5,6 +5,7 @@ import { StockFeedSimulator } from "./StockFeedSimulator";
 import { FortyTwentyStrategy } from "./strategy/FortyTwentyStrategy";
 import { MovingAverageStrategy } from "./strategy/MovingAverageStrategy";
 import { Trades } from "./Trades";
+import { transformStockData } from "./restructureData";
 
 const STRATEGY = FortyTwentyStrategy;
 
@@ -14,6 +15,7 @@ const persistTrades = (stockName: string) => (data: string) => {
 
 const runStrategy = ({ name: stockName, symbol }: any) => {
   const stockData = parseQuotes(stockName);
+  // const stockData = transformStockData(stockName);
   const startingDay = 40;
   const stock = new StockFeedSimulator(stockData, startingDay);
   const capital = 100000;
