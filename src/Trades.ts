@@ -1,3 +1,4 @@
+import Papa from "papaparse";
 import { ITradeOutcome } from "./ITradeOutcome";
 import { Quote } from "./StockFeedSimulator";
 
@@ -81,24 +82,14 @@ export class Trades {
   }
 
   public toCSV(): string {
-    const headers = [
-      "Buying Date",
-      "Buying Price",
-      "Selling Date",
-      "Selling Price",
-      "Total Stocks",
-    ];
-    const tradesCSV = this.tradeResults.map((trade) => {
-      const row = [
-        new Date(trade.buyingDay.Date).toLocaleDateString(),
-        trade.buyingDay.High,
-        new Date(trade.sellingDay.Date).toLocaleDateString(),
-        trade.sellingDay.Low,
-        trade.totalStocks,
-      ];
-      return row.join(",");
-    });
+    const tradesCSV = this.tradeResults.map((trade) => ({
+      "Buying Date": new Date(trade.buyingDay.Date).toLocaleDateString(),
+      "Buying Price": trade.buyingDay.High,
+      "Selling Date": new Date(trade.sellingDay.Date).toLocaleDateString(),
+      "Selling Price": trade.sellingDay.Low,
+      "Total Stocks": trade.totalStocks,
+    }));
 
-    return headers.join(",") + "\n" + tradesCSV.join("\n");
+    return Papa.unparse(tradesCSV);
   }
 }
