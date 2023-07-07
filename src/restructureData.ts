@@ -1,5 +1,6 @@
 import { Quote, StockFeedSimulator } from "./StockFeedSimulator";
 import { parseQuotes } from "./parser";
+import { movingAverageOf } from "./technical/nDayMA";
 import { highOfLast } from "./technical/nDaysHigh";
 import { lowOfLast } from "./technical/nDaysLow";
 
@@ -13,6 +14,8 @@ interface TechnicalQuote {
   "Adj Close": number;
   "FortyDayHigh": number;
   "TwentyDayLow": number;
+  "FortyDayMA": number;
+  "TwoHundredDayMA": number;
 }
 
 const removeNulls = (quotes: Quote[]) => {
@@ -27,15 +30,20 @@ const addTechnicalData = (processedData: Quote[]) => {
     const currentQuote = processedData[processedData.length - 1];
     const fortyDayHigh = highOfLast(processedData, 40);
     const twentyDayLow = lowOfLast(processedData, 20);
+    const fortyDayMA = movingAverageOf(processedData, 40);
+    const twoHundredDayMA = movingAverageOf(processedData, 200);
     const quote: TechnicalQuote = {
       ...currentQuote,
       FortyDayHigh: fortyDayHigh,
-      TwentyDayLow: twentyDayLow
+      TwentyDayLow: twentyDayLow,
+      FortyDayMA: fortyDayMA,
+      TwoHundredDayMA: twoHundredDayMA
     };
 
     technicalData.push(quote);
     processedData.pop();
   }
+  
   return technicalData;
 };
 
