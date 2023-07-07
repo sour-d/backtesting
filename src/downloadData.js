@@ -20,7 +20,7 @@ const onReceivingData = (res, name, isHeaderNeeded) => {
   if (!isHeaderNeeded) {
     data = '\n' + res.data.split('\n').slice(2).join('\n');
   }
-  
+
   writeIntoFile(`./${DIR_PATH}/${name}.csv`, data);
 };
 
@@ -37,10 +37,10 @@ const getDateAndHeaderInfo = (name) => {
   try {
     data = fs.readFileSync(`./${DIR_PATH}/${name}.csv`, { encoding: "utf-8" });
   } catch (error) {
-    return { date : "2005-01-01", isHeaderNeeded: true };
+    return { date: "2005-01-01", isHeaderNeeded: true };
   }
 
-  const lastDate = data.split('\n').slice(-1)[0].slice(0,10);
+  const lastDate = data.split('\n').slice(-1)[0].slice(0, 10);
   return { date: lastDate, isHeaderNeeded: false };
 };
 
@@ -61,7 +61,8 @@ const downloadData = () => {
           interval: "1d",
           period1: period1,
           period2: period2
-      }})
+        }
+      })
         .then(res => onReceivingData(res, name, isHeaderNeeded))
         .catch(res => onReceivingError(name))
         .finally(res => console.log(`${name} download complete`));

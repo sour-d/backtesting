@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx tsc && node index.js",
-    "setup": "npm install; rm -rf ./data ./result; mkdir data && mkdir result; brew install serve",
+    "setup": "npm install; rm -rf ./data ./result ./technicalData; mkdir data technicalData result; brew install serve",
     "download": "node src/downloadData.js",
     "clean": "rm -rf ./data/* ./result/*",
     "serve": "npx http-server  --no-dotfiles -a 'localhost' -o 'src/web'"

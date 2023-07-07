@@ -14,8 +14,8 @@ const persistTrades = (stockName: string) => (data: string) => {
 };
 
 const runStrategy = ({ name: stockName, symbol }: any) => {
-  const stockData = parseQuotes(stockName);
-  // const stockData = transformStockData(stockName);
+  const stockData = transformStockData(stockName);
+
   const startingDay = 40;
   const stock = new StockFeedSimulator(stockData, startingDay);
   const capital = 100000;
