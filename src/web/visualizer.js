@@ -2,7 +2,17 @@ const searchQueryString = location.search;
 const searchQuery = new URLSearchParams(searchQueryString);
 const stockName = decodeURI(searchQuery.get("name"));
 
-const drawProfitLossChart = async () => {
+const downloadData = async () => {
+  const response = await fetch(`/result/${stockName}.csv`);
+  const rawTrades = await response.text();
+  const trades = Papa.parse(rawTrades, {
+    header: true,
+    dynamicTyping: true,
+  });
+  return trades.data;
+};
+
+const drawProfitLossChart = async (trades) => {
   var chartData = {
     title: {
       text: "Profit or Loss on each trade",
@@ -16,14 +26,14 @@ const drawProfitLossChart = async () => {
     encoding: {
       x: { field: "buyingDate", type: "ordinal", title: "Buying Date" },
       y: {
-        field: "totalProfitOrLoss",
+        field: "profitOrLoss",
         type: "quantitative",
         title: "Profit Or Loss",
       },
       tooltip: [
         { field: "buyingDate", type: "ordinal", title: "Buying Date" },
         {
-          field: "totalProfitOrLoss",
+          field: "profitOrLoss",
           type: "quantitative",
           title: "Profit Or Loss",
         },
@@ -37,26 +47,20 @@ const drawProfitLossChart = async () => {
     },
   };
 
-  const data = await fetch(`/result/${stockName}.json`)
-    .then((res) => res.json())
-    .then((res) => {
-      return res.map(
-        ({ buyingDay, totalProfitOrLoss, sellingDay, totalStocks }) =>
-          new Object({
-            buyingDate: dayjs(buyingDay.Date).format("YYYY-MM-DD"),
-            totalProfitOrLoss,
-            sellingDate: dayjs(sellingDay.Date).format("YYYY-MM-DD"),
-            transactionAmount: totalStocks * buyingDay.High,
-          })
-      );
-    });
+  const data = trades.map((trade) => ({
+    buyingDate: dayjs(trade["Buying Date"]).format("YYYY-MM-DD"),
+    sellingDate: dayjs(trade["Selling Date"]).format("YYYY-MM-DD"),
+    profitOrLoss:
+      (trade["Selling Price"] - trade["Buying Price"]) * trade["Total Stocks"],
+    transactionAmount: trade["Total Stocks"] * trade["Buying Price"],
+  }));
 
   chartData.data = { values: data };
 
   vegaEmbed("#graph1", chartData);
 };
 
-const drawTotalProfitOverTime = async () => {
+const drawTotalProfitOverTime = async (trades) => {
   const chartData = {
     title: {
       text: "Total Profit or Loss over time",
@@ -68,14 +72,14 @@ const drawTotalProfitOverTime = async () => {
     encoding: {
       x: { field: "date", type: "ordinal", title: "Date" },
       y: {
-        field: "totalProfitOrLoss",
+        field: "profitOrLoss",
         type: "quantitative",
         title: "Total Profit Or Loss",
       },
       tooltip: [
         { field: "date", type: "ordinal", title: "Selling Date" },
         {
-          field: "totalProfitOrLoss",
+          field: "profitOrLoss",
           type: "quantitative",
           title: "Total Profit or Loss",
         },
@@ -84,21 +88,24 @@ const drawTotalProfitOverTime = async () => {
   };
 
   const data = [];
-  await fetch(`/result/${stockName}.json`)
-    .then((res) => res.json())
-    .then((res) => {
-      res.reduce((total, { sellingDay, totalProfitOrLoss }) => {
-        data.push({
-          date: dayjs(sellingDay.Date).format("YYYY-MM-DD"),
-          totalProfitOrLoss: total,
-        });
-        return total + totalProfitOrLoss;
-      }, 0);
+  trades.reduce((total, trade) => {
+    const profitOrLoss =
+      (trade["Selling Price"] - trade["Buying Price"]) * trade["Total Stocks"];
+    data.push({
+      date: dayjs(trade["Buying Date"]).format("YYYY-MM-DD"),
+      profitOrLoss: total + profitOrLoss,
     });
+    return total + profitOrLoss;
+  }, 0);
 
   chartData.data = { values: data };
   vegaEmbed("#graph2", chartData);
 };
 
-drawProfitLossChart();
-drawTotalProfitOverTime();
+const main = async () => {
+  const trades = await downloadData();
+  drawProfitLossChart(trades);
+  drawTotalProfitOverTime(trades);
+};
+
+main();

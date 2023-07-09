@@ -7,7 +7,7 @@ import { MovingAverageStrategy } from "./strategy/MovingAverageStrategy";
 import { Trades } from "./Trades";
 import { transformStockData } from "./restructureData";
 
-const STRATEGY = FortyTwentyStrategy;
+const STRATEGY = MovingAverageStrategy;
 
 const persistTrades = (stockName: string) => (data: string) => {
   fs.writeFileSync(`result/${stockName}.csv`, data, "utf-8");

@@ -1,6 +1,7 @@
 import Papa from "papaparse";
 import { ITradeOutcome } from "./ITradeOutcome";
 import { Quote } from "./StockFeedSimulator";
+import dayjs, { Dayjs } from "dayjs";
 
 export class Trades {
   private tradeResults: ITradeOutcome[];
@@ -83,9 +84,9 @@ export class Trades {
 
   public toCSV(): string {
     const tradesCSV = this.tradeResults.map((trade) => ({
-      "Buying Date": new Date(trade.buyingDay.Date).toLocaleDateString(),
+      "Buying Date": dayjs(trade.buyingDay.Date).format("YYYY-MM-DD"),
       "Buying Price": trade.buyingDay.High,
-      "Selling Date": new Date(trade.sellingDay.Date).toLocaleDateString(),
+      "Selling Date": dayjs(trade.sellingDay.Date).format("YYYY-MM-DD"),
       "Selling Price": trade.sellingDay.Low,
       "Total Stocks": trade.totalStocks,
     }));
