@@ -5,6 +5,7 @@ import { highOfLast } from "./technical/nDaysHigh";
 import { lowOfLast } from "./technical/nDaysLow";
 import Papa from "papaparse";
 import * as fs from "fs";
+import candleStick from "./technical/candleStick";
 
 interface TechnicalQuote {
   Open: number;
@@ -18,6 +19,9 @@ interface TechnicalQuote {
   "TwentyDayLow": number;
   "FortyDayMA": number;
   "TwoHundredDayMA": number;
+  "UpperWick": number;
+  "LowerWick": number;
+  "CandleBody": number;
 }
 
 const removeNulls = (quotes: Quote[]) => {
@@ -33,10 +37,9 @@ const addTechnicalData = (processedData: Quote[]) => {
 
   while (processedData.length !== 0) {
     const currentQuote = processedData[processedData.length - 1];
-    const technicalFields = calculateTechnicals(processedData);
+    const technicalFields = calculateTechnicals(processedData, currentQuote);
     
-    const quote: TechnicalQuote = {...currentQuote, ...technicalFields
-    };
+    const quote: TechnicalQuote = {...currentQuote, ...technicalFields };
 
     technicalData.push(quote);
     processedData.pop();
@@ -52,12 +55,15 @@ const writeTechnicalData = (filename: string, technicalData: Quote[]) => {
   fs.writeFileSync(path, data, { flag: 'a', encoding: 'utf8' });
 }
 
-const calculateTechnicals = (processedData: Quote[]) => {
+const calculateTechnicals = (processedData: Quote[], currentQuote: Quote) => {
   const FortyDayHigh = highOfLast(processedData, 40);
   const TwentyDayLow = lowOfLast(processedData, 20);
   const FortyDayMA = trimToDec(movingAverageOf(processedData, 40));
   const TwoHundredDayMA = trimToDec(movingAverageOf(processedData, 200));
-  return { FortyDayHigh, TwentyDayLow, FortyDayMA, TwoHundredDayMA };
+  const UpperWick = trimToDec(candleStick.calcUpperWickValue(currentQuote));
+  const LowerWick = trimToDec(candleStick.calcLowerWickValue(currentQuote));
+  const CandleBody = trimToDec(candleStick.calcCandleBodyValue(currentQuote));
+  return { FortyDayHigh, TwentyDayLow, FortyDayMA, TwoHundredDayMA, UpperWick, LowerWick, CandleBody };
 }
 
 const transformStockData = (filename: string) => {
