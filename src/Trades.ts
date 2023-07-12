@@ -2,6 +2,7 @@ import Papa from "papaparse";
 import { ITradeOutcome } from "./ITradeOutcome";
 import { Quote } from "./StockFeedSimulator";
 import dayjs, { Dayjs } from "dayjs";
+import { TechnicalQuote } from "./restructureData";
 
 export class Trades {
   private tradeResults: ITradeOutcome[];
@@ -37,8 +38,8 @@ export class Trades {
   }
 
   private returnPercentage(
-    sellingDay: Quote,
-    buyingDay: Quote,
+    sellingDay: TechnicalQuote,
+    buyingDay: TechnicalQuote,
     totalProfitOrLoss: number,
     capital: number
   ) {
@@ -51,8 +52,8 @@ export class Trades {
   }
 
   public addTradeResult(
-    buyingDay: Quote,
-    sellingDay: Quote,
+    buyingDay: TechnicalQuote,
+    sellingDay: TechnicalQuote,
     initialStopLoss: number,
     totalStocks: number,
     risk: number,

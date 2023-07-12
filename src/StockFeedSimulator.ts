@@ -1,3 +1,5 @@
+import { TechnicalQuote } from "./restructureData";
+
 interface Quote {
   Open: number;
   High: number;
@@ -9,10 +11,10 @@ interface Quote {
 }
 
 class StockFeedSimulator {
-  #quotes: Quote[];
+  #quotes: TechnicalQuote[];
   #currentQuoteIndex: number;
 
-  constructor(data: Quote[], startingQuoteDay: number = 1) {
+  constructor(data: TechnicalQuote[], startingQuoteDay: number = 1) {
     if (data.length < 1) {
       throw new Error("Data must be at least 1 day long for stock simulator");
     }
@@ -24,11 +26,11 @@ class StockFeedSimulator {
     return this.#quotes.length - 1 > this.#currentQuoteIndex;
   }
 
-  now(): Quote {
+  now(): TechnicalQuote {
     return this.#quotes[this.#currentQuoteIndex];
   }
 
-  move(): Quote | undefined {
+  move(): TechnicalQuote | undefined {
     if (this.hasData()) {
       this.#currentQuoteIndex++;
       return this.now();
@@ -47,7 +49,7 @@ class StockFeedSimulator {
     return new StockFeedSimulator(data);
   }
 
-  highOfLast(days: number): Quote {
+  highOfLast(days: number): TechnicalQuote {
     const stock: StockFeedSimulator = this.dataOfLast(days);
 
     let highestDay: any = stock.now();
@@ -60,10 +62,10 @@ class StockFeedSimulator {
     return highestDay;
   }
 
-  lowOfLast(days: number): Quote {
+  lowOfLast(days: number): TechnicalQuote {
     const stock: StockFeedSimulator = this.dataOfLast(days);
 
-    let lowestDay: Quote = stock.now();
+    let lowestDay: TechnicalQuote = stock.now();
     while (stock.move()) {
       if (stock.now().Low < lowestDay.Low) {
         lowestDay = stock.now();

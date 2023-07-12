@@ -1,7 +1,7 @@
-import { ITradeOutcome } from "../ITradeOutcome";
-import { Quote, StockFeedSimulator } from "../StockFeedSimulator";
+import { StockFeedSimulator } from "../StockFeedSimulator";
 import { Strategy } from "../Strategy";
 import { Trades } from "../Trades";
+import { TechnicalQuote } from "../restructureData";
 
 const LOWER_LIMIT = 40;
 const UPPER_LIMIT = 200;
@@ -16,7 +16,7 @@ class MovingAverageStrategy extends Strategy {
     super(stock, capital, riskPercentage, persistTradesFn);
   }
 
-  protected override checkForStopLossHit(): Quote {
+  protected override checkForStopLossHit(): TechnicalQuote {
     while (this.stock.move()) {
       const today = this.stock.now();
       const fortyDayMA = this.stock.simpleMovingAverage(LOWER_LIMIT);

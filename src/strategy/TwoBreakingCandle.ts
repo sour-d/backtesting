@@ -1,9 +1,9 @@
-import { Quote, StockFeedSimulator } from "../StockFeedSimulator";
+import { StockFeedSimulator } from "../StockFeedSimulator";
 import { Strategy } from "../Strategy";
 import { Trades } from "../Trades";
 import { TechnicalQuote } from "../restructureData";
 
-class FortyTwentyStrategy extends Strategy {
+class TwoBreakingCandle extends Strategy {
   constructor(
     stock: StockFeedSimulator,
     capital: number,
@@ -14,42 +14,49 @@ class FortyTwentyStrategy extends Strategy {
   }
 
   protected override checkForStopLossHit(): TechnicalQuote {
+    let yesterday = this.stock.now();
     while (this.stock.move()) {
       const today = this.stock.now();
-      const lastTwentyDayLow = this.stock.lowOfLast(20);
-      if (today.Low <= lastTwentyDayLow.Low) {
+      if (today.Low <= yesterday.Low) {
         return today;
       }
     }
     return this.stock.now();
   }
 
-  private isHighBroken(today: Quote, highestDay: Quote): boolean {
-    return today.High > highestDay.High;
-  }
-
   protected override trade(): void {
+    const breakingDay = this.stock.now();
+    this.stock.move();
     const buyingDay = this.stock.now();
-    const initialStopLoss = this.stock.lowOfLast(20).Low;
-    const sellingDay = this.checkForStopLossHit();
-
+    const initialStopLoss = breakingDay.Low;
     const riskForOneStock = buyingDay.High - initialStopLoss;
+    
+    if (riskForOneStock <= 0) {
+      return;
+    }
+
+    const sellingDay = this.checkForStopLossHit();
     const totalStocks = this.getTotalStocks(riskForOneStock, buyingDay.High);
 
     // store result
     this.updateTrades(buyingDay, sellingDay, initialStopLoss, totalStocks);
   }
 
+  private isGreenCandle(quote: TechnicalQuote): boolean {
+    return quote["CandleBody"] > 0;
+  }
+
   public override execute(): Trades {
+    let yesterday = this.stock.now();
     while (this.stock.move()) {
       const today = this.stock.now();
-      const lastFortyDayHigh = this.stock.highOfLast(40);
 
-      if (this.isHighBroken(today, lastFortyDayHigh)) this.trade();
+      if (this.isGreenCandle(yesterday) && this.isGreenCandle(today)) this.trade();
+      yesterday = today;
     }
     this.persistTradesFn(this.trades.toCSV());
     return this.trades;
   }
 }
 
-export { FortyTwentyStrategy };
+export { TwoBreakingCandle };

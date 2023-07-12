@@ -1,11 +1,11 @@
-import { Quote } from "./StockFeedSimulator";
+import { TechnicalQuote } from "./restructureData";
 
 export interface ITradeOutcome {
-  buyingDay: Quote;
+  buyingDay: TechnicalQuote;
   initialStopLoss: number;
   riskForOneStock: number;
   totalStocks: number;
-  sellingDay: Quote;
+  sellingDay: TechnicalQuote;
   oneStockProfitOrLoss: number;
   totalProfitOrLoss: number;
   riskMultiple: number;

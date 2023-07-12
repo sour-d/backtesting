@@ -32,16 +32,14 @@ const removeNulls = (quotes: Quote[]) => {
 
 const trimToDec = (value: number) => +value.toFixed(2);
 
-const addTechnicalData = (processedData: Quote[]) => {
+const addTechnicalData = (processedData: Quote[]): TechnicalQuote[] => {
   const technicalData = [];
 
   while (processedData.length !== 0) {
     const currentQuote = processedData[processedData.length - 1];
-    const technicalFields = calculateTechnicals(processedData, currentQuote);
+    const technicalQuote = calculateTechnicals(processedData, currentQuote);
     
-    const quote: TechnicalQuote = {...currentQuote, ...technicalFields };
-
-    technicalData.push(quote);
+    technicalData.push(technicalQuote);
     processedData.pop();
   }
   
@@ -55,7 +53,7 @@ const writeTechnicalData = (filename: string, technicalData: Quote[]) => {
   fs.writeFileSync(path, data, { flag: 'a', encoding: 'utf8' });
 }
 
-const calculateTechnicals = (processedData: Quote[], currentQuote: Quote) => {
+const calculateTechnicals = (processedData: Quote[], currentQuote: Quote): TechnicalQuote => {
   const FortyDayHigh = highOfLast(processedData, 40);
   const TwentyDayLow = lowOfLast(processedData, 20);
   const FortyDayMA = trimToDec(movingAverageOf(processedData, 40));
@@ -63,10 +61,20 @@ const calculateTechnicals = (processedData: Quote[], currentQuote: Quote) => {
   const UpperWick = trimToDec(candleStick.calcUpperWickValue(currentQuote));
   const LowerWick = trimToDec(candleStick.calcLowerWickValue(currentQuote));
   const CandleBody = trimToDec(candleStick.calcCandleBodyValue(currentQuote));
-  return { FortyDayHigh, TwentyDayLow, FortyDayMA, TwoHundredDayMA, UpperWick, LowerWick, CandleBody };
+  
+  return {
+    ...currentQuote,
+    FortyDayHigh,
+    TwentyDayLow,
+    FortyDayMA,
+    TwoHundredDayMA,
+    UpperWick,
+    LowerWick,
+    CandleBody
+  };
 }
 
-const transformStockData = (filename: string) => {
+const transformStockData = (filename: string) : TechnicalQuote[] => {
   const stockData = parseQuotes(filename);
   const processedData = removeNulls(stockData);
   
@@ -84,4 +92,4 @@ const transformStockData = (filename: string) => {
   return technicalData;
 }
 
-export { transformStockData  };
+export { transformStockData , TechnicalQuote };

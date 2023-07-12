@@ -1,6 +1,6 @@
-import { ITradeOutcome } from "./ITradeOutcome";
 import { Quote, StockFeedSimulator } from "./StockFeedSimulator";
 import { Trades } from "./Trades";
+import { TechnicalQuote } from "./restructureData";
 
 class Strategy {
   stock: StockFeedSimulator;
@@ -46,8 +46,8 @@ class Strategy {
   }
 
   protected updateTrades(
-    buyingDay: Quote,
-    sellingDay: Quote,
+    buyingDay: TechnicalQuote,
+    sellingDay: TechnicalQuote,
     initialStopLoss: number,
     totalStocks: number
   ): void {
