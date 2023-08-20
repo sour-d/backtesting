@@ -1,52 +1,51 @@
-import fs from "fs";
-import { table } from "console";
-import { parseQuotes } from "./parser";
-import { StockFeedSimulator } from "./StockFeedSimulator";
-import { FortyTwentyStrategy } from "./strategy/FortyTwentyStrategy";
-import { MovingAverageStrategy } from "./strategy/MovingAverageStrategy";
-import { Trades } from "./Trades";
-import { transformStockData } from "./restructureData";
-import { TwoBreakingCandle } from "./strategy/TwoBreakingCandle";
+import express from "express";
+import morgan from "morgan";
+import runStrategy from "./runStrategy";
+import bodyParser from "body-parser";
+import path from "path";
 
-const STRATEGY = FortyTwentyStrategy;
+const app: express.Application = express();
 
-const persistTrades = (stockName: string) => (data: string) => {
-  fs.writeFileSync(`result/${stockName}.csv`, data, "utf-8");
-};
+app.use(morgan("tiny"));
+app.use(bodyParser.text());
 
-const runStrategy = ({ name: stockName, symbol }: any) => {
-  const stockData = transformStockData(stockName);
+app.get("/", (_req, _res) => {
+  _res.redirect(302, "index.html");
+});
 
-  const startingDay = 40;
-  const stock = new StockFeedSimulator(stockData, startingDay);
-  const capital = 100000;
-  const riskFactor = 0.05;
-  const strategy = new STRATEGY(
-    stock,
-    capital,
-    riskFactor,
-    persistTrades(stockName)
-  );
-  const outcomes: Trades = strategy.execute();
-  return {
-    averageExpectancy: outcomes.averageExpectancy(),
-    averageReturn: outcomes.averageReturn(),
-  };
-};
+app.get("/api/strategies", (req, res) => {
+  res.json([
+    "FortyTwentyStrategy",
+    "MovingAverageStrategy",
+    "TwoBreakingCandle",
+  ]);
+});
 
-const app = (symbolList: any) => {
-  console.log("Strategy used :", STRATEGY.name);
+app.post("/api/strategies", (req, res) => {
+  console.log("request came");
+  const { strategy } = JSON.parse(req.body);
+  console.log(req.body, strategy);
 
-  Object.keys(symbolList).forEach((categoryName) => {
-    console.log(categoryName);
-    const stockList = symbolList[categoryName];
-    const results: any = {};
-    stockList.forEach((stock: any) => {
-      const result = runStrategy(stock);
-      results[stock.name] = result;
-    });
-    table(results);
-  });
-};
+  let result;
+  try {
+    result = runStrategy("Nifty", strategy);
+  } catch (e) {
+    console.log(e);
 
-module.exports = { app };
+    res.json({});
+    return;
+  }
+  res.json({ status: "OK", result });
+});
+
+app.get("/api/result/:symbol", (req, res) => {
+  res.sendFile(path.resolve("result", `${req.params.symbol}.csv`));
+});
+
+app.use(express.static("public"));
+
+const port: number = 3000;
+app.listen(port, () => {
+  console.log(`TypeScript with Express
+         http://localhost:${port}/`);
+});

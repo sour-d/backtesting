@@ -6,7 +6,7 @@ const RED = "#ff6060";
 const DARK_RED = "#b20000";
 
 const downloadData = async () => {
-  const response = await fetch(`/result/${stockName}.csv`);
+  const response = await fetch(`api/result/Nifty`);
   const rawTrades = await response.text();
   const trades = Papa.parse(rawTrades, {
     header: true,
@@ -234,17 +234,9 @@ const drawTimeProfitBarChart = async (trades) => {
   vegaEmbed("#graph3", chartData);
 };
 
-const fillDynamicAreas = (count) => {
-  document.querySelector("#totalTrades").innerText = count;
-  document.querySelector("#symbol").innerText = stockName;
-};
-
 const main = async () => {
   const trades = await downloadData();
   drawProfitLossChart(trades);
   drawTotalProfitOverTime(trades);
   drawTimeProfitBarChart(trades);
-  fillDynamicAreas(trades.length);
 };
-
-main();

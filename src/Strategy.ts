@@ -9,7 +9,7 @@ class Strategy {
   trades: Trades;
   persistTradesFn: Function;
 
-  constructor(
+  protected constructor(
     stock: StockFeedSimulator,
     capital: number,
     riskPercentage: number,
@@ -21,6 +21,15 @@ class Strategy {
     this.riskPercentage = riskPercentage; // riskPercentage stored as fraction like 2/100, not 2%
     this.trades = new Trades();
     this.persistTradesFn = persistTradesFn;
+  }
+
+  create(
+    stock: StockFeedSimulator,
+    capital: number,
+    riskPercentage: number,
+    persistTradesFn: Function
+  ): Strategy {
+    return new Strategy(stock, capital, riskPercentage, persistTradesFn);
   }
 
   protected getTotalStocks(
