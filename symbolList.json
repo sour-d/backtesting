@@ -1,6 +1,10 @@
 {
   "Nifty 50": [
     {
+      "name": "Nifty",
+      "symbol": "^NSEI"
+    },
+    {
       "name": "UltraTech",
       "symbol": "ULTRACEMCO.NS"
     },

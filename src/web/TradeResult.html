@@ -8,19 +8,65 @@
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.22.1"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.8/dayjs.min.js" integrity="sha512-af90l7+r/ujCury3kqomcoZ4aNuC4JP0xUUU682bqlRCLLvGJrc9L82zONFccLWmxcMXSqO9d6C7Rr39EkbT3Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" integrity="sha512-dfX5uYVXzyU8+KHqj8bjo7UkOdg18PaOtpa48djpNbZHwExddghZ+ZmzWT06R5v6NSk3ZUfsH6FNEDepLx9hPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+  
   <script src="visualizer.js"></script>
+  <style>
+    body {
+      margin: 0 40px;
+      font-family: sans-serif;
+    }
+    #heading {
+      border-bottom: 2px solid #ccc;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    #heading > h1 {
+      margin: 0;
+    }
+    #heading > p {
+      margin: 0;
+      font-size: 20px;
+      font-style: italic;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      gap: 60px;
+      padding: 40px 0px;
+    }
+    main div {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  </style>
 </head>
 
 <body>
-  <div>
-    <h1>Profits in each trades</h1>
-    <div id="graph1"></div>
+  <div id="heading">
+    <h1>Report For <span id="symbol"></span></h1>
+    <p>Total trades <span id="totalTrades"></span></p>
   </div>
 
-  <div>
-    <h1>Profit over time</h1>
-    <div id="graph2"></div>
-  </div>
+  <main>
+    <div>
+      <h2>Each Trade Date And Profit/Loss</h2>
+      <div id="graph1" class="graph"></div>
+    </div>
+    <div>
+      <h2>Profit Over Time</h2>
+      <div id="graph2" class="graph"></div>
+    </div>
+    <div>
+      <h2>Profit V/S Time Taken</h2>
+      <div id="graph3" class="graph"></div>
+    </div>
+  </main>
 </body>
 
 </html>
