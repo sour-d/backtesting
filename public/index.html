@@ -38,36 +38,38 @@
     ></script>
   </head>
 
-  <body class="text-body-secondary">
-    <header class="container mt-2 border-bottom p-2">
-      <h1 class="col">Back Testing</h1>
-      <button
-        class="btn btn-primary col-2 mt-2 mb-2"
-        type="button"
-        data-bs-toggle="offcanvas"
-        data-bs-target="#strategyRunnerOffCanvas"
-        aria-controls="strategyRunnerOffCanvas"
-      >
-        Run A Strategy
-      </button>
+  <body class="text-body-secondary container">
+    <header class="mt-5">
+      <h2>Back Testing</h2>
     </header>
 
-    <main class="container pt-3">
-      <div id="resultInfo" class="pt-2">
-        <h4 class="pb-3">Trade Info</h4>
-        <p>Result of Nifty</p>
-        <p>Total trades 49</p>
+    <main class="pt-5">
+      <div id="resultInfo" class="card shadow rounded p-5">
+        <div class="d-flex justify-content-space-between mb-3 border-bottom pb-3">
+          <h4 class="m-auto col-10">Strategy Info</h4>
+          <button
+            class="btn btn-primary btn-sm col-2"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#strategyRunnerOffCanvas"
+            aria-controls="strategyRunnerOffCanvas"
+          >
+            Run Another Strategy
+          </button>
+        </div>
+        <p>Stock - Nifty</p>
+        <p>Total trades - 49</p>
       </div>
-      <div class="row g-3 pt-5">
-        <h4>Each Trade Date And Profit/Loss</h4>
+      <div class="card shadow rounded mt-5 p-5">
+        <h4 class="mb-5">Each Trade Date And Profit/Loss</h4>
         <div id="graph1" class="graph"></div>
       </div>
-      <div class="row g-3 pt-5">
-        <h4>Profit Over Time</h4>
+      <div class="card shadow rounded mt-5 p-5">
+        <h4 class="mb-5">Profit Over Time</h4>
         <div id="graph2" class="graph"></div>
       </div>
-      <div class="row g-3 pt-5">
-        <h4>Profit V/S Time Taken</h4>
+      <div class="card shadow rounded mt-5 p-5">
+        <h4 class="mb-5">Profit v/s Time Taken</h4>
         <div id="graph3" class="graph"></div>
       </div>
     </main>
@@ -110,7 +112,6 @@
         aria-live="assertive"
         aria-atomic="true"
         id="resultToast"
-        data-bs-autohide="false"
       >
         <div class="d-flex p-2">
           <div class="toast-body"></div>

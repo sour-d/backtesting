@@ -1,6 +1,3 @@
-const searchQueryString = location.search;
-const searchQuery = new URLSearchParams(searchQueryString);
-const stockName = decodeURI(searchQuery.get("name"));
 const GREEN = "#6dc66d";
 const RED = "#ff6060";
 const DARK_RED = "#b20000";
@@ -129,11 +126,6 @@ const drawTimeProfitBarChart = async (trades) => {
   const chartData = {
     $schema: "https://vega.github.io/schema/vega-lite/v5.json",
     description: "Profit over time.",
-    config: {
-      legend: {
-        aria: false,
-      },
-    },
     vconcat: [
       {
         mark: { type: "bar", tooltip: true },
