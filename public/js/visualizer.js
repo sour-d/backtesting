@@ -232,3 +232,5 @@ const main = async () => {
   drawTotalProfitOverTime(trades);
   drawTimeProfitBarChart(trades);
 };
+
+main();

@@ -1,19 +1,9 @@
 const handelResponse = (res) => {
-  const toast = document.getElementById("resultToast");
-  const toastBody = document.querySelector("#resultToast .toast-body");
   if (res.status === "OK") {
-    toastBody.innerHTML = "Strategy ran successfully";
-    toast.classList.remove("bg-danger");
-    toast.classList.add("bg-success");
-    main();
+    window.open("/result.html");
   } else {
-    toastBody.innerHTML = "Something went wrong";
-    toast.classList.add("bg-danger");
-    toast.classList.remove("bg-success");
+    alert("Something went wrong");
   }
-
-  const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toast);
-  toastBootstrap.show();
 };
 
 const runStrategy = (event) => {
@@ -40,11 +30,11 @@ const createOptions = (strategy) => {
 };
 
 document.body.onload = async () => {
-  const strategies = await fetch("/api/strategies").then((res) => res.json());
-  strategies.forEach(createOptions);
+  fetch("/api/strategies")
+    .then((res) => res.json())
+    .then((Strategies) => Strategies.forEach(createOptions));
+
   document
     .querySelector("#runStrategyBtn")
     .addEventListener("click", runStrategy);
-
-  main();
 };

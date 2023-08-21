@@ -1,28 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Embedding Vega-Lite</title>
-    <!-- vega -->
-    <script src="https://cdn.jsdelivr.net/npm/vega@5.25.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.9.1"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.22.1"></script>
-
-    <!-- dayjs -->
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.8/dayjs.min.js"
-      integrity="sha512-af90l7+r/ujCury3kqomcoZ4aNuC4JP0xUUU682bqlRCLLvGJrc9L82zONFccLWmxcMXSqO9d6C7Rr39EkbT3Q=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
-
-    <!-- papaParse -->
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"
-      integrity="sha512-dfX5uYVXzyU8+KHqj8bjo7UkOdg18PaOtpa48djpNbZHwExddghZ+ZmzWT06R5v6NSk3ZUfsH6FNEDepLx9hPQ=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
+    <title>Run A Strategy</title>
 
     <!-- bootstrap -->
     <link
@@ -43,53 +22,12 @@
       <h2>Back Testing</h2>
     </header>
 
-    <main class="pt-5">
-      <div id="resultInfo" class="card shadow rounded p-5">
-        <div class="d-flex justify-content-space-between mb-3 border-bottom pb-3">
-          <h4 class="m-auto col-10">Strategy Info</h4>
-          <button
-            class="btn btn-primary btn-sm col-2"
-            type="button"
-            data-bs-toggle="offcanvas"
-            data-bs-target="#strategyRunnerOffCanvas"
-            aria-controls="strategyRunnerOffCanvas"
-          >
-            Run Another Strategy
-          </button>
-        </div>
-        <p>Stock - Nifty</p>
-        <p>Total trades - 49</p>
+    <main class="card shadow rounded p-5 mt-4">
+      <div class="border-bottom mb-3 pb-3">
+        <h4>Run a Strategy</h4>
       </div>
-      <div class="card shadow rounded mt-5 p-5">
-        <h4 class="mb-5">Each Trade Date And Profit/Loss</h4>
-        <div id="graph1" class="graph"></div>
-      </div>
-      <div class="card shadow rounded mt-5 p-5">
-        <h4 class="mb-5">Profit Over Time</h4>
-        <div id="graph2" class="graph"></div>
-      </div>
-      <div class="card shadow rounded mt-5 p-5">
-        <h4 class="mb-5">Profit v/s Time Taken</h4>
-        <div id="graph3" class="graph"></div>
-      </div>
-    </main>
-
-    <div
-      class="offcanvas offcanvas-bottom text-bg-dark"
-      tabindex="-1"
-      id="strategyRunnerOffCanvas"
-    >
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="offcanvasLabel">Run Strategy</h5>
-        <button
-          type="button"
-          class="btn-close btn-close-white"
-          data-bs-dismiss="offcanvas"
-          aria-label="Close"
-        ></button>
-      </div>
-      <div class="offcanvas-body">
-        <form action="">
+      <div class="container">
+        <form action="" class="col-6">
           <div class="form-group mb-3">
             <label for="strategy" class="form-label">Choose a strategy</label>
             <select name="strategy" id="strategy" required class="form-select">
@@ -103,30 +41,9 @@
           </div>
         </form>
       </div>
-    </div>
-
-    <div class="toast-container top-0 end-0 p-3">
-      <div
-        class="toast align-items-center text-white"
-        role="alert"
-        aria-live="assertive"
-        aria-atomic="true"
-        id="resultToast"
-      >
-        <div class="d-flex p-2">
-          <div class="toast-body"></div>
-          <button
-            type="button"
-            class="btn-close btn-close-white me-2 m-auto"
-            data-bs-dismiss="toast"
-            aria-label="Close"
-          ></button>
-        </div>
-      </div>
-    </div>
+    </main>
 
     <!-- custom js -->
     <script src="js/index.js"></script>
-    <script src="js/visualizer.js"></script>
   </body>
 </html>
