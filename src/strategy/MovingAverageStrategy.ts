@@ -3,24 +3,39 @@ import { Strategy } from "../Strategy";
 import { Trades } from "../Trades";
 import { TechnicalQuote } from "../restructureData";
 
-const LOWER_LIMIT = 40;
-const UPPER_LIMIT = 200;
+interface Config {
+  upperLimit: number;
+  lowerLimit: number;
+  capital: number;
+  riskPercentage: number;
+}
+
+export const movingAverageStrategyConfig: Config = {
+  upperLimit: 200,
+  lowerLimit: 40,
+  capital: 100000,
+  riskPercentage: 0.5,
+};
 
 class MovingAverageStrategy extends Strategy {
+  config: Config;
+
   constructor(
     stock: StockFeedSimulator,
-    capital: number,
-    riskPercentage: number,
-    persistTradesFn: Function
+    persistTradesFn: Function,
+    config: Config = movingAverageStrategyConfig
   ) {
-    super(stock, capital, riskPercentage, persistTradesFn);
+    super(stock, config.capital, config.riskPercentage, persistTradesFn);
+    this.config = config;
   }
 
   protected override checkForStopLossHit(): TechnicalQuote {
     while (this.stock.move()) {
       const today = this.stock.now();
-      const fortyDayMA = this.stock.simpleMovingAverage(LOWER_LIMIT);
-      const twoHundredDayMA = this.stock.simpleMovingAverage(UPPER_LIMIT);
+      const fortyDayMA = this.stock.simpleMovingAverage(this.config.lowerLimit);
+      const twoHundredDayMA = this.stock.simpleMovingAverage(
+        this.config.upperLimit
+      );
       if (today.Low <= fortyDayMA || twoHundredDayMA >= fortyDayMA) {
         return today;
       }
@@ -30,7 +45,9 @@ class MovingAverageStrategy extends Strategy {
 
   protected override trade(): void {
     const buyingDay = this.stock.now();
-    const initialStopLoss = this.stock.simpleMovingAverage(LOWER_LIMIT);
+    const initialStopLoss = this.stock.simpleMovingAverage(
+      this.config.lowerLimit
+    );
     const sellingDay = this.checkForStopLossHit();
 
     const riskForOneStock = buyingDay.High - initialStopLoss;
@@ -41,14 +58,20 @@ class MovingAverageStrategy extends Strategy {
 
   public override execute(): Trades {
     while (this.stock.hasData()) {
-      const previousDayUpperLimitMA =
-        this.stock.simpleMovingAverage(UPPER_LIMIT);
-      const previousDayLowerLimitMA =
-        this.stock.simpleMovingAverage(LOWER_LIMIT);
+      const previousDayUpperLimitMA = this.stock.simpleMovingAverage(
+        this.config.upperLimit
+      );
+      const previousDayLowerLimitMA = this.stock.simpleMovingAverage(
+        this.config.lowerLimit
+      );
       const today = this.stock.move();
       if (previousDayUpperLimitMA > previousDayLowerLimitMA) {
-        const upperLimitMA = this.stock.simpleMovingAverage(UPPER_LIMIT);
-        const lowerLimitMA = this.stock.simpleMovingAverage(LOWER_LIMIT);
+        const upperLimitMA = this.stock.simpleMovingAverage(
+          this.config.upperLimit
+        );
+        const lowerLimitMA = this.stock.simpleMovingAverage(
+          this.config.lowerLimit
+        );
         if (lowerLimitMA >= upperLimitMA) this.trade();
       }
     }

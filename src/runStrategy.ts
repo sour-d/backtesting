@@ -27,8 +27,6 @@ const runStrategy = (stockName: string, strategyName: string) => {
 
   const strategy = new STRATEGIES[strategyName](
     stock,
-    capital,
-    riskFactor,
     persistTrades(stockName)
   );
   const outcomes: Trades = strategy.execute();

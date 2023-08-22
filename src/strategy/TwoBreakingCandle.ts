@@ -3,14 +3,25 @@ import { Strategy } from "../Strategy";
 import { Trades } from "../Trades";
 import { TechnicalQuote } from "../restructureData";
 
+interface Config {
+  capital: number;
+  riskPercentage: number;
+}
+export const twoBreakingCandleConfig: Config = {
+  capital: 100000,
+  riskPercentage: 0.5,
+};
+
 class TwoBreakingCandle extends Strategy {
+  config: Config;
+
   constructor(
     stock: StockFeedSimulator,
-    capital: number,
-    riskPercentage: number,
-    persistTradesFn: Function
+    persistTradesFn: Function,
+    config: Config = twoBreakingCandleConfig
   ) {
-    super(stock, capital, riskPercentage, persistTradesFn);
+    super(stock, config.capital, config.riskPercentage, persistTradesFn);
+    this.config = config;
   }
 
   protected override checkForStopLossHit(): TechnicalQuote {
@@ -30,7 +41,7 @@ class TwoBreakingCandle extends Strategy {
     const buyingDay = this.stock.now();
     const initialStopLoss = breakingDay.Low;
     const riskForOneStock = buyingDay.High - initialStopLoss;
-    
+
     if (riskForOneStock <= 0) {
       return;
     }
@@ -51,7 +62,8 @@ class TwoBreakingCandle extends Strategy {
     while (this.stock.move()) {
       const today = this.stock.now();
 
-      if (this.isGreenCandle(yesterday) && this.isGreenCandle(today)) this.trade();
+      if (this.isGreenCandle(yesterday) && this.isGreenCandle(today))
+        this.trade();
       yesterday = today;
     }
     this.persistTradesFn(this.trades.toCSV());

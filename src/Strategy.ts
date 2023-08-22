@@ -1,6 +1,7 @@
 import { Quote, StockFeedSimulator } from "./StockFeedSimulator";
 import { Trades } from "./Trades";
 import { TechnicalQuote } from "./restructureData";
+import { FortyTwentyStrategy } from "./strategy/FortyTwentyStrategy";
 
 class Strategy {
   stock: StockFeedSimulator;
@@ -87,5 +88,11 @@ class Strategy {
     throw new Error("Method not implemented.");
   }
 }
+
+// const strategies = {
+//   FortyTwentyStrategy: FortyTwentyStrategy.config,
+//   // "MovingAverageStrategy",
+//   // "TwoBreakingCandle",
+// };
 
 export { Strategy };

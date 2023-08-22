@@ -3,20 +3,38 @@ import { Strategy } from "../Strategy";
 import { Trades } from "../Trades";
 import { TechnicalQuote } from "../restructureData";
 
+
+interface Config {
+  buyWindow: number;
+  sellWindow: number;
+  stopLossWindow: number;
+  capital: number;
+  riskPercentage: number;
+}
+export const fortyTwentyStrategyConfig: Config = {
+  buyWindow: 40,
+  sellWindow: 20,
+  stopLossWindow: 20,
+  capital: 100000,
+  riskPercentage: 0.5,
+};
+
 class FortyTwentyStrategy extends Strategy {
+  config: Config;
+
   constructor(
     stock: StockFeedSimulator,
-    capital: number,
-    riskPercentage: number,
-    persistTradesFn: Function
+    persistTradesFn: Function,
+    config: Config = fortyTwentyStrategyConfig
   ) {
-    super(stock, capital, riskPercentage, persistTradesFn);
+    super(stock, config.capital, config.riskPercentage, persistTradesFn);
+    this.config = config;
   }
 
   protected override checkForStopLossHit(): TechnicalQuote {
     while (this.stock.move()) {
       const today = this.stock.now();
-      const lastTwentyDayLow = this.stock.lowOfLast(20);
+      const lastTwentyDayLow = this.stock.lowOfLast(this.config.stopLossWindow);
       if (today.Low <= lastTwentyDayLow.Low) {
         return today;
       }
@@ -30,7 +48,9 @@ class FortyTwentyStrategy extends Strategy {
 
   protected override trade(): void {
     const buyingDay = this.stock.now();
-    const initialStopLoss = this.stock.lowOfLast(20).Low;
+    const { Low: initialStopLoss } = this.stock.lowOfLast(
+      this.config.sellWindow
+    );
     const sellingDay = this.checkForStopLossHit();
 
     const riskForOneStock = buyingDay.High - initialStopLoss;
@@ -43,7 +63,7 @@ class FortyTwentyStrategy extends Strategy {
   public override execute(): Trades {
     while (this.stock.move()) {
       const today = this.stock.now();
-      const lastFortyDayHigh = this.stock.highOfLast(40);
+      const lastFortyDayHigh = this.stock.highOfLast(this.config.buyWindow);
 
       if (this.isHighBroken(today, lastFortyDayHigh)) this.trade();
     }

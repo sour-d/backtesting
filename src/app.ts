@@ -22,16 +22,11 @@ app.get("/api/strategies", (req, res) => {
 });
 
 app.post("/api/strategies", (req, res) => {
-  console.log("request came");
   const { strategy } = JSON.parse(req.body);
-  console.log(req.body, strategy);
-
   let result;
   try {
     result = runStrategy("Nifty", strategy);
   } catch (e) {
-    console.log(e);
-
     res.json({});
     return;
   }
