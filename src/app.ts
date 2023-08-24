@@ -1,31 +1,26 @@
 import express from "express";
 import morgan from "morgan";
-import runStrategy from "./runStrategy";
-import bodyParser from "body-parser";
+import strategyRunner, { STRATEGIES } from "./strategyRunner";
 import path from "path";
 
 const app: express.Application = express();
+app.use(express.urlencoded());
+app.use(express.json());
 
 app.use(morgan("tiny"));
-app.use(bodyParser.text());
 
 app.get("/", (_req, _res) => {
   _res.redirect(302, "index.html");
 });
 
 app.get("/api/strategies", (req, res) => {
-  res.json([
-    "FortyTwentyStrategy",
-    "MovingAverageStrategy",
-    "TwoBreakingCandle",
-  ]);
+  res.json(STRATEGIES);
 });
 
 app.post("/api/strategies", (req, res) => {
-  const { strategy } = JSON.parse(req.body);
   let result;
   try {
-    result = runStrategy("Nifty", strategy);
+    result = strategyRunner("Nifty", req.body);
   } catch (e) {
     res.json({});
     return;

@@ -2,6 +2,7 @@ import { StockFeedSimulator } from "../StockFeedSimulator";
 import { Strategy } from "../Strategy";
 import { Trades } from "../Trades";
 import { TechnicalQuote } from "../restructureData";
+import { getProps } from "../utils";
 
 interface Config {
   upperLimit: number;
@@ -10,7 +11,7 @@ interface Config {
   riskPercentage: number;
 }
 
-export const movingAverageStrategyConfig: Config = {
+const movingAverageStrategyConfig: Config = {
   upperLimit: 200,
   lowerLimit: 40,
   capital: 100000,
@@ -25,11 +26,14 @@ class MovingAverageStrategy extends Strategy {
     persistTradesFn: Function,
     config: Config = movingAverageStrategyConfig
   ) {
-    super(stock, config.capital, config.riskPercentage, persistTradesFn);
+    super(stock, persistTradesFn, config.capital, config.riskPercentage);
     this.config = config;
   }
 
-  protected override checkForStopLossHit(): TechnicalQuote {
+  protected override checkForStopLossHit(): {
+    sellingDay: TechnicalQuote | null;
+    sellingPrice: number | null;
+  } {
     while (this.stock.move()) {
       const today = this.stock.now();
       const fortyDayMA = this.stock.simpleMovingAverage(this.config.lowerLimit);
@@ -37,10 +41,10 @@ class MovingAverageStrategy extends Strategy {
         this.config.upperLimit
       );
       if (today.Low <= fortyDayMA || twoHundredDayMA >= fortyDayMA) {
-        return today;
+        return { sellingDay: today, sellingPrice: today.Low };
       }
     }
-    return this.stock.now();
+    return { sellingDay: null, sellingPrice: null };
   }
 
   protected override trade(): void {
@@ -48,12 +52,15 @@ class MovingAverageStrategy extends Strategy {
     const initialStopLoss = this.stock.simpleMovingAverage(
       this.config.lowerLimit
     );
-    const sellingDay = this.checkForStopLossHit();
+    const { sellingDay, sellingPrice } = this.checkForStopLossHit();
+    if (!(sellingDay && sellingPrice)) {
+      return;
+    }
 
     const riskForOneStock = buyingDay.High - initialStopLoss;
     const totalStocks = this.getTotalStocks(riskForOneStock, buyingDay.High);
 
-    this.updateTrades(buyingDay, sellingDay, initialStopLoss, totalStocks);
+    this.updateTrades(buyingDay, sellingDay, sellingPrice, totalStocks);
   }
 
   public override execute(): Trades {
@@ -80,4 +87,7 @@ class MovingAverageStrategy extends Strategy {
   }
 }
 
-export { MovingAverageStrategy };
+export default {
+  _class: MovingAverageStrategy,
+  _config: getProps(movingAverageStrategyConfig),
+};

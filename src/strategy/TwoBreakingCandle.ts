@@ -2,12 +2,13 @@ import { StockFeedSimulator } from "../StockFeedSimulator";
 import { Strategy } from "../Strategy";
 import { Trades } from "../Trades";
 import { TechnicalQuote } from "../restructureData";
+import { getProps } from "../utils";
 
 interface Config {
   capital: number;
   riskPercentage: number;
 }
-export const twoBreakingCandleConfig: Config = {
+const twoBreakingCandleConfig: Config = {
   capital: 100000,
   riskPercentage: 0.5,
 };
@@ -20,19 +21,22 @@ class TwoBreakingCandle extends Strategy {
     persistTradesFn: Function,
     config: Config = twoBreakingCandleConfig
   ) {
-    super(stock, config.capital, config.riskPercentage, persistTradesFn);
+    super(stock, persistTradesFn, config.capital, config.riskPercentage);
     this.config = config;
   }
 
-  protected override checkForStopLossHit(): TechnicalQuote {
+  protected override checkForStopLossHit(): {
+    sellingDay: TechnicalQuote | null;
+    sellingPrice: number | null;
+  } {
     let yesterday = this.stock.now();
     while (this.stock.move()) {
       const today = this.stock.now();
       if (today.Low <= yesterday.Low) {
-        return today;
+        return { sellingDay: today, sellingPrice: today.Low };
       }
     }
-    return this.stock.now();
+    return { sellingDay: null, sellingPrice: null };
   }
 
   protected override trade(): void {
@@ -46,11 +50,14 @@ class TwoBreakingCandle extends Strategy {
       return;
     }
 
-    const sellingDay = this.checkForStopLossHit();
+    const { sellingDay, sellingPrice } = this.checkForStopLossHit();
+    if (!(sellingDay && sellingPrice)) {
+      return;
+    }
     const totalStocks = this.getTotalStocks(riskForOneStock, buyingDay.High);
 
     // store result
-    this.updateTrades(buyingDay, sellingDay, initialStopLoss, totalStocks);
+    this.updateTrades(buyingDay, sellingDay, sellingPrice, totalStocks);
   }
 
   private isGreenCandle(quote: TechnicalQuote): boolean {
@@ -71,4 +78,7 @@ class TwoBreakingCandle extends Strategy {
   }
 }
 
-export { TwoBreakingCandle };
+export default {
+  _class: TwoBreakingCandle,
+  _config: getProps(twoBreakingCandleConfig),
+};

@@ -54,12 +54,11 @@ export class Trades {
   public addTradeResult(
     buyingDay: TechnicalQuote,
     sellingDay: TechnicalQuote,
-    initialStopLoss: number,
+    sellingPrice: number,
     totalStocks: number,
     risk: number,
     capital: number
   ): void {
-    const riskForOneStock: number = buyingDay.High - initialStopLoss;
     const oneStockProfitOrLoss: number = sellingDay.Low - buyingDay.High;
     const totalProfitOrLoss: number = oneStockProfitOrLoss * totalStocks;
     const riskMultiple: number = totalProfitOrLoss / risk;
@@ -69,18 +68,18 @@ export class Trades {
       totalProfitOrLoss,
       capital
     );
-
-    this.tradeResults.push({
+    const outcome: ITradeOutcome = {
       buyingDay,
       sellingDay,
-      initialStopLoss,
+      sellingPrice,
       totalStocks,
       returnPercentage,
       riskMultiple,
-      riskForOneStock,
       oneStockProfitOrLoss,
       totalProfitOrLoss,
-    });
+    };
+
+    this.tradeResults.push(outcome);
   }
 
   public toCSV(): string {
@@ -88,7 +87,7 @@ export class Trades {
       "Buying Date": dayjs(trade.buyingDay.Date).format("YYYY-MM-DD"),
       "Buying Price": trade.buyingDay.High,
       "Selling Date": dayjs(trade.sellingDay.Date).format("YYYY-MM-DD"),
-      "Selling Price": trade.sellingDay.Low,
+      "Selling Price": trade.sellingPrice,
       "Total Stocks": trade.totalStocks,
     }));
 

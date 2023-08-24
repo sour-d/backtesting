@@ -2,19 +2,17 @@ import { Quote, StockFeedSimulator } from "../StockFeedSimulator";
 import { Strategy } from "../Strategy";
 import { Trades } from "../Trades";
 import { TechnicalQuote } from "../restructureData";
-
+import { getProps } from "../utils";
 
 interface Config {
   buyWindow: number;
   sellWindow: number;
-  stopLossWindow: number;
   capital: number;
   riskPercentage: number;
 }
-export const fortyTwentyStrategyConfig: Config = {
+const fortyTwentyStrategyConfig: Config = {
   buyWindow: 40,
   sellWindow: 20,
-  stopLossWindow: 20,
   capital: 100000,
   riskPercentage: 0.5,
 };
@@ -27,19 +25,23 @@ class FortyTwentyStrategy extends Strategy {
     persistTradesFn: Function,
     config: Config = fortyTwentyStrategyConfig
   ) {
-    super(stock, config.capital, config.riskPercentage, persistTradesFn);
+    super(stock, persistTradesFn, config.capital, config.riskPercentage);
     this.config = config;
+    console.log(this.config);
   }
 
-  protected override checkForStopLossHit(): TechnicalQuote {
+  protected override checkForStopLossHit(): {
+    sellingDay: TechnicalQuote | null;
+    sellingPrice: number | null;
+  } {
     while (this.stock.move()) {
       const today = this.stock.now();
-      const lastTwentyDayLow = this.stock.lowOfLast(this.config.stopLossWindow);
-      if (today.Low <= lastTwentyDayLow.Low) {
-        return today;
+      const { Low: stopLoss } = this.stock.lowOfLast(this.config.sellWindow);
+      if (today.Low <= stopLoss) {
+        return { sellingDay: today, sellingPrice: stopLoss };
       }
     }
-    return this.stock.now();
+    return { sellingDay: null, sellingPrice: null };
   }
 
   private isHighBroken(today: Quote, highestDay: Quote): boolean {
@@ -51,13 +53,16 @@ class FortyTwentyStrategy extends Strategy {
     const { Low: initialStopLoss } = this.stock.lowOfLast(
       this.config.sellWindow
     );
-    const sellingDay = this.checkForStopLossHit();
+    const { sellingDay, sellingPrice } = this.checkForStopLossHit();
+    if (!(sellingDay && sellingPrice)) {
+      return;
+    }
 
     const riskForOneStock = buyingDay.High - initialStopLoss;
     const totalStocks = this.getTotalStocks(riskForOneStock, buyingDay.High);
 
     // store result
-    this.updateTrades(buyingDay, sellingDay, initialStopLoss, totalStocks);
+    this.updateTrades(buyingDay, sellingDay, sellingPrice, totalStocks);
   }
 
   public override execute(): Trades {
@@ -72,4 +77,7 @@ class FortyTwentyStrategy extends Strategy {
   }
 }
 
-export { FortyTwentyStrategy };
+export default {
+  _class: FortyTwentyStrategy,
+  _config: getProps(fortyTwentyStrategyConfig),
+};

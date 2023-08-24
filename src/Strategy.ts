@@ -1,7 +1,6 @@
-import { Quote, StockFeedSimulator } from "./StockFeedSimulator";
+import { StockFeedSimulator } from "./StockFeedSimulator";
 import { Trades } from "./Trades";
 import { TechnicalQuote } from "./restructureData";
-import { FortyTwentyStrategy } from "./strategy/FortyTwentyStrategy";
 
 class Strategy {
   stock: StockFeedSimulator;
@@ -12,25 +11,16 @@ class Strategy {
 
   protected constructor(
     stock: StockFeedSimulator,
-    capital: number,
-    riskPercentage: number,
-    persistTradesFn: Function
+    persistTradesFn: Function,
+    capital: number = 100000,
+    riskPercentage: number = 0.05
   ) {
     this.stock = stock;
     this.capital = capital;
 
-    this.riskPercentage = riskPercentage; // riskPercentage stored as fraction like 2/100, not 2%
+    this.riskPercentage = riskPercentage;
     this.trades = new Trades();
     this.persistTradesFn = persistTradesFn;
-  }
-
-  create(
-    stock: StockFeedSimulator,
-    capital: number,
-    riskPercentage: number,
-    persistTradesFn: Function
-  ): Strategy {
-    return new Strategy(stock, capital, riskPercentage, persistTradesFn);
   }
 
   protected getTotalStocks(
@@ -58,13 +48,13 @@ class Strategy {
   protected updateTrades(
     buyingDay: TechnicalQuote,
     sellingDay: TechnicalQuote,
-    initialStopLoss: number,
+    sellingPrice: number,
     totalStocks: number
   ): void {
     this.trades.addTradeResult(
       buyingDay,
       sellingDay,
-      initialStopLoss,
+      sellingPrice,
       totalStocks,
       this.getRisk(),
       this.capital
@@ -80,7 +70,10 @@ class Strategy {
     throw new Error("Method not implemented.");
   }
 
-  protected checkForStopLossHit(): Quote {
+  protected checkForStopLossHit(): {
+    sellingDay: TechnicalQuote | null;
+    sellingPrice: number | null;
+  } {
     throw new Error("Method not implemented.");
   }
 
