@@ -12,10 +12,10 @@ interface Config {
 }
 
 const movingAverageStrategyConfig: Config = {
-  upperLimit: 200,
-  lowerLimit: 40,
+  upperLimit: 50,
+  lowerLimit: 20,
   capital: 100000,
-  riskPercentage: 0.5,
+  riskPercentage: 5,
 };
 
 class MovingAverageStrategy extends Strategy {
@@ -34,52 +34,56 @@ class MovingAverageStrategy extends Strategy {
     sellingDay: TechnicalQuote | null;
     sellingPrice: number | null;
   } {
+    const { upperLimit, lowerLimit } = this.config;
+
     while (this.stock.move()) {
       const today = this.stock.now();
-      const fortyDayMA = this.stock.simpleMovingAverage(this.config.lowerLimit);
-      const twoHundredDayMA = this.stock.simpleMovingAverage(
-        this.config.upperLimit
-      );
-      if (today.Low <= fortyDayMA || twoHundredDayMA >= fortyDayMA) {
-        return { sellingDay: today, sellingPrice: today.Low };
+      const lowerMA = this.stock.simpleMovingAverage(lowerLimit);
+      const upperMA = this.stock.simpleMovingAverage(upperLimit);
+      if (lowerMA >= today.Low) {
+        return { sellingDay: today, sellingPrice: lowerMA };
       }
     }
     return { sellingDay: null, sellingPrice: null };
   }
 
   protected override trade(): void {
+    if (!this.stock.move()) return;
     const buyingDay = this.stock.now();
-    const initialStopLoss = this.stock.simpleMovingAverage(
-      this.config.lowerLimit
-    );
+    const { upperLimit, lowerLimit } = this.config;
+    const initialStopLoss = this.stock.simpleMovingAverage(lowerLimit);
+    if (initialStopLoss >= buyingDay.Open) return;
+
+    const riskForOneStock = buyingDay.Open - initialStopLoss;
+    const totalStocks = this.getTotalStocks(riskForOneStock, buyingDay.Open);
+
     const { sellingDay, sellingPrice } = this.checkForStopLossHit();
-    if (!(sellingDay && sellingPrice)) {
-      return;
+    if (sellingDay && sellingPrice) {
+      this.updateTrades(
+        buyingDay,
+        buyingDay.Open,
+        sellingDay,
+        sellingPrice,
+        totalStocks
+      );
     }
-
-    const riskForOneStock = buyingDay.High - initialStopLoss;
-    const totalStocks = this.getTotalStocks(riskForOneStock, buyingDay.High);
-
-    this.updateTrades(buyingDay, sellingDay, sellingPrice, totalStocks);
   }
 
   public override execute(): Trades {
     while (this.stock.hasData()) {
-      const previousDayUpperLimitMA = this.stock.simpleMovingAverage(
-        this.config.upperLimit
-      );
-      const previousDayLowerLimitMA = this.stock.simpleMovingAverage(
-        this.config.lowerLimit
-      );
+      const { upperLimit, lowerLimit } = this.config;
+
+      const previousDayUpperLimitMA =
+        this.stock.simpleMovingAverage(upperLimit);
+      const previousDayLowerLimitMA =
+        this.stock.simpleMovingAverage(lowerLimit);
       const today = this.stock.move();
+
       if (previousDayUpperLimitMA > previousDayLowerLimitMA) {
-        const upperLimitMA = this.stock.simpleMovingAverage(
-          this.config.upperLimit
-        );
-        const lowerLimitMA = this.stock.simpleMovingAverage(
-          this.config.lowerLimit
-        );
-        if (lowerLimitMA >= upperLimitMA) this.trade();
+        const upperLimitMA = this.stock.simpleMovingAverage(upperLimit);
+        const lowerLimitMA = this.stock.simpleMovingAverage(lowerLimit);
+        if (lowerLimitMA >= upperLimitMA && today && today.Close > lowerLimitMA)
+          this.trade();
       }
     }
     this.persistTradesFn(this.trades.toCSV());

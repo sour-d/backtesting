@@ -30,6 +30,15 @@ class Strategy {
     const risk = this.getRisk();
     const numberOfStocksUnderRisk = Math.floor(risk / riskForOneStock);
     const totalCost = numberOfStocksUnderRisk * buyingPrice;
+    console.log({
+      risk,
+      riskForOneStock,
+      buyingPrice,
+      numberOfStocksUnderRisk,
+      totalCost,
+      c: Math.floor(this.capital / buyingPrice),
+    });
+
     if (totalCost <= this.capital) {
       return numberOfStocksUnderRisk;
     }
@@ -42,17 +51,19 @@ class Strategy {
   }
 
   getRisk(): number {
-    return this.capital * this.riskPercentage;
+    return this.capital * (this.riskPercentage / 100);
   }
 
   protected updateTrades(
     buyingDay: TechnicalQuote,
+    buyingPrice: number,
     sellingDay: TechnicalQuote,
     sellingPrice: number,
     totalStocks: number
   ): void {
     this.trades.addTradeResult(
       buyingDay,
+      buyingPrice,
       sellingDay,
       sellingPrice,
       totalStocks,

@@ -57,7 +57,7 @@ class TwoBreakingCandle extends Strategy {
     const totalStocks = this.getTotalStocks(riskForOneStock, buyingDay.High);
 
     // store result
-    this.updateTrades(buyingDay, sellingDay, sellingPrice, totalStocks);
+    this.updateTrades(buyingDay, 0, sellingDay, sellingPrice, totalStocks);
   }
 
   private isGreenCandle(quote: TechnicalQuote): boolean {

@@ -14,7 +14,7 @@ const fortyTwentyStrategyConfig: Config = {
   buyWindow: 40,
   sellWindow: 20,
   capital: 100000,
-  riskPercentage: 0.5,
+  riskPercentage: 5,
 };
 
 class FortyTwentyStrategy extends Strategy {
@@ -27,7 +27,6 @@ class FortyTwentyStrategy extends Strategy {
   ) {
     super(stock, persistTradesFn, config.capital, config.riskPercentage);
     this.config = config;
-    console.log(this.config);
   }
 
   protected override checkForStopLossHit(): {
@@ -49,20 +48,25 @@ class FortyTwentyStrategy extends Strategy {
   }
 
   protected override trade(): void {
-    const buyingDay = this.stock.now();
-    const { Low: initialStopLoss } = this.stock.lowOfLast(
-      this.config.sellWindow
-    );
-    const { sellingDay, sellingPrice } = this.checkForStopLossHit();
-    if (!(sellingDay && sellingPrice)) {
-      return;
-    }
+    const { buyWindow, sellWindow } = this.config;
 
-    const riskForOneStock = buyingDay.High - initialStopLoss;
-    const totalStocks = this.getTotalStocks(riskForOneStock, buyingDay.High);
+    const buyingDay = this.stock.now();
+    const { High: buyPrice } = this.stock.highOfLast(buyWindow);
+    const { Low: initialStopLoss } = this.stock.lowOfLast(sellWindow);
+    const { sellingDay, sellingPrice } = this.checkForStopLossHit();
+    if (!(sellingDay && sellingPrice)) return;
+
+    const riskForOneStock = buyPrice - initialStopLoss;
+    const totalStocks = this.getTotalStocks(riskForOneStock, buyPrice);
 
     // store result
-    this.updateTrades(buyingDay, sellingDay, sellingPrice, totalStocks);
+    this.updateTrades(
+      buyingDay,
+      buyPrice,
+      sellingDay,
+      sellingPrice,
+      totalStocks
+    );
   }
 
   public override execute(): Trades {

@@ -53,6 +53,7 @@ export class Trades {
 
   public addTradeResult(
     buyingDay: TechnicalQuote,
+    buyingPrice: number,
     sellingDay: TechnicalQuote,
     sellingPrice: number,
     totalStocks: number,
@@ -70,6 +71,7 @@ export class Trades {
     );
     const outcome: ITradeOutcome = {
       buyingDay,
+      buyingPrice,
       sellingDay,
       sellingPrice,
       totalStocks,
@@ -85,7 +87,7 @@ export class Trades {
   public toCSV(): string {
     const tradesCSV = this.tradeResults.map((trade) => ({
       "Buying Date": dayjs(trade.buyingDay.Date).format("YYYY-MM-DD"),
-      "Buying Price": trade.buyingDay.High,
+      "Buying Price": trade.buyingPrice,
       "Selling Date": dayjs(trade.sellingDay.Date).format("YYYY-MM-DD"),
       "Selling Price": trade.sellingPrice,
       "Total Stocks": trade.totalStocks,
