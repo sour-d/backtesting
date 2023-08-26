@@ -12,8 +12,8 @@ interface Config {
 }
 
 const movingAverageStrategyConfig: Config = {
-  upperLimit: 50,
-  lowerLimit: 20,
+  upperLimit: 20,
+  lowerLimit: 10,
   capital: 100000,
   riskPercentage: 5,
 };
@@ -48,7 +48,6 @@ class MovingAverageStrategy extends Strategy {
   }
 
   protected override trade(): void {
-    if (!this.stock.move()) return;
     const buyingDay = this.stock.now();
     const { upperLimit, lowerLimit } = this.config;
     const initialStopLoss = this.stock.simpleMovingAverage(lowerLimit);
@@ -70,20 +69,14 @@ class MovingAverageStrategy extends Strategy {
   }
 
   public override execute(): Trades {
-    while (this.stock.hasData()) {
+    while (this.stock.move()) {
       const { upperLimit, lowerLimit } = this.config;
+      const today = this.stock.now();
 
-      const previousDayUpperLimitMA =
-        this.stock.simpleMovingAverage(upperLimit);
-      const previousDayLowerLimitMA =
-        this.stock.simpleMovingAverage(lowerLimit);
-      const today = this.stock.move();
-
-      if (previousDayUpperLimitMA > previousDayLowerLimitMA) {
-        const upperLimitMA = this.stock.simpleMovingAverage(upperLimit);
-        const lowerLimitMA = this.stock.simpleMovingAverage(lowerLimit);
-        if (lowerLimitMA >= upperLimitMA && today && today.Close > lowerLimitMA)
-          this.trade();
+      const upperLimitMA = this.stock.simpleMovingAverage(upperLimit);
+      const lowerLimitMA = this.stock.simpleMovingAverage(lowerLimit);
+      if (lowerLimitMA >= upperLimitMA && today.Close > lowerLimitMA) {
+        this.stock.move() && this.trade();
       }
     }
     this.persistTradesFn(this.trades.toCSV());

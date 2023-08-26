@@ -30,14 +30,6 @@ class Strategy {
     const risk = this.getRisk();
     const numberOfStocksUnderRisk = Math.floor(risk / riskForOneStock);
     const totalCost = numberOfStocksUnderRisk * buyingPrice;
-    console.log({
-      risk,
-      riskForOneStock,
-      buyingPrice,
-      numberOfStocksUnderRisk,
-      totalCost,
-      c: Math.floor(this.capital / buyingPrice),
-    });
 
     if (totalCost <= this.capital) {
       return numberOfStocksUnderRisk;
