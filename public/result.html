@@ -53,19 +53,26 @@
       </div>
       <div class="card shadow rounded mt-5 p-5">
         <h4 class="mb-5">Each Trade Date And Profit/Loss</h4>
-        <div id="graph1" class="graph"></div>
+        <div id="graph1" class="graph overflow-scroll"></div>
       </div>
       <div class="card shadow rounded mt-5 p-5">
         <h4 class="mb-5">Profit Over Time</h4>
-        <div id="graph2" class="graph"></div>
+        <div id="graph2" class="graph overflow-scroll"></div>
       </div>
       <div class="card shadow rounded mt-5 p-5">
-        <h4 class="mb-5">Profit v/s Time Taken</h4>
-        <div id="graph3" class="graph"></div>
+        <h4 class="mb-5">Profit v/s Duration</h4>
+        <div id="graph3" class="graph overflow-scroll"></div>
       </div>
     </main>
 
+    
     <!-- custom js -->
+    <script src="js/data.js"></script>
+
+    <script src="js/charts/durationProfitChart.js"></script>
+    <script src="js/charts/profitLossChart.js"></script>
+    <script src="js/charts/totalProfitOverTime.js"></script>
+
     <script src="js/visualizer.js"></script>
   </body>
 </html>

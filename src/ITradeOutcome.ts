@@ -8,6 +8,5 @@ export interface ITradeOutcome {
   oneStockProfitOrLoss: number;
   totalProfitOrLoss: number;
   riskMultiple: number;
-  returnPercentage: number;
   sellingPrice: number;
 }

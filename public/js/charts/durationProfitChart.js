@@ -1,8 +1,4 @@
-const GREEN = "#6dc66d";
-const RED = "#ff6060";
-const DARK_RED = "#b20000";
-
-const drawTimeProfitBarChart = async (trades) => {
+const drawDurationProfitChart = (data) => {
   const chartData = {
     $schema: "https://vega.github.io/schema/vega-lite/v5.json",
     description: "Profit over time.",
@@ -86,32 +82,6 @@ const drawTimeProfitBarChart = async (trades) => {
     ],
   };
 
-  const data = trades.map((trade, i) => {
-    const timeDiff = dayjs(trade["Selling Date"]).diff(
-      dayjs(trade["Buying Date"]),
-      "day"
-    );
-    const profitOrLoss =
-      (trade["Selling Price"] - trade["Buying Price"]) * trade["Total Stocks"];
-    return {
-      time: timeDiff,
-      profitOrLoss,
-      id: i + 1,
-      buyingDate: trade["Buying Date"],
-      sellingDate: trade["Selling Date"],
-    };
-  });
-
   chartData.data = { values: data };
   vegaEmbed("#graph3", chartData);
 };
-
-const main = async () => {
-  const trades = await getTrades();
-  const data = transformData(trades);
-  drawProfitLossChart(data);
-  drawTotalProfitOverTime(data);
-  drawDurationProfitChart(data);
-};
-
-main();

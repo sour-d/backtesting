@@ -46,6 +46,7 @@ class Strategy {
     return this.capital * (this.riskPercentage / 100);
   }
 
+  // risk should calculated properly, eg, not have enough money to buy all stock
   protected updateTrades(
     buyingDay: TechnicalQuote,
     buyingPrice: number,
@@ -59,15 +60,14 @@ class Strategy {
       sellingDay,
       sellingPrice,
       totalStocks,
-      this.getRisk(),
-      this.capital
+      this.getRisk()
     );
   }
 
   // needs to implement
-  // trade(),
-  // checkForStopLossHit() and
-  // execute()
+  //    trade(),
+  //    checkForStopLossHit(),
+  //    execute()
 
   protected trade(): void {
     throw new Error("Method not implemented.");
@@ -84,11 +84,5 @@ class Strategy {
     throw new Error("Method not implemented.");
   }
 }
-
-// const strategies = {
-//   FortyTwentyStrategy: FortyTwentyStrategy.config,
-//   // "MovingAverageStrategy",
-//   // "TwoBreakingCandle",
-// };
 
 export { Strategy };

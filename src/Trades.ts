@@ -1,7 +1,6 @@
 import Papa from "papaparse";
 import { ITradeOutcome } from "./ITradeOutcome";
-import { Quote } from "./StockFeedSimulator";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { TechnicalQuote } from "./restructureData";
 
 export class Trades {
@@ -17,7 +16,7 @@ export class Trades {
 
   private totalExpectancy(): number {
     return this.tradeResults.reduce(
-      (result, { riskMultiple }) => result + riskMultiple,
+      (totalRiskMultiple, { riskMultiple }) => totalRiskMultiple + riskMultiple,
       0
     );
   }
@@ -26,56 +25,25 @@ export class Trades {
     return this.totalExpectancy() / this.totalTrades();
   }
 
-  private totalReturnPercentage(): number {
-    return this.tradeResults.reduce(
-      (result, { returnPercentage }) => result + returnPercentage,
-      0
-    );
-  }
-
-  public averageReturn(): number {
-    return this.totalReturnPercentage() / this.totalTrades();
-  }
-
-  private returnPercentage(
-    sellingDay: TechnicalQuote,
-    buyingDay: TechnicalQuote,
-    totalProfitOrLoss: number,
-    capital: number
-  ) {
-    const buyingDate = new Date(buyingDay.Date);
-    const sellingDate = new Date(sellingDay.Date);
-    const noOfMilliseconds = sellingDate.getTime() - buyingDate.getTime();
-    const noOfYrs: number = noOfMilliseconds / (1000 * 60 * 60 * 24 * 365);
-    const returnPercentage = (totalProfitOrLoss * 100) / (capital * noOfYrs);
-    return returnPercentage;
-  }
-
   public addTradeResult(
     buyingDay: TechnicalQuote,
     buyingPrice: number,
     sellingDay: TechnicalQuote,
     sellingPrice: number,
     totalStocks: number,
-    risk: number,
-    capital: number
+    risk: number
   ): void {
-    const oneStockProfitOrLoss: number = sellingDay.Low - buyingDay.High;
+    const oneStockProfitOrLoss: number = sellingPrice - buyingPrice;
     const totalProfitOrLoss: number = oneStockProfitOrLoss * totalStocks;
     const riskMultiple: number = totalProfitOrLoss / risk;
-    const returnPercentage: number = this.returnPercentage(
-      sellingDay,
-      buyingDay,
-      totalProfitOrLoss,
-      capital
-    );
+    console.log(riskMultiple);
+
     const outcome: ITradeOutcome = {
       buyingDay,
       buyingPrice,
       sellingDay,
       sellingPrice,
       totalStocks,
-      returnPercentage,
       riskMultiple,
       oneStockProfitOrLoss,
       totalProfitOrLoss,
