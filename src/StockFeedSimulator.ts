@@ -13,13 +13,19 @@ interface Quote {
 class StockFeedSimulator {
   #quotes: TechnicalQuote[];
   #currentQuoteIndex: number;
+  name: string;
 
-  constructor(data: TechnicalQuote[], startingQuoteDay: number = 1) {
+  constructor(
+    data: TechnicalQuote[],
+    startingQuoteDay: number = 1,
+    name: string = ""
+  ) {
     if (data.length < 1) {
       throw new Error("Data must be at least 1 day long for stock simulator");
     }
     this.#quotes = data;
     this.#currentQuoteIndex = startingQuoteDay - 1;
+    this.name = name;
   }
 
   hasData(): boolean {

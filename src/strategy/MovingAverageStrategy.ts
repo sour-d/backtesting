@@ -79,7 +79,7 @@ class MovingAverageStrategy extends Strategy {
         this.stock.move() && this.trade();
       }
     }
-    this.persistTradesFn(this.trades.toCSV());
+    this.persistTradesFn(this.trades);
     return this.trades;
   }
 }

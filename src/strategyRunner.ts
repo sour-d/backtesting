@@ -12,23 +12,25 @@ export const STRATEGIES: any = {
   TwoBreakingCandle,
 };
 
-const persistTrades = (stockName: string) => (data: string) => {
-  fs.writeFileSync(`result/${stockName}.csv`, data, "utf-8");
+const persistTrades = (stockName: string) => (outcomes: Trades) => {
+  fs.writeFileSync(
+    `result/result.json`,
+    JSON.stringify({ report: outcomes.getReport(), trades: outcomes.toCSV() }),
+    "utf-8"
+  );
 };
 
 const strategyRunner = (stockName: string, config: any) => {
   const stockData = transformStockData(stockName);
 
   const startingDay = 40;
-  const stock = new StockFeedSimulator(stockData, startingDay);
+  const stock = new StockFeedSimulator(stockData, startingDay, stockName);
   const strategyClass = STRATEGIES[config.strategy]._class;
 
   const strategy = new strategyClass(stock, persistTrades(stockName), config);
   const outcomes: Trades = strategy.execute();
-  return {
-    averageExpectancy: outcomes.averageExpectancy(),
-    // averageReturn: outcomes.averageReturn(),
-  };
+
+  return outcomes;
 };
 
 export default strategyRunner;

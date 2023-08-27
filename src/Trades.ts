@@ -4,10 +4,16 @@ import dayjs from "dayjs";
 import { TechnicalQuote } from "./restructureData";
 
 export class Trades {
+  private capital: number;
+  private risk: number;
+  private stock: string;
   private tradeResults: ITradeOutcome[];
 
-  constructor() {
+  constructor(capital: number, risk: number, stock: string) {
     this.tradeResults = [];
+    this.capital = capital;
+    this.risk = risk;
+    this.stock = stock;
   }
 
   public totalTrades(): number {
@@ -49,6 +55,16 @@ export class Trades {
     };
 
     this.tradeResults.push(outcome);
+  }
+
+  public getReport() {
+    return {
+      stock: this.stock,
+      capital: this.capital,
+      riskTaken: this.risk,
+      averageExpectancy: this.averageExpectancy(),
+      totalTrades: this.totalTrades(),
+    };
   }
 
   public toCSV(): string {

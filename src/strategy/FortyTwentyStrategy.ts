@@ -59,7 +59,7 @@ class FortyTwentyStrategy extends Strategy {
     const riskForOneStock = buyPrice - initialStopLoss;
     const totalStocks = this.getTotalStocks(riskForOneStock, buyPrice);
 
-    // store result
+    // storing result
     this.updateTrades(
       buyingDay,
       buyPrice,
@@ -76,7 +76,7 @@ class FortyTwentyStrategy extends Strategy {
 
       if (this.isHighBroken(today, lastFortyDayHigh)) this.trade();
     }
-    this.persistTradesFn(this.trades.toCSV());
+    this.persistTradesFn(this.trades);
     return this.trades;
   }
 }

@@ -73,7 +73,7 @@ class TwoBreakingCandle extends Strategy {
         this.trade();
       yesterday = today;
     }
-    this.persistTradesFn(this.trades.toCSV());
+    this.persistTradesFn(this.trades);
     return this.trades;
   }
 }

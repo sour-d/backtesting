@@ -18,18 +18,19 @@ app.get("/api/strategies", (req, res) => {
 });
 
 app.post("/api/strategies", (req, res) => {
-  let result;
   try {
-    result = strategyRunner("Nifty", req.body);
+    strategyRunner("Nifty", req.body);
   } catch (e) {
     res.json({});
     return;
   }
-  res.json({ status: "OK", result });
+  res.json({ status: "OK" });
 });
 
-app.get("/api/result/:symbol", (req, res) => {
-  res.sendFile(path.resolve("result", `${req.params.symbol}.csv`));
+app.get("/api/result", (req, res) => {
+  // res.sendFile(path.resolve("result", `${req.params.symbol}.csv`));
+  res.header("Content-Type", "application/json");
+  res.sendFile(path.resolve("result", `result.json`));
 });
 
 app.use(express.static("public"));

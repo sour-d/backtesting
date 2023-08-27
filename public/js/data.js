@@ -1,14 +1,16 @@
-const getTrades = async () => {
-  const response = await fetch(`api/result/Nifty`);
-  const rawTrades = await response.text();
-  const trades = Papa.parse(rawTrades, {
-    header: true,
-    dynamicTyping: true,
-  });
-  return trades.data;
+const getResult = async () => {
+  return await fetch(`api/result`)
+    .then((response) => response.json())
+    .then((response) => {
+      const trades = Papa.parse(response.trades, {
+        header: true,
+        dynamicTyping: true,
+      });
+      return { report: response.report, trades: trades.data };
+    });
 };
 
-const transformData = (trades) => {
+const transformTradesData = (trades) => {
   const transformedData = trades.map((trade, i) => {
     const timeDiff = dayjs(trade["Selling Date"]).diff(
       dayjs(trade["Buying Date"]),
@@ -31,6 +33,7 @@ const transformData = (trades) => {
     return trade.totalProfitOrLoss;
   }, 0);
 
-  transformedData.unshift();
+  transformedData.unshift({ sellingDate: "0000-00-00", totalProfitOrLoss: 0 });
+
   return transformedData;
 };

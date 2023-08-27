@@ -19,7 +19,7 @@ class Strategy {
     this.capital = capital;
 
     this.riskPercentage = riskPercentage;
-    this.trades = new Trades();
+    this.trades = new Trades(this.capital, this.getRisk(), this.stock.name);
     this.persistTradesFn = persistTradesFn;
   }
 
