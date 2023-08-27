@@ -5,6 +5,38 @@
       "symbol": "^NSEI"
     },
     {
+      "name": "Bank Nifty",
+      "symbol": "^NSEBANK"
+    },
+    {
+      "name": "Bartronics India Ltd",
+      "symbol": "ASMS.NS"
+    },
+    {
+      "name": "Star Cement Ltd",
+      "symbol": "STARCEMENT.NS"
+    },
+    {
+      "name": "Goldiam International Ltd",
+      "symbol": "GOLDIAM.NS"
+    },
+    {
+      "name": "VST Industries",
+      "symbol": "VSTIND.NS"
+    },
+    {
+      "name": "Thyrocare Technologies Ltd",
+      "symbol": "THYROCARE.NS"
+    },
+    {
+      "name": "Relaxo Footwears Ltd",
+      "symbol": "RELAXO.NS"
+    },
+    {
+      "name": "Deepak Nitrite Ltd",
+      "symbol": "DEEPAKNTR.NS"
+    },
+    {
       "name": "UltraTech",
       "symbol": "ULTRACEMCO.NS"
     },

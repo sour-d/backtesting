@@ -31,7 +31,6 @@ const transformData = (trades) => {
     return trade.totalProfitOrLoss;
   }, 0);
 
-  transformedData.unshift({ sellingDate: "0000-00-00", totalProfitOrLoss: 0 });
-  console.log(transformedData);
+  transformedData.unshift();
   return transformedData;
 };

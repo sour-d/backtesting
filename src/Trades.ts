@@ -36,7 +36,6 @@ export class Trades {
     const oneStockProfitOrLoss: number = sellingPrice - buyingPrice;
     const totalProfitOrLoss: number = oneStockProfitOrLoss * totalStocks;
     const riskMultiple: number = totalProfitOrLoss / risk;
-    console.log(riskMultiple);
 
     const outcome: ITradeOutcome = {
       buyingDay,

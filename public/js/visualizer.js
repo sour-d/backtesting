@@ -106,9 +106,15 @@ const drawTimeProfitBarChart = async (trades) => {
   vegaEmbed("#graph3", chartData);
 };
 
+const updatedTotalTrades = (data) => {
+  const totalTradesEle = document.getElementById('total-trades');
+  totalTradesEle.innerText = `Total Trades : ${data.length}`;
+}
+
 const main = async () => {
   const trades = await getTrades();
   const data = transformData(trades);
+  updatedTotalTrades(data);
   drawProfitLossChart(data);
   drawTotalProfitOverTime(data);
   drawDurationProfitChart(data);

@@ -27,7 +27,7 @@ const strategyRunner = (stockName: string, config: any) => {
   const outcomes: Trades = strategy.execute();
   return {
     averageExpectancy: outcomes.averageExpectancy(),
-    averageReturn: outcomes.averageReturn(),
+    // averageReturn: outcomes.averageReturn(),
   };
 };
 
