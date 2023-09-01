@@ -49,6 +49,7 @@ export class Trades {
       sellingDay,
       sellingPrice,
       totalStocks,
+      risk,
       riskMultiple,
       oneStockProfitOrLoss,
       totalProfitOrLoss,
@@ -61,7 +62,7 @@ export class Trades {
     return {
       stock: this.stock,
       capital: this.capital,
-      riskTaken: this.risk,
+      riskTaken: this.risk + "%",
       averageExpectancy: this.averageExpectancy(),
       totalTrades: this.totalTrades(),
     };
@@ -74,6 +75,7 @@ export class Trades {
       "Selling Date": dayjs(trade.sellingDay.Date).format("YYYY-MM-DD"),
       "Selling Price": trade.sellingPrice,
       "Total Stocks": trade.totalStocks,
+      Risk: trade.risk,
     }));
 
     return Papa.unparse(tradesCSV);

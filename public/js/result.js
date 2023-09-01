@@ -16,9 +16,9 @@ const generateReport = (report) => {
 };
 
 const updatedTotalTrades = (data) => {
-  const totalTradesEle = document.getElementById('total-trades');
+  const totalTradesEle = document.getElementById("total-trades");
   totalTradesEle.innerText = `Total Trades : ${data.length}`;
-}
+};
 
 const main = async () => {
   const { report, trades } = await getResult();
@@ -29,6 +29,8 @@ const main = async () => {
   drawProfitLossChart(data);
   drawTotalProfitOverTime(data);
   drawDurationProfitChart(data);
+  drawRiskRewardChart(data);
+  drawAccumulatedRewardChart(data);
 };
 
 main();

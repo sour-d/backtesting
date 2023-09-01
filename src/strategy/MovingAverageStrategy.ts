@@ -55,6 +55,7 @@ class MovingAverageStrategy extends Strategy {
 
     const riskForOneStock = buyingDay.Open - initialStopLoss;
     const totalStocks = this.getTotalStocks(riskForOneStock, buyingDay.Open);
+    const riskTaken = totalStocks * riskForOneStock;
 
     const { sellingDay, sellingPrice } = this.checkForStopLossHit();
     if (sellingDay && sellingPrice) {
@@ -63,7 +64,8 @@ class MovingAverageStrategy extends Strategy {
         buyingDay.Open,
         sellingDay,
         sellingPrice,
-        totalStocks
+        totalStocks,
+        riskTaken
       );
     }
   }

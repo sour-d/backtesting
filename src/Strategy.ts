@@ -19,7 +19,11 @@ class Strategy {
     this.capital = capital;
 
     this.riskPercentage = riskPercentage;
-    this.trades = new Trades(this.capital, this.getRisk(), this.stock.name);
+    this.trades = new Trades(
+      this.capital,
+      this.riskPercentage,
+      this.stock.name
+    );
     this.persistTradesFn = persistTradesFn;
   }
 
@@ -52,7 +56,8 @@ class Strategy {
     buyingPrice: number,
     sellingDay: TechnicalQuote,
     sellingPrice: number,
-    totalStocks: number
+    totalStocks: number,
+    risk: number
   ): void {
     this.trades.addTradeResult(
       buyingDay,
@@ -60,7 +65,7 @@ class Strategy {
       sellingDay,
       sellingPrice,
       totalStocks,
-      this.getRisk()
+      risk
     );
   }
 

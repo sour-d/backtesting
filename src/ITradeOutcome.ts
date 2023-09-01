@@ -7,6 +7,7 @@ export interface ITradeOutcome {
   sellingDay: TechnicalQuote;
   oneStockProfitOrLoss: number;
   totalProfitOrLoss: number;
+  risk: number;
   riskMultiple: number;
   sellingPrice: number;
 }

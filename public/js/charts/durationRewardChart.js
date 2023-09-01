@@ -5,12 +5,6 @@ const drawDurationProfitChart = (data) => {
     vconcat: [
       {
         mark: { type: "bar", tooltip: true },
-        transform: [
-          {
-            calculate: "datum.profitOrLoss > 0 ? 'Profit' : 'Loss'",
-            as: "Outcome",
-          },
-        ],
         encoding: {
           x: {
             field: "id",
@@ -22,7 +16,7 @@ const drawDurationProfitChart = (data) => {
             type: "quantitative",
             title: "Profit or Loss",
           },
-          color: { field: "Outcome", scale: { range: [RED, GREEN] } },
+          color: { field: "result", scale: { range: [RED, GREEN] } },
           tooltip: [
             {
               field: "profitOrLoss",
@@ -38,12 +32,6 @@ const drawDurationProfitChart = (data) => {
         layer: [
           {
             mark: "bar",
-            transform: [
-              {
-                calculate: "datum.profitOrLoss > 0 ? 'Profit' : 'Loss'",
-                as: "Outcome",
-              },
-            ],
             encoding: {
               x: {
                 field: "id",
@@ -51,16 +39,20 @@ const drawDurationProfitChart = (data) => {
                 title: "Trades",
               },
               y: {
-                field: "time",
+                field: "duration",
                 type: "quantitative",
-                title: "Time",
+                title: "Duration",
               },
               color: {
-                field: "Outcome",
+                field: "result",
                 scale: { range: [RED, GREEN] },
               },
               tooltip: [
-                { field: "time", type: "quantitative", title: "Time Taken" },
+                {
+                  field: "duration",
+                  type: "quantitative",
+                  title: "Duration",
+                },
               ],
             },
           },
@@ -69,9 +61,9 @@ const drawDurationProfitChart = (data) => {
             encoding: {
               y: {
                 aggregate: "mean",
-                field: "time",
+                field: "duration",
                 type: "quantitative",
-                title: "Average Time Taken",
+                title: "Average duration",
               },
               color: { value: DARK_RED },
               size: { value: 2 },

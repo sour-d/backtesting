@@ -55,9 +55,17 @@ class TwoBreakingCandle extends Strategy {
       return;
     }
     const totalStocks = this.getTotalStocks(riskForOneStock, buyingDay.High);
+    const riskTaken = totalStocks * riskForOneStock;
 
     // store result
-    this.updateTrades(buyingDay, 0, sellingDay, sellingPrice, totalStocks);
+    this.updateTrades(
+      buyingDay,
+      0,
+      sellingDay,
+      sellingPrice,
+      totalStocks,
+      riskTaken
+    );
   }
 
   private isGreenCandle(quote: TechnicalQuote): boolean {

@@ -58,6 +58,7 @@ class FortyTwentyStrategy extends Strategy {
 
     const riskForOneStock = buyPrice - initialStopLoss;
     const totalStocks = this.getTotalStocks(riskForOneStock, buyPrice);
+    const riskTaken = totalStocks * riskForOneStock;
 
     // storing result
     this.updateTrades(
@@ -65,7 +66,8 @@ class FortyTwentyStrategy extends Strategy {
       buyPrice,
       sellingDay,
       sellingPrice,
-      totalStocks
+      totalStocks,
+      riskTaken
     );
   }
 
