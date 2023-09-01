@@ -5,6 +5,7 @@ const drawDurationProfitChart = (data) => {
     vconcat: [
       {
         mark: { type: "bar", tooltip: true },
+        height: 300,
         encoding: {
           x: {
             field: "id",
@@ -32,6 +33,7 @@ const drawDurationProfitChart = (data) => {
         layer: [
           {
             mark: "bar",
+            height: 300,
             encoding: {
               x: {
                 field: "id",

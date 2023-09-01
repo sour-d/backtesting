@@ -3,9 +3,10 @@ const drawAccumulatedRewardChart = (data) => {
     $schema: "https://vega.github.io/schema/vega-lite/v5.json",
     description: "Profit over time.",
     layer: [
-      { mark: { type: "line", point: true, tooltip: true } },
+      { mark: { type: "line", point: true, tooltip: true }, height: 400 },
       {
         mark: { type: "line", point: true, tooltip: true },
+        height: 400,
         transform: [
           {
             calculate: "datum.totalProfitOrLoss > 0 ? 'Profit' : 'Loss'",

@@ -7,6 +7,10 @@ const drawRiskRewardChart = (data) => {
         layer: [
           {
             mark: { type: "bar", tooltip: true },
+<<<<<<< HEAD
+=======
+            height: 400,
+>>>>>>> bfe44f7 (Added one more chart)
             encoding: {
               x: {
                 field: "id",
@@ -37,6 +41,10 @@ const drawRiskRewardChart = (data) => {
           },
           {
             mark: { type: "rule", tooltip: true },
+<<<<<<< HEAD
+=======
+            height: 400,
+>>>>>>> bfe44f7 (Added one more chart)
             encoding: {
               y: {
                 aggregate: "mean",

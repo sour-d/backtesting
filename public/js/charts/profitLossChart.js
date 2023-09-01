@@ -5,6 +5,7 @@ const drawProfitLossChart = (data) => {
       type: "bar",
       tooltip: true,
     },
+    height: 400,
     transform: [
       {
         calculate: "datum.profitOrLoss > 0 ? 'Profit' : 'Loss'",
