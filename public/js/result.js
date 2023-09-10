@@ -31,6 +31,7 @@ const main = async () => {
   drawDurationProfitChart(data);
   drawRiskRewardChart(data);
   drawAccumulatedRewardChart(data);
+  drawDrawDownChart(data);
 };
 
 main();

@@ -19,7 +19,7 @@ const transformTradesData = (trades) => {
     const profitOrLoss =
       (trade["Selling Price"] - trade["Buying Price"]) * trade["Total Stocks"];
     return {
-      duration: duration,
+      duration,
       profitOrLoss,
       id: i + 1,
       buyingDate: dayjs(trade["Buying Date"]).format("YYYY-MM-DD"),
@@ -43,7 +43,27 @@ const transformTradesData = (trades) => {
     { totalProfitOrLoss: 0, totalReward: 0 }
   );
 
-  transformedData.unshift();
+  addDrawDown(transformedData);
 
   return transformedData;
+};
+
+const addDrawDown = (tradeResults) => {
+  const money = 100000;
+  let highestProfitLoss = 0;
+
+  for (let i = 0; i < tradeResults.length; i++) {
+    const tradeResult = tradeResults[i];
+    const totalProfitLoss = tradeResult.totalProfitOrLoss;
+    const total = money + highestProfitLoss;
+    let afterDrawDown = money + highestProfitLoss - Math.abs(totalProfitLoss);
+    let drawDownPercentage = (afterDrawDown / total) * 100;
+
+    if (totalProfitLoss > highestProfitLoss) {
+      drawDownPercentage = 100;
+      highestProfitLoss = totalProfitLoss;
+    }
+
+    tradeResult.drawDown = drawDownPercentage - 100;
+  }
 };

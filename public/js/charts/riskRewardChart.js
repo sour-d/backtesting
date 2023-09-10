@@ -36,23 +36,25 @@ const drawRiskRewardChart = (data) => {
               ],
             },
           },
-          {
-            mark: { type: "rule", tooltip: true },
-            encoding: {
-              y: {
-                aggregate: "mean",
-                field: "reward",
-                type: "quantitative",
-                title: "Average Time Taken",
-              },
-              color: { value: DARK_RED },
-              size: { value: 2 },
-            },
-          },
+          // {
+          //   mark: { type: "rule", tooltip: true },
+          //   encoding: {
+          //     y: {
+          //       aggregate: "mean",
+          //       field: "reward",
+          //       type: "quantitative",
+          //       title: "Average Time Taken",
+          //     },
+          //     color: { value: DARK_RED },
+          //     size: { value: 2 },
+          //   },
+          // },
         ],
       },
     ],
   };
+
+  console.log(data);
 
   chartData.data = { values: data };
   vegaEmbed("#graph4", chartData);
