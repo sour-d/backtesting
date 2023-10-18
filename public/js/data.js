@@ -53,17 +53,18 @@ const addDrawDown = (tradeResults) => {
   let highestProfitLoss = 0;
 
   for (let i = 0; i < tradeResults.length; i++) {
-    const tradeResult = tradeResults[i];
-    const totalProfitLoss = tradeResult.totalProfitOrLoss;
-    const total = money + highestProfitLoss;
-    let afterDrawDown = money + highestProfitLoss - Math.abs(totalProfitLoss);
-    let drawDownPercentage = (afterDrawDown / total) * 100;
+    const trade = tradeResults[i];
+    const profitOrLoss = trade.profitOrLoss;
+    const totalProfitLoss = trade.totalProfitOrLoss;
 
     if (totalProfitLoss > highestProfitLoss) {
-      drawDownPercentage = 100;
+      trade.drawDown = 0;
       highestProfitLoss = totalProfitLoss;
+    } else {
+      const total = money + highestProfitLoss;
+      let drawDownFromPeak = total - Math.abs(profitOrLoss);
+      let drawDownPercentage = (drawDownFromPeak / total) * 100;
+      trade.drawDown = drawDownPercentage - 100;
     }
-
-    tradeResult.drawDown = drawDownPercentage - 100;
   }
 };

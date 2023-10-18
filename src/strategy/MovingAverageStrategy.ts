@@ -7,6 +7,7 @@ import { getProps } from "../utils";
 interface Config {
   upperLimit: number;
   lowerLimit: number;
+  stopLossWindow: number;
   capital: number;
   riskPercentage: number;
 }
@@ -14,6 +15,7 @@ interface Config {
 const movingAverageStrategyConfig: Config = {
   upperLimit: 20,
   lowerLimit: 10,
+  stopLossWindow: 10,
   capital: 100000,
   riskPercentage: 5,
 };
@@ -49,11 +51,11 @@ class MovingAverageStrategy extends Strategy {
 
   protected override trade(): void {
     const buyingDay = this.stock.now();
-    const { upperLimit, lowerLimit } = this.config;
-    const initialStopLoss = this.stock.simpleMovingAverage(lowerLimit);
-    if (initialStopLoss >= buyingDay.Open) return;
+    // const { upperLimit, lowerLimit } = this.config;
+    const initialStopLoss = this.stock.lowOfLast(this.config.stopLossWindow);
+    if (initialStopLoss.Low >= buyingDay.Open) return;
 
-    const riskForOneStock = buyingDay.Open - initialStopLoss;
+    const riskForOneStock = buyingDay.Open - initialStopLoss.Low;
     const totalStocks = this.getTotalStocks(riskForOneStock, buyingDay.Open);
     const riskTaken = totalStocks * riskForOneStock;
 
