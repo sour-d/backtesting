@@ -10,7 +10,7 @@ interface Config {
 }
 const twoBreakingCandleConfig: Config = {
   capital: 100000,
-  riskPercentage: 0.5,
+  riskPercentage: 5,
 };
 
 class TwoBreakingCandle extends Strategy {
@@ -29,13 +29,15 @@ class TwoBreakingCandle extends Strategy {
     sellingDay: TechnicalQuote | null;
     sellingPrice: number | null;
   } {
-    let yesterday = this.stock.now();
-    while (this.stock.move()) {
+    let yesterday = this.stock.prev();
+    do {
       const today = this.stock.now();
       if (today.Low <= yesterday.Low) {
-        return { sellingDay: today, sellingPrice: today.Low };
+        return { sellingDay: today, sellingPrice: yesterday.Low };
       }
-    }
+      yesterday = today;
+    } while (this.stock.move());
+
     return { sellingDay: null, sellingPrice: null };
   }
 
@@ -43,10 +45,13 @@ class TwoBreakingCandle extends Strategy {
     const breakingDay = this.stock.now();
     this.stock.move();
     const buyingDay = this.stock.now();
+    const buyingPrice = buyingDay.Open;
     const initialStopLoss = breakingDay.Low;
-    const riskForOneStock = buyingDay.High - initialStopLoss;
+    const riskForOneStock = buyingPrice - initialStopLoss;
+    const totalStocks = this.getTotalStocks(riskForOneStock, buyingPrice);
+    const riskTaken = totalStocks * riskForOneStock;
 
-    if (riskForOneStock <= 0) {
+    if (riskForOneStock <= 0 || totalStocks <= 0) {
       return;
     }
 
@@ -54,13 +59,11 @@ class TwoBreakingCandle extends Strategy {
     if (!(sellingDay && sellingPrice)) {
       return;
     }
-    const totalStocks = this.getTotalStocks(riskForOneStock, buyingDay.High);
-    const riskTaken = totalStocks * riskForOneStock;
 
     // store result
     this.updateTrades(
       buyingDay,
-      0,
+      buyingPrice,
       sellingDay,
       sellingPrice,
       totalStocks,
@@ -79,7 +82,7 @@ class TwoBreakingCandle extends Strategy {
 
       if (this.isGreenCandle(yesterday) && this.isGreenCandle(today))
         this.trade();
-      yesterday = today;
+      yesterday = this.stock.now();
     }
     this.persistTradesFn(this.trades);
     return this.trades;

@@ -19,7 +19,7 @@ app.get("/api/strategies", (req, res) => {
 
 app.post("/api/strategies", (req, res) => {
   try {
-    strategyRunner("Nifty", req.body);
+    strategyRunner(req.body.stock, req.body);
   } catch (e) {
     res.json({});
     return;
