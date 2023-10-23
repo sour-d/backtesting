@@ -35,8 +35,9 @@ class StockFeedSimulator {
   now(): TechnicalQuote {
     return this.#quotes[this.#currentQuoteIndex];
   }
-  prev(): TechnicalQuote {
-    return this.#quotes[this.#currentQuoteIndex - 1];
+
+  prev(quoteCount: number = 1): TechnicalQuote {
+    return this.#quotes[this.#currentQuoteIndex - quoteCount];
   }
 
   move(): TechnicalQuote | undefined {

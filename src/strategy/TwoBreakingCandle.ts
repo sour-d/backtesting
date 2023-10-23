@@ -1,6 +1,5 @@
 import { StockFeedSimulator } from "../StockFeedSimulator";
-import { Strategy } from "../Strategy";
-import { Trades } from "../Trades";
+import { _Strategy } from "../Strategy";
 import { TechnicalQuote } from "../restructureData";
 import { getProps } from "../utils";
 
@@ -13,7 +12,7 @@ const twoBreakingCandleConfig: Config = {
   riskPercentage: 5,
 };
 
-class TwoBreakingCandle extends Strategy {
+class TwoBreakingCandleNew extends _Strategy {
   config: Config;
 
   constructor(
@@ -25,71 +24,38 @@ class TwoBreakingCandle extends Strategy {
     this.config = config;
   }
 
-  protected override checkForStopLossHit(): {
-    sellingDay: TechnicalQuote | null;
-    sellingPrice: number | null;
-  } {
-    let yesterday = this.stock.prev();
-    do {
-      const today = this.stock.now();
-      if (today.Low <= yesterday.Low) {
-        return { sellingDay: today, sellingPrice: yesterday.Low };
-      }
-      yesterday = today;
-    } while (this.stock.move());
-
-    return { sellingDay: null, sellingPrice: null };
-  }
-
-  protected override trade(): void {
-    const breakingDay = this.stock.now();
-    this.stock.move();
-    const buyingDay = this.stock.now();
-    const buyingPrice = buyingDay.Open;
-    const initialStopLoss = breakingDay.Low;
-    const riskForOneStock = buyingPrice - initialStopLoss;
-    const totalStocks = this.getTotalStocks(riskForOneStock, buyingPrice);
-    const riskTaken = totalStocks * riskForOneStock;
-
-    if (riskForOneStock <= 0 || totalStocks <= 0) {
-      return;
-    }
-
-    const { sellingDay, sellingPrice } = this.checkForStopLossHit();
-    if (!(sellingDay && sellingPrice)) {
-      return;
-    }
-
-    // store result
-    this.updateTrades(
-      buyingDay,
-      buyingPrice,
-      sellingDay,
-      sellingPrice,
-      totalStocks,
-      riskTaken
-    );
-  }
-
   private isGreenCandle(quote: TechnicalQuote): boolean {
     return quote["CandleBody"] > 0;
   }
 
-  public override execute(): Trades {
-    let yesterday = this.stock.now();
-    while (this.stock.move()) {
-      const today = this.stock.now();
-
-      if (this.isGreenCandle(yesterday) && this.isGreenCandle(today))
-        this.trade();
-      yesterday = this.stock.now();
+  override sell(): void {
+    let yesterday = this.stock.prev();
+    const today = this.stock.now();
+    if (today.Low <= yesterday.Low) {
+      this.exitPosition(yesterday.Low);
     }
-    this.persistTradesFn(this.trades);
-    return this.trades;
+  }
+
+  override buy(): void {
+    const secondPrev = this.stock.prev(2);
+    const prev = this.stock.prev();
+
+    if (this.isGreenCandle(secondPrev) && this.isGreenCandle(prev)) {
+      const { Open: buyingPrice } = this.stock.now();
+      const { Low: initialStopLoss } = prev;
+      const riskForOneStock = buyingPrice - initialStopLoss;
+      const totalStocks = this.stocksCanBeBought(riskForOneStock, buyingPrice);
+      const riskTaken = totalStocks * riskForOneStock;
+
+      if (riskForOneStock <= 0 || totalStocks <= 0) {
+        return;
+      }
+      this.takePosition(riskForOneStock, buyingPrice);
+    }
   }
 }
 
 export default {
-  _class: TwoBreakingCandle,
+  _class: TwoBreakingCandleNew,
   _config: getProps(twoBreakingCandleConfig),
 };

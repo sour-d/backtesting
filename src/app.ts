@@ -28,7 +28,6 @@ app.post("/api/strategies", (req, res) => {
 });
 
 app.get("/api/result", (req, res) => {
-  // res.sendFile(path.resolve("result", `${req.params.symbol}.csv`));
   res.header("Content-Type", "application/json");
   res.sendFile(path.resolve("result", `result.json`));
 });
