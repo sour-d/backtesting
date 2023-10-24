@@ -1,7 +1,5 @@
 import { StockFeedSimulator } from "../StockFeedSimulator";
 import { Strategy } from "../Strategy";
-import { Trades } from "../Trades";
-import { TechnicalQuote } from "../restructureData";
 import { getProps } from "../utils";
 
 interface Config {
@@ -32,59 +30,31 @@ class MovingAverageStrategy extends Strategy {
     this.config = config;
   }
 
-  protected override checkForStopLossHit(): {
-    sellingDay: TechnicalQuote | null;
-    sellingPrice: number | null;
-  } {
+  protected override buy(): void {
+    const yesterday = this.stock.prev();
     const { upperLimit, lowerLimit } = this.config;
 
-    while (this.stock.move()) {
-      const today = this.stock.now();
-      const lowerMA = this.stock.simpleMovingAverage(lowerLimit);
-      const upperMA = this.stock.simpleMovingAverage(upperLimit);
-      if (lowerMA >= today.Low) {
-        return { sellingDay: today, sellingPrice: lowerMA };
-      }
-    }
-    return { sellingDay: null, sellingPrice: null };
-  }
-
-  protected override trade(): void {
-    const buyingDay = this.stock.now();
-    // const { upperLimit, lowerLimit } = this.config;
-    const initialStopLoss = this.stock.lowOfLast(this.config.stopLossWindow);
-    if (initialStopLoss.Low >= buyingDay.Open) return;
-
-    const riskForOneStock = buyingDay.Open - initialStopLoss.Low;
-    const totalStocks = this.getTotalStocks(riskForOneStock, buyingDay.Open);
-    const riskTaken = totalStocks * riskForOneStock;
-
-    const { sellingDay, sellingPrice } = this.checkForStopLossHit();
-    if (sellingDay && sellingPrice) {
-      this.updateTrades(
-        buyingDay,
-        buyingDay.Open,
-        sellingDay,
-        sellingPrice,
-        totalStocks,
-        riskTaken
+    const upperLimitMA = this.stock.simpleMovingAverage(upperLimit);
+    const lowerLimitMA = this.stock.simpleMovingAverage(lowerLimit);
+    if (lowerLimitMA >= upperLimitMA && yesterday.Close > lowerLimitMA) {
+      const { Open: buyingPrice } = this.stock.now();
+      const { Low: initialStopLoss } = this.stock.lowOfLast(
+        this.config.stopLossWindow
       );
+      const riskForOneStock = buyingPrice - initialStopLoss;
+      if (initialStopLoss >= buyingPrice) return;
+
+      this.takePosition(riskForOneStock, buyingPrice);
     }
   }
 
-  public override execute(): Trades {
-    while (this.stock.move()) {
-      const { upperLimit, lowerLimit } = this.config;
-      const today = this.stock.now();
-
-      const upperLimitMA = this.stock.simpleMovingAverage(upperLimit);
-      const lowerLimitMA = this.stock.simpleMovingAverage(lowerLimit);
-      if (lowerLimitMA >= upperLimitMA && today.Close > lowerLimitMA) {
-        this.stock.move() && this.trade();
-      }
+  protected override sell(): void {
+    const { lowerLimit } = this.config;
+    const today = this.stock.now();
+    const lowerMA = this.stock.simpleMovingAverage(lowerLimit);
+    if (lowerMA >= today.Low) {
+      this.exitPosition(lowerMA);
     }
-    this.persistTradesFn(this.trades);
-    return this.trades;
   }
 }
 

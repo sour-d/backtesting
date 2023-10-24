@@ -1,5 +1,5 @@
 import { StockFeedSimulator } from "../StockFeedSimulator";
-import { _Strategy } from "../Strategy";
+import { Strategy } from "../Strategy";
 import { TechnicalQuote } from "../restructureData";
 import { getProps } from "../utils";
 
@@ -12,7 +12,7 @@ const twoBreakingCandleConfig: Config = {
   riskPercentage: 5,
 };
 
-class TwoBreakingCandleNew extends _Strategy {
+class TwoBreakingCandleNew extends Strategy {
   config: Config;
 
   constructor(

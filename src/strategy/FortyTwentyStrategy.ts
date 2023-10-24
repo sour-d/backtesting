@@ -1,7 +1,5 @@
 import { Quote, StockFeedSimulator } from "../StockFeedSimulator";
 import { Strategy } from "../Strategy";
-import { Trades } from "../Trades";
-import { TechnicalQuote } from "../restructureData";
 import { getProps } from "../utils";
 
 interface Config {
@@ -29,57 +27,30 @@ class FortyTwentyStrategy extends Strategy {
     this.config = config;
   }
 
-  protected override checkForStopLossHit(): {
-    sellingDay: TechnicalQuote | null;
-    sellingPrice: number | null;
-  } {
-    while (this.stock.move()) {
-      const today = this.stock.now();
-      const { Low: stopLoss } = this.stock.lowOfLast(this.config.sellWindow);
-      if (today.Low <= stopLoss) {
-        return { sellingDay: today, sellingPrice: stopLoss };
-      }
-    }
-    return { sellingDay: null, sellingPrice: null };
-  }
-
   private isHighBroken(today: Quote, highestDay: Quote): boolean {
     return today.High > highestDay.High;
   }
 
-  protected override trade(): void {
-    const { buyWindow, sellWindow } = this.config;
-
-    const buyingDay = this.stock.now();
-    const { High: buyPrice } = this.stock.highOfLast(buyWindow);
-    const { Low: initialStopLoss } = this.stock.lowOfLast(sellWindow);
-    const { sellingDay, sellingPrice } = this.checkForStopLossHit();
-    if (!(sellingDay && sellingPrice)) return;
-
-    const riskForOneStock = buyPrice - initialStopLoss;
-    const totalStocks = this.getTotalStocks(riskForOneStock, buyPrice);
-    const riskTaken = totalStocks * riskForOneStock;
-
-    // storing result
-    this.updateTrades(
-      buyingDay,
-      buyPrice,
-      sellingDay,
-      sellingPrice,
-      totalStocks,
-      riskTaken
-    );
+  protected override sell(): void {
+    const today = this.stock.now();
+    const { Low: stopLoss } = this.stock.lowOfLast(this.config.sellWindow);
+    if (today.Low <= stopLoss) {
+      this.exitPosition(stopLoss);
+    }
   }
 
-  public override execute(): Trades {
-    while (this.stock.move()) {
-      const today = this.stock.now();
-      const lastFortyDayHigh = this.stock.highOfLast(this.config.buyWindow);
+  protected override buy(): void {
+    const { buyWindow, sellWindow } = this.config;
+    const today = this.stock.now();
+    const lastFortyDayHigh = this.stock.highOfLast(buyWindow);
 
-      if (this.isHighBroken(today, lastFortyDayHigh)) this.trade();
+    if (this.isHighBroken(today, lastFortyDayHigh)) {
+      const { High: buyPrice } = this.stock.highOfLast(buyWindow);
+      const { Low: initialStopLoss } = this.stock.lowOfLast(sellWindow);
+      const riskForOneStock = buyPrice - initialStopLoss;
+
+      this.takePosition(riskForOneStock, buyPrice);
     }
-    this.persistTradesFn(this.trades);
-    return this.trades;
   }
 }
 
