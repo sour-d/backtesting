@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run build && node build/app.js",
     "setup": "npm install; rm -rf ./data ./result ./technicalData; mkdir data technicalData result; brew install serve",
-    "download": "node src/downloadData.js",
+    "download": "node downloadData.js",
     "clean": "rm -rf ./data/* ./result/*",
     "serve": "npx http-server --no-dotfiles -a 'localhost' -o 'src/web' -c-1",
     "build": "npx tsc"

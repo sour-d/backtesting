@@ -29,10 +29,10 @@ class TwoBreakingCandleNew extends Strategy {
   }
 
   override sell(): void {
-    let yesterday = this.stock.prev();
+    const { Low: stopLoss } = this.stock.lowOfLast(3);
     const today = this.stock.now();
-    if (today.Low <= yesterday.Low) {
-      this.exitPosition(yesterday.Low);
+    if (today.Low <= stopLoss) {
+      this.exitPosition(stopLoss);
     }
   }
 
@@ -42,15 +42,13 @@ class TwoBreakingCandleNew extends Strategy {
 
     if (this.isGreenCandle(secondPrev) && this.isGreenCandle(prev)) {
       const { Open: buyingPrice } = this.stock.now();
-      const { Low: initialStopLoss } = prev;
+      const { Low: initialStopLoss } = this.stock.lowOfLast(3);
       const riskForOneStock = buyingPrice - initialStopLoss;
-      const totalStocks = this.stocksCanBeBought(riskForOneStock, buyingPrice);
-      const riskTaken = totalStocks * riskForOneStock;
 
-      if (riskForOneStock <= 0 || totalStocks <= 0) {
-        return;
+      if (riskForOneStock > 0) {
+        this.takePosition(riskForOneStock, buyingPrice);
+        this.sell(); // should sell if price goes down today only.
       }
-      this.takePosition(riskForOneStock, buyingPrice);
     }
   }
 }

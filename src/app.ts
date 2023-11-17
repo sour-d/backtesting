@@ -2,6 +2,8 @@ import express from "express";
 import morgan from "morgan";
 import strategyRunner, { STRATEGIES } from "./strategyRunner";
 import path from "path";
+import { getFileName } from "./utils";
+import { log } from "console";
 
 const app: express.Application = express();
 app.use(express.urlencoded());
@@ -19,8 +21,10 @@ app.get("/api/strategies", (req, res) => {
 
 app.post("/api/strategies", (req, res) => {
   try {
-    strategyRunner(req.body.stock, req.body);
+    const fileName: string = getFileName(req.body.stock);
+    strategyRunner(fileName, req.body);
   } catch (e) {
+    log(e);
     res.json({});
     return;
   }
@@ -31,6 +35,13 @@ app.get("/api/result", (req, res) => {
   res.header("Content-Type", "application/json");
   res.sendFile(path.resolve("result", `result.json`));
 });
+
+app.get("/api/downloaded-data", (req, res) => {
+  res.header("Content-Type", "application/json");
+  res.sendFile(path.resolve("", "symbolList.json"));
+});
+
+app.post("/api/re-download-data", (req, res) => {});
 
 app.use(express.static("public"));
 

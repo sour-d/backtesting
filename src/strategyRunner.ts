@@ -18,6 +18,7 @@ const persistTrades = (stockName: string) => (outcomes: Trades) => {
     JSON.stringify({ report: outcomes.getReport(), trades: outcomes.toCSV() }),
     "utf-8"
   );
+  fs.writeFileSync(`result/result.csv`, outcomes.toCSV(), "utf-8");
 };
 
 const strategyRunner = (stockName: string, config: any) => {

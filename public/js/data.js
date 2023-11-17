@@ -25,7 +25,7 @@ const transformTradesData = (trades) => {
       buyingDate: dayjs(trade["Buying Date"]).format("YYYY-MM-DD"),
       sellingDate: dayjs(trade["Selling Date"]).format("YYYY-MM-DD"),
       transactionAmount: trade["Total Stocks"] * trade["Buying Price"],
-      reward: profitOrLoss / trade["Risk"],
+      reward: profitOrLoss ? profitOrLoss / trade["Risk"] : 0,
       risk: trade["Risk"],
       result: profitOrLoss > 0 ? "Profit" : "Loss",
     };

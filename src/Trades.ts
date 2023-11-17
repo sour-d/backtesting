@@ -41,7 +41,9 @@ export class Trades {
   ): void {
     const oneStockProfitOrLoss: number = sellingPrice - buyingPrice;
     const totalProfitOrLoss: number = oneStockProfitOrLoss * totalStocks;
-    const riskMultiple: number = totalProfitOrLoss / risk;
+    const riskMultiple: number = totalProfitOrLoss
+      ? totalProfitOrLoss / risk
+      : 0;
 
     const outcome: ITradeOutcome = {
       buyingDay,
