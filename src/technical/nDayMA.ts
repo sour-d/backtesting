@@ -1,17 +1,12 @@
-import { Quote } from "../StockFeedSimulator";
-import { dataOfLast } from "./utils";
+import _ from "lodash";
 
-const movingAverageOf = (quotes: Quote[], days: number): number => {
-  const lastNDayQuotes: Quote[] = dataOfLast(quotes, days);
-  let sumOfDayCloses: number = 0;
-
-   while (lastNDayQuotes.length !== 0) {
-    const todaysClose = lastNDayQuotes[lastNDayQuotes.length - 1]['Close'];
-    sumOfDayCloses += todaysClose;
-    lastNDayQuotes.pop();
-  }
-
-  return sumOfDayCloses / days;
+const movingAverageOf = (
+  quote: any,
+  prevMA: number = 0,
+  days: number
+): number => {
+  const totalMovingAverage = prevMA * days - prevMA;
+  return (totalMovingAverage + quote["Close"]) / days;
 };
 
 export { movingAverageOf };

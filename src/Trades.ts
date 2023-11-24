@@ -8,12 +8,14 @@ export class Trades {
   private risk: number;
   private stock: string;
   private tradeResults: ITradeOutcome[];
+  private flushedTill: number;
 
   constructor(capital: number, risk: number, stock: string) {
     this.tradeResults = [];
     this.capital = capital;
     this.risk = risk;
     this.stock = stock;
+    this.flushedTill = 0;
   }
 
   public totalTrades(): number {
@@ -81,5 +83,21 @@ export class Trades {
     }));
 
     return Papa.unparse(tradesCSV);
+  }
+
+  public flush(): string {
+    this.flushedTill = this.tradeResults.length;
+    const trades = this.tradeResults.slice(this.flushedTill);
+
+    const tradesCSV = this.tradeResults.map((trade) => ({
+      "Buying Date": dayjs(trade.buyingDay.Date).format("YYYY-MM-DD"),
+      "Buying Price": trade.buyingPrice,
+      "Selling Date": dayjs(trade.sellingDay.Date).format("YYYY-MM-DD"),
+      "Selling Price": trade.sellingPrice,
+      "Total Stocks": trade.totalStocks,
+      Risk: trade.risk,
+    }));
+
+    return Papa.unparse(tradesCSV, { header: false });
   }
 }

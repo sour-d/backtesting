@@ -1,6 +1,6 @@
 const handelResponse = (res) => {
   if (res.status === "OK") {
-    window.open("/result.html");
+    window.open("/paper-trade/result");
   } else {
     alert("Something went wrong");
   }
@@ -10,7 +10,7 @@ const runStrategy = (event) => {
   event.stopPropagation();
 
   const strategy = document.querySelector("#strategy").value;
-  const url = `/api/strategies`;
+  const url = `/api/start-paper-trade`;
   const formData = new FormData(document.querySelector("form"));
 
   fetch(url, {

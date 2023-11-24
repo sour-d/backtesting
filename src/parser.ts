@@ -1,6 +1,6 @@
 import * as Papa from "papaparse";
 import * as fs from "fs";
-import { Quote } from "./StockFeedSimulator";
+import { Quote } from "./QuoteManager";
 
 const CONFIG: Papa.ParseConfig = {
   header: true,

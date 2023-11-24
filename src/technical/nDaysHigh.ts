@@ -1,19 +1,11 @@
-import { Quote } from "../StockFeedSimulator";
-import { dataOfLast } from "./utils";
+import { Quote } from "../QuoteManager";
+import _ from "lodash";
 
-const highOfLast = (quotes: Quote[], days: number): number => {
-  const lastNDayQuotes: Quote[] = dataOfLast(quotes, days);
-  let highestDay: number = lastNDayQuotes[lastNDayQuotes.length - 1]['High'];
+const highOfLast = (quote: Quote, prevQuotes: any[], days: number): number => {
+  const lastNDayQuotes: Quote[] = _.takeRight(prevQuotes, days - 1);
+  const highestDay = _.maxBy(lastNDayQuotes, (q) => q.High)?.High || 0;
 
-  while (lastNDayQuotes.length !== 0) {
-    const todaysHigh = lastNDayQuotes[lastNDayQuotes.length - 1]['High'];
-    if (todaysHigh > highestDay) {
-      highestDay = todaysHigh;
-    }
-    lastNDayQuotes.pop();
-  }
-
-  return highestDay;
+  return Math.max(highestDay, quote.High);
 };
 
 export { highOfLast };

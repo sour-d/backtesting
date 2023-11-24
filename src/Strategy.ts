@@ -1,4 +1,4 @@
-import { StockFeedSimulator } from "./StockFeedSimulator";
+import { ExistingQuoteManager, LiveQuoteManager } from "./QuoteManager";
 import { Trades } from "./Trades";
 import { TechnicalQuote } from "./restructureData";
 
@@ -10,7 +10,7 @@ interface CurrentTradeInfo {
 }
 
 class Strategy {
-  stock: StockFeedSimulator;
+  stock: ExistingQuoteManager | LiveQuoteManager;
   capital: number;
   riskPercentage: number;
   trades: Trades;
@@ -18,12 +18,14 @@ class Strategy {
   protected bought: boolean;
   protected currentTradeInfo: CurrentTradeInfo | null;
   protected risk: number;
+  protected fractionBuy: boolean;
 
   protected constructor(
-    stock: StockFeedSimulator,
+    stock: ExistingQuoteManager | LiveQuoteManager,
     persistTradesFn: Function,
     capital: number = 100000,
-    riskPercentage: number = 0.05
+    riskPercentage: number = 5,
+    fractionBuy: boolean = false
   ) {
     this.stock = stock;
     this.capital = capital;
@@ -37,20 +39,26 @@ class Strategy {
     this.bought = false;
     this.currentTradeInfo = null;
     this.risk = this.capital * (this.riskPercentage / 100);
+
+    this.fractionBuy = fractionBuy;
   }
 
   protected stocksCanBeBought(
     riskForOneStock: number,
     buyingPrice: number
   ): number {
-    const numberOfStocksUnderRisk = Math.floor(this.risk / riskForOneStock);
-    const totalCost = numberOfStocksUnderRisk * buyingPrice;
+    const maxStocksByCapital = this.capital / buyingPrice;
+    const maxStocksByRisk = this.risk / riskForOneStock;
 
-    if (totalCost <= this.capital) {
-      return numberOfStocksUnderRisk;
+    const totalCost = maxStocksByRisk * buyingPrice;
+    const affordableStocks: number =
+      totalCost <= this.capital ? maxStocksByRisk : maxStocksByCapital;
+
+    if (this.fractionBuy) {
+      return +affordableStocks.toFixed(2) - 0.01;
     }
 
-    return Math.floor(this.capital / buyingPrice);
+    return Math.floor(affordableStocks);
   }
 
   persistTrades(): void {
@@ -117,13 +125,25 @@ class Strategy {
     this.currentTradeInfo = null;
   }
 
-  public execute(): Trades {
-    while (this.stock.hasData() && this.stock.move()) {
-      if (this.alreadyTookPosition()) this.sell();
-      else this.buy();
+  protected trade(): void {
+    if (this.alreadyTookPosition()) this.sell();
+    else this.buy();
+  }
+
+  public execute(): void {
+    if (this.stock instanceof ExistingQuoteManager) {
+      while (this.stock.hasData() && this.stock.move()) {
+        this.trade();
+      }
+      this.persistTradesFn(this.trades);
     }
-    this.persistTradesFn(this.trades);
-    return this.trades;
+
+    if (this.stock instanceof LiveQuoteManager) {
+      this.stock.subscribe(() => this.trade());
+      const intervalId = setInterval(() => {
+        this.persistTradesFn(this.trades.flush());
+      }, 5000);
+    }
   }
 }
 

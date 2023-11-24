@@ -1,64 +1,37 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Run A Strategy</title>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Button Page</title>
+  <!-- Bootstrap CSS CDN -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Center aligning content */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    /* Styling for buttons */
+    .btn-container {
+      text-align: center;
+    }
+    .btn-container .btn {
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
 
-    <!-- bootstrap -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
-      crossorigin="anonymous"
-    />
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
-      crossorigin="anonymous"
-    ></script>
-  </head>
+  <div class="btn-container">
+    <!-- Backtest button -->
+    <a href="/backtest" class="btn btn-outline-primary">Backtest</a>
+    <!-- Paper Trade button -->
+    <a href="/paper-trade" class="btn btn-outline-primary">Paper Trade</a>
+  </div>
 
-  <body class="text-body-secondary container">
-    <header class="mt-5">
-      <h2>Back Testing</h2>
-    </header>
-
-    <main class="card shadow rounded p-5 mt-4">
-      <div class="border-bottom mb-3 pb-3">
-        <h4>Run a Strategy</h4>
-      </div>
-      <div class="container">
-        <form>
-          <div class="form-group mb-3">
-            <label for="strategy" class="form-label">Choose a strategy</label>
-            <select name="strategy" id="strategy" required class="form-select">
-              <option value="">Select a strategy</option>
-            </select>
-          </div>
-          <div class="form-group mb-3">
-            <label for="stock" class="form-label">Choose a Stock</label>
-            <select name="stock" id="stock" required class="form-select">
-              <option value="Bajaj Finance">Bajaj Finance</option>
-              <option value="Binance Coin">Binance Coin</option>
-              <option value="Bitcoin">Bitcoin</option>
-              <option value="ICICI Bank">ICICI Bank</option>
-              <option value="ITC Limited">ITC Limited</option>
-              <option value="Nifty" selected>Nifty</option>
-              <option value="Tata Consultancy">Tata Consultancy</option>
-              <option value="UltraTech">UltraTech</option>
-              <option value="Yes Bank">Yes Bank</option>
-            </select>
-          </div>
-          <div class="form-group mb-3 row" id="configs"></div>
-          <div class="form-group mb-3" id="runStrategy-btn-group">
-            <button type="button" class="btn btn-primary" id="runStrategyBtn">
-              Run Strategy
-            </button>
-          </div>
-        </form>
-      </div>
-    </main>
-
-    <!-- custom js -->
-    <script src="js/index.js"></script>
-  </body>
+  <!-- Bootstrap JS CDN (optional, for certain Bootstrap features) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

@@ -1,4 +1,4 @@
-import { Quote, StockFeedSimulator } from "../StockFeedSimulator";
+import { Quote, ExistingQuoteManager, LiveQuoteManager } from "../QuoteManager";
 import { Strategy } from "../Strategy";
 import { getProps } from "../utils";
 
@@ -19,7 +19,7 @@ class FortyTwentyStrategy extends Strategy {
   config: Config;
 
   constructor(
-    stock: StockFeedSimulator,
+    stock: ExistingQuoteManager | LiveQuoteManager,
     persistTradesFn: Function,
     config: Config = fortyTwentyStrategyConfig
   ) {

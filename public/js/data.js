@@ -1,5 +1,6 @@
 const getResult = async () => {
-  return await fetch(`api/result`)
+  const type = window.location.pathname.split("/")[1];
+  return await fetch(`/api/${type}/result`)
     .then((response) => response.json())
     .then((response) => {
       const trades = Papa.parse(response.trades, {

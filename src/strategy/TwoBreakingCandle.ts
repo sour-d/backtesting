@@ -1,4 +1,4 @@
-import { StockFeedSimulator } from "../StockFeedSimulator";
+import { ExistingQuoteManager, LiveQuoteManager } from "../QuoteManager";
 import { Strategy } from "../Strategy";
 import { TechnicalQuote } from "../restructureData";
 import { getProps } from "../utils";
@@ -16,11 +16,11 @@ class TwoBreakingCandleNew extends Strategy {
   config: Config;
 
   constructor(
-    stock: StockFeedSimulator,
+    stock: ExistingQuoteManager | LiveQuoteManager,
     persistTradesFn: Function,
     config: Config = twoBreakingCandleConfig
   ) {
-    super(stock, persistTradesFn, config.capital, config.riskPercentage);
+    super(stock, persistTradesFn, config.capital, config.riskPercentage, true);
     this.config = config;
   }
 
