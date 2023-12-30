@@ -1,3 +1,4 @@
+import { log } from "console";
 import LiveQuote from "./LiveQuote";
 import { TechnicalQuote, calculateTechnicals } from "./restructureData";
 
@@ -110,6 +111,7 @@ export class LiveQuoteManager extends ExistingQuoteManager {
       if (startingQuoteDay > this.currentQuoteIndex) return;
 
       this.listeners.forEach((listener) => listener());
+      log("got a quote at ", new Date().toLocaleTimeString());
     });
   }
 

@@ -1,6 +1,8 @@
+import { log } from "console";
 import { ExistingQuoteManager, LiveQuoteManager } from "./QuoteManager";
 import { Trades } from "./Trades";
 import { TechnicalQuote } from "./restructureData";
+const { exec } = require("child_process");
 
 interface CurrentTradeInfo {
   buyingDay: TechnicalQuote;
@@ -19,6 +21,7 @@ class Strategy {
   protected currentTradeInfo: CurrentTradeInfo | null;
   protected risk: number;
   protected fractionBuy: boolean;
+  protected isLive: boolean;
 
   protected constructor(
     stock: ExistingQuoteManager | LiveQuoteManager,
@@ -41,28 +44,27 @@ class Strategy {
     this.risk = this.capital * (this.riskPercentage / 100);
 
     this.fractionBuy = fractionBuy;
+    this.isLive = stock instanceof LiveQuoteManager;
   }
 
   protected stocksCanBeBought(
     riskForOneStock: number,
     buyingPrice: number
   ): number {
+    log({ riskForOneStock, buyingPrice });
     const maxStocksByCapital = this.capital / buyingPrice;
     const maxStocksByRisk = this.risk / riskForOneStock;
 
     const totalCost = maxStocksByRisk * buyingPrice;
     const affordableStocks: number =
       totalCost <= this.capital ? maxStocksByRisk : maxStocksByCapital;
+    log({ affordableStocks, totalCost, maxStocksByRisk, maxStocksByCapital });
 
     if (this.fractionBuy) {
       return +affordableStocks.toFixed(2) - 0.01;
     }
 
     return Math.floor(affordableStocks);
-  }
-
-  persistTrades(): void {
-    this.persistTradesFn(JSON.stringify(this.trades));
   }
 
   protected updateTrades(
@@ -105,6 +107,7 @@ class Strategy {
       position,
       risk,
     };
+    // this.isLive && exec("afplay ./public/start.mp3", () => {});
   }
 
   protected exitPosition(sellingPrice: number): void {
@@ -123,6 +126,7 @@ class Strategy {
 
     this.bought = false;
     this.currentTradeInfo = null;
+    // this.isLive && exec("afplay ./public/end.mp3", () => {});
   }
 
   protected trade(): void {
@@ -131,18 +135,20 @@ class Strategy {
   }
 
   public execute(): void {
+    if (this.stock instanceof LiveQuoteManager) {
+      this.stock.subscribe(() => this.trade());
+      const intervalId = setInterval(() => {
+        const trades = this.trades.flush();
+        if (trades) this.persistTradesFn(trades);
+      }, 5000);
+      return;
+    }
+
     if (this.stock instanceof ExistingQuoteManager) {
       while (this.stock.hasData() && this.stock.move()) {
         this.trade();
       }
       this.persistTradesFn(this.trades);
-    }
-
-    if (this.stock instanceof LiveQuoteManager) {
-      this.stock.subscribe(() => this.trade());
-      const intervalId = setInterval(() => {
-        this.persistTradesFn(this.trades.flush());
-      }, 5000);
     }
   }
 }

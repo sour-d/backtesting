@@ -22,22 +22,6 @@ const persistBacktestResult = (stockName: string) => (outcomes: Trades) => {
   fs.writeFileSync(`result/backtest.csv`, outcomes.toCSV(), "utf-8");
 };
 
-const persistPaperTradeResult = (fileName: string) => (trade: any) => {
-  if (!fs.existsSync(`result/${fileName}.json`)) {
-    fs.writeFileSync(
-      `result/${fileName}.csv`,
-      "Buying Date,Buying Price,Selling Date,Selling Price,Total Stocks,Risk",
-      "utf-8"
-    );
-  }
-  fs.writeFile(
-    `result/${fileName}.csv`,
-    "\r\n" + trade,
-    { encoding: "utf-8", flag: "a" },
-    () => {}
-  );
-};
-
 const backtest = (stockName: string, config: any) => {
   const stockData = transformStockData(stockName);
 
@@ -49,21 +33,6 @@ const backtest = (stockName: string, config: any) => {
     stock,
     persistBacktestResult(stockName),
     config
-  );
-
-  strategy.execute();
-};
-
-export const paperTrade = (config: any) => {
-  const startingDay = 2;
-  const liveQuote = new LiveQuote();
-  const stock = new LiveQuoteManager(liveQuote, startingDay);
-
-  const strategyClass = STRATEGIES[config.strategy]._class;
-
-  const strategy = new strategyClass(
-    stock,
-    persistPaperTradeResult("paperTrade")
   );
 
   strategy.execute();

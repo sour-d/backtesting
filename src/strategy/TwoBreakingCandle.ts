@@ -41,7 +41,7 @@ class TwoBreakingCandleNew extends Strategy {
     const today = this.stock.now();
 
     if (this.isGreenCandle(prev) && this.isGreenCandle(today)) {
-      const { Open: buyingPrice } = today;
+      const { Close: buyingPrice } = today;
       const { Low: initialStopLoss } = this.stock.lowOfLast(3);
       const riskForOneStock = buyingPrice - initialStopLoss;
 

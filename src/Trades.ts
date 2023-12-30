@@ -86,10 +86,10 @@ export class Trades {
   }
 
   public flush(): string {
+    const trades: ITradeOutcome[] = this.tradeResults.slice(this.flushedTill);
     this.flushedTill = this.tradeResults.length;
-    const trades = this.tradeResults.slice(this.flushedTill);
 
-    const tradesCSV = this.tradeResults.map((trade) => ({
+    const tradesCSV = trades.map((trade: ITradeOutcome) => ({
       "Buying Date": dayjs(trade.buyingDay.Date).format("YYYY-MM-DD"),
       "Buying Price": trade.buyingPrice,
       "Selling Date": dayjs(trade.sellingDay.Date).format("YYYY-MM-DD"),
@@ -98,6 +98,6 @@ export class Trades {
       Risk: trade.risk,
     }));
 
-    return Papa.unparse(tradesCSV, { header: false });
+    return trades.length ? Papa.unparse(tradesCSV, { header: false }) : "";
   }
 }

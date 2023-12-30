@@ -8,6 +8,7 @@ const parseTitle = (camelCase) => {
 };
 
 const generateReport = (report) => {
+  document.querySelector("#report").innerHTML = "";
   Object.entries(report).forEach(([itemName, item]) => {
     const p = document.createElement("p");
     p.innerText = `${parseTitle(itemName)} : ${item}`;
@@ -21,9 +22,9 @@ const updatedTotalTrades = (data) => {
 };
 
 const main = async () => {
-  const { report, trades } = await getResult();
+  const { tradeInfo, trades } = await getResult();
 
-  generateReport(report);
+  generateReport(tradeInfo);
 
   const data = transformTradesData(trades);
   drawProfitLossChart(data);
@@ -33,5 +34,3 @@ const main = async () => {
   drawAccumulatedRewardChart(data);
   drawDrawDownChart(data);
 };
-
-main();

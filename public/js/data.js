@@ -1,13 +1,14 @@
 const getResult = async () => {
   const type = window.location.pathname.split("/")[1];
-  return await fetch(`/api/${type}/result`)
+  return await fetch(`/api/${type}/result${window.location.search}`)
+    .then((res) => (res.status !== 200 ? alert("Data not found") : res))
     .then((response) => response.json())
     .then((response) => {
       const trades = Papa.parse(response.trades, {
         header: true,
         dynamicTyping: true,
       });
-      return { report: response.report, trades: trades.data };
+      return { tradeInfo: response.tradeInfo, trades: trades.data };
     });
 };
 

@@ -1,17 +1,20 @@
-const handelResponse = (res) => {
-  if (res.status === "OK") {
-    window.open("/paper-trade/result");
-  } else {
-    alert("Something went wrong");
-  }
-};
+let validPairs = [];
 
-const runStrategy = (event) => {
+fetch("https://api.binance.com/api/v3/exchangeInfo")
+  .then((response) => response.json())
+  .then((data) => {
+    validPairs = data.symbols.map((s) => s.symbol);
+  });
+
+const startPaperTrade = (event) => {
   event.stopPropagation();
 
-  const strategy = document.querySelector("#strategy").value;
-  const url = `/api/start-paper-trade`;
+  const url = "/api/paper-trade";
   const formData = new FormData(document.querySelector("form"));
+
+  if (!validPairs.includes(formData.get("symbol").toUpperCase())) {
+    return alert("Invalid symbol");
+  }
 
   fetch(url, {
     method: "POST",
@@ -21,7 +24,13 @@ const runStrategy = (event) => {
     },
   })
     .then((res) => res.json())
-    .then(handelResponse);
+    .then((res) => {
+      if (res.id) {
+        initiateTableCreation();
+        return;
+      }
+      alert(res.message);
+    });
 };
 
 const parseTitle = (camelCase) => {
@@ -65,7 +74,41 @@ const renderConfigs = (strategies) => (event) => {
   });
 };
 
+const timeAgo = (timestamp) => dayjs(timestamp).fromNow();
+
+const createTable = (data) => {
+  data = data.sort((a, b) => b.startTime - a.startTime);
+
+  data.forEach((activeStrategy, index) => {
+    const html = `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${activeStrategy.symbol}</td>
+      <td>${activeStrategy.timeFrame}</td>
+      <td>${activeStrategy.strategy}</td>
+      <td>${timeAgo(activeStrategy.startTime)}</td>
+      <td><button class="btn btn-link" onclick="viewResult('${
+        activeStrategy.id
+      }')">View</button></td>
+    </tr>
+    `;
+    document.getElementsByTagName("tbody")[0].innerHTML += html;
+  });
+};
+
+const viewResult = (id) => {
+  window.location.href = `/paper-trade/result?id=${id}`;
+};
+
+const initiateTableCreation = () =>
+  fetch("/api/paper-trade/list")
+    .then((res) => res.json())
+    .then((res) => createTable(res))
+    .catch((err) => alert(err.message));
+
 document.body.onload = async () => {
+  dayjs.extend(dayjs_plugin_relativeTime);
+
   fetch("/api/strategies")
     .then((res) => res.json())
     .then((strategies) => {
@@ -75,7 +118,12 @@ document.body.onload = async () => {
         .addEventListener("change", renderConfigs(strategies));
     });
 
+  fetch("/api/paper-trade/list")
+    .then((res) => res.json())
+    .then((res) => createTable(res))
+    .catch((err) => alert(err.message));
+
   document
     .querySelector("#runStrategyBtn")
-    .addEventListener("click", runStrategy);
+    .addEventListener("click", startPaperTrade);
 };

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Result</title>
+    <!-- vega -->
+    <script src="https://cdn.jsdelivr.net/npm/vega@5.25.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.9.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.22.1"></script>
+
+    <!-- dayjs -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.8/dayjs.min.js"
+      integrity="sha512-af90l7+r/ujCury3kqomcoZ4aNuC4JP0xUUU682bqlRCLLvGJrc9L82zONFccLWmxcMXSqO9d6C7Rr39EkbT3Q=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+
+    <!-- papaParse -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"
+      integrity="sha512-dfX5uYVXzyU8+KHqj8bjo7UkOdg18PaOtpa48djpNbZHwExddghZ+ZmzWT06R5v6NSk3ZUfsH6FNEDepLx9hPQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <!-- bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body class="text-body-secondary container">
+    <header class="mt-5">
+      <h2>Back Testing</h2>
+    </header>
+
+    <main class="mt-3 mb-3">
+      <div class="card shadow rounded p-5">
+        <div class="mb-3 border-bottom pb-3">
+          <h4>Strategy Report</h4>
+        </div>
+        <div id="report"></div>
+      </div>
+      <div class="card shadow rounded mt-5 p-5">
+        <h4 class="mb-5">Risk v/s Reward</h4>
+        <div id="graph4" class="graph overflow-x-scroll"></div>
+      </div>
+      <div class="card shadow rounded mt-5 p-5 overflow-x-scroll">
+        <h4 class="mb-5">Accumulated Reward</h4>
+        <div id="graph5" class="graph "></div>
+      </div>
+      <div class="card shadow rounded mt-5 p-5 overflow-x-scroll">
+        <h4 class="mb-5">Draw Down</h4>
+        <div id="graph6" class="graph "></div>
+      </div>
+      <div class="card shadow rounded mt-5 p-5 overflow-x-scroll">
+        <h4 class="mb-5">Profit v/s Duration</h4>
+        <div id="graph3" class="graph "></div>
+      </div>
+      <div class="card shadow rounded mt-5 p-5">
+        <h4 class="mb-5">Each Trade Date And Profit/Loss</h4>
+        <div id="graph1" class="graph overflow-x-scroll"></div>
+      </div>
+      <div class="card shadow rounded mt-5 p-5">
+        <h4 class="mb-5">Profit Over Time</h4>
+        <div id="graph2" class="graph overflow-x-scroll"></div>
+      </div>
+    </main>
+
+    
+    <!-- custom js -->
+    <script src="/js/data.js"></script>
+
+    <script src="/js/charts/durationRewardChart.js"></script>
+    <script src="/js/charts/profitLossChart.js"></script>
+    <script src="/js/charts/totalProfitOverTime.js"></script>
+    <script src="/js/charts/riskRewardChart.js"></script>
+    <script src="/js/charts/accumulatedReward.js"></script>
+    <script src="/js/charts/drawDownChart.js"></script>
+
+    <script src="/js/result.js"></script>
+    <script>
+      main();
+
+      setInterval(() => {
+        main();
+      }, 10000);
+    </script>
+  </body>
+</html>
