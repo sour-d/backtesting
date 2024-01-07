@@ -1,19 +1,28 @@
 import fs from "fs";
 import express from "express";
+import ws from "express-ws";
 import morgan from "morgan";
 import backtest, { STRATEGIES } from "./strategyRunner";
 import path from "path";
 import { getFileName } from "./utils";
 import { log } from "console";
 import { restartPaperTrade, startPaperTrade } from "./handlers/paperTrade";
-import { addDbToRequest } from "./handlers/middlewares";
+import { addDbToRequest, addStrategyManager } from "./handlers/middlewares";
+
+declare module "express-serve-static-core" {
+  interface Application {
+    ws: (route: string, callback: (ws: any, req: any) => void) => void;
+  }
+}
 
 const app: express.Application = express();
+ws(app);
 
 app.use(express.urlencoded());
 app.use(express.json());
 app.use(morgan("tiny"));
 app.use(addDbToRequest);
+app.use(addStrategyManager);
 
 app.get(["/", "/index", "/index.html"], (req, res) =>
   res.sendFile(path.resolve("public", "index.html"))
@@ -82,6 +91,14 @@ app.post("/api/paper-trade/:id/delete", (req, res) => {
 
 app.get("/api/paper-trade/list", (req, res) => {
   res.json(req.db.liveQuotes);
+});
+
+app.ws("/api/paper-trade/:id", (ws, req) => {
+  const id = req.params.id;
+  const { strategyManager } = req;
+  ws.sendText = (data: any) => ws.send(JSON.stringify(data));
+
+  strategyManager.channelLiveActivity(id, ws);
 });
 
 app.use(express.static("public"));

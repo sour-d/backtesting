@@ -24,11 +24,25 @@ export const startPaperTrade = (req: Request, res: Response) => {
   const id = uuidv4();
 
   try {
-    paperTrade(symbol, timeFrame, strategy, id, setTimeEnd(db, id));
+    const strategyInstance = paperTrade(
+      symbol,
+      timeFrame,
+      strategy,
+      id,
+      setTimeEnd(db, id)
+    );
+    req.strategyManager.manage(id, strategyInstance);
     log("started paper trade", "id: ", id);
     const startTime = new Date().getTime();
     const endTime = null;
-    db.add({ id, symbol, strategy, timeFrame, startTime, endTime });
+    db.add({
+      id,
+      symbol,
+      strategy: strategy,
+      timeFrame,
+      startTime,
+      endTime,
+    });
     return res.json({ id, status: "OK" });
   } catch (e) {
     log(e);
@@ -89,4 +103,6 @@ const paperTrade = (
   const strategy = new strategyClass(stock, persistTradeResult(id));
 
   strategy.execute();
+
+  return strategy;
 };

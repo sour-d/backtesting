@@ -7,7 +7,7 @@ export interface Quote {
   High: number;
   Low: number;
   Close: number;
-  Date: string;
+  Date: number;
   Volume: number;
 }
 

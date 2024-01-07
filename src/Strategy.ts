@@ -2,6 +2,7 @@ import { log } from "console";
 import { ExistingQuoteManager, LiveQuoteManager } from "./QuoteManager";
 import { Trades } from "./Trades";
 import { TechnicalQuote } from "./restructureData";
+import EventEmitter from "events";
 const { exec } = require("child_process");
 
 interface CurrentTradeInfo {
@@ -11,7 +12,7 @@ interface CurrentTradeInfo {
   risk: number;
 }
 
-class Strategy {
+class Strategy extends EventEmitter {
   stock: ExistingQuoteManager | LiveQuoteManager;
   capital: number;
   riskPercentage: number;
@@ -30,6 +31,7 @@ class Strategy {
     riskPercentage: number = 5,
     fractionBuy: boolean = false
   ) {
+    super();
     this.stock = stock;
     this.capital = capital;
     this.riskPercentage = riskPercentage;
@@ -107,6 +109,13 @@ class Strategy {
       position,
       risk,
     };
+
+    this.emit("buy", {
+      quantity: position,
+      price: buyingPrice,
+      risk,
+      time: this.stock.now().Date,
+    });
     // this.isLive && exec("afplay ./public/start.mp3", () => {});
   }
 
@@ -124,14 +133,24 @@ class Strategy {
         this.currentTradeInfo.risk * this.currentTradeInfo.position
       );
 
+    this.emit("sell", {
+      quantity: this.currentTradeInfo.position,
+      price: sellingPrice,
+      time: this.stock.now().Date,
+    });
+
     this.bought = false;
     this.currentTradeInfo = null;
+
     // this.isLive && exec("afplay ./public/end.mp3", () => {});
   }
 
   protected trade(): void {
     if (this.alreadyTookPosition()) this.sell();
     else this.buy();
+    console.log("will emit now");
+
+    this.emit("data", this.stock.now());
   }
 
   public execute(): void {

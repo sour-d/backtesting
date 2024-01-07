@@ -74,9 +74,9 @@ export class Trades {
 
   public toCSV(): string {
     const tradesCSV = this.tradeResults.map((trade) => ({
-      "Buying Date": dayjs(trade.buyingDay.Date).format("YYYY-MM-DD"),
+      "Buying Date": trade.buyingDay.Date,
       "Buying Price": trade.buyingPrice,
-      "Selling Date": dayjs(trade.sellingDay.Date).format("YYYY-MM-DD"),
+      "Selling Date": trade.sellingDay.Date,
       "Selling Price": trade.sellingPrice,
       "Total Stocks": trade.totalStocks,
       Risk: trade.risk,
@@ -90,9 +90,9 @@ export class Trades {
     this.flushedTill = this.tradeResults.length;
 
     const tradesCSV = trades.map((trade: ITradeOutcome) => ({
-      "Buying Date": dayjs(trade.buyingDay.Date).format("YYYY-MM-DD"),
+      "Buying Date": trade.buyingDay.Date,
       "Buying Price": trade.buyingPrice,
-      "Selling Date": dayjs(trade.sellingDay.Date).format("YYYY-MM-DD"),
+      "Selling Date": trade.sellingDay.Date,
       "Selling Price": trade.sellingPrice,
       "Total Stocks": trade.totalStocks,
       Risk: trade.risk,

@@ -30,6 +30,7 @@ const transformTradesData = (trades) => {
       reward: profitOrLoss ? profitOrLoss / trade["Risk"] : 0,
       risk: trade["Risk"],
       result: profitOrLoss > 0 ? "Profit" : "Loss",
+      quantity: trade["Total Stocks"],
     };
   });
 

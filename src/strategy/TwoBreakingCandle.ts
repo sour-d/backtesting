@@ -47,7 +47,6 @@ class TwoBreakingCandleNew extends Strategy {
 
       if (riskForOneStock > 0) {
         this.takePosition(riskForOneStock, buyingPrice);
-        // this.sell(); // should sell if price goes down today only.
       }
     }
   }

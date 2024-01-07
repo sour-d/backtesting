@@ -64,7 +64,7 @@ class LiveQuote extends EventEmitter {
     ws.on("message", (data: any) => {
       this.isWsOpen = true;
       const message = JSON.parse(data);
-      log("wc got quote at ", new Date().toLocaleTimeString());
+      log("LiveQuotes got quote at ", new Date().toLocaleTimeString());
       const quote = prevCandle?.k;
       prevCandle = message;
       if (!quote) return;
@@ -72,12 +72,12 @@ class LiveQuote extends EventEmitter {
       log("emitting a quote at ", new Date().toLocaleTimeString());
 
       this.emit("Quote", {
-        Date: quote.T,
-        Open: quote.o,
-        High: quote.h,
-        Low: quote.l,
-        Close: quote.c,
-        Volume: quote.v,
+        Date: +quote.T,
+        Open: +quote.o,
+        High: +quote.h,
+        Low: +quote.l,
+        Close: +quote.c,
+        Volume: +quote.v,
       });
     });
 
@@ -102,7 +102,7 @@ class LiveQuote extends EventEmitter {
     });
   }
 
-  // start(symbol: string, timeFrame: string) {
+  // start(symbol: string, timeFrame: string, id: string) {
   //   const data = [
   //     {
   //       e: "kline",
