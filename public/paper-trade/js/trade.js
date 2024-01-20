@@ -26,8 +26,7 @@ const startPaperTrade = (event) => {
     .then((res) => res.json())
     .then((res) => {
       if (res.id) {
-        initiateTableCreation();
-        return;
+        return window.location.reload();
       }
       alert(res.message);
     });
@@ -76,23 +75,34 @@ const renderConfigs = (strategies) => (event) => {
 
 const timeAgo = (timestamp) => dayjs(timestamp).fromNow();
 
+const createTableRow = (activeStrategy, rowNumber) => {
+  return `
+      <tr>
+        <td>${rowNumber}</td>
+        <td>${activeStrategy.symbol}</td>
+        <td>${activeStrategy.timeFrame}</td>
+        <td>${activeStrategy.strategy}</td>
+        <td>${timeAgo(activeStrategy.startTime)}</td>
+        <td>
+          <button id="${activeStrategy.id}" class="btn btn-link">
+            View
+          </button>
+        </td>
+      </tr>
+    `;
+};
+
 const createTable = (data) => {
   data = data.sort((a, b) => b.startTime - a.startTime);
 
   data.forEach((activeStrategy, index) => {
-    const html = `
-    <tr>
-      <td>${index + 1}</td>
-      <td>${activeStrategy.symbol}</td>
-      <td>${activeStrategy.timeFrame}</td>
-      <td>${activeStrategy.strategy}</td>
-      <td>${timeAgo(activeStrategy.startTime)}</td>
-      <td><button class="btn btn-link" onclick="viewResult('${
-        activeStrategy.id
-      }')">View</button></td>
-    </tr>
-    `;
-    document.getElementsByTagName("tbody")[0].innerHTML += html;
+    document.querySelector("tbody").innerHTML += createTableRow(
+      activeStrategy,
+      index + 1
+    );
+    document
+      .getElementById(activeStrategy.id)
+      .addEventListener("click", () => viewResult(activeStrategy.id));
   });
 };
 

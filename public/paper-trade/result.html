@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Result</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- vega -->
     <script src="https://cdn.jsdelivr.net/npm/vega@5.25.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.9.1"></script>
@@ -88,7 +89,7 @@
 
     
     <!-- custom js -->
-    <script src="/js/dashboard/data.js"></script>
+    <script src="/paper-trade/js/dashboard/data.js"></script>
 
     <script src="/js/charts/durationRewardChart.js"></script>
     <script src="/js/charts/profitLossChart.js"></script>
@@ -97,7 +98,7 @@
     <script src="/js/charts/accumulatedReward.js"></script>
     <script src="/js/charts/drawDownChart.js"></script>
 
-    <script src="/js/dashboard/result.js"></script>
+    <script src="/paper-trade/js/dashboard/result.js"></script>
     <script>
       main();
       fetchLiveData();
@@ -106,6 +107,12 @@
     <style>
       p {
         margin-bottom: 5px;
+      }
+      .red {
+        color: red;
+      }
+      .green {
+        color: green;
       }
     </style>
   </body>

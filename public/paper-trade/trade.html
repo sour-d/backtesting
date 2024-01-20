@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Crypto Paper Trade</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- bootstrap -->
     <link
@@ -24,17 +25,17 @@
 
   <body class="text-body-secondary container">
     <header class="mt-5">
-      <h2>Crypto Paper Trade</h2>
+      <h2 class="text-center">Crypto Paper Trade</h2>
     </header>
 
-    <main class="card shadow rounded p-5 mt-4">
+    <main class="card shadow rounded p-3 mt-4">
       <div class="border-bottom mb-3 pb-3">
-        <h4>Start paper trade</h4>
+        <h5>Start paper trade</h5>
       </div>
-      <div class="container">
+      <div>
         <form>
           <div class="form-group mb-3">
-            <label for="symbol" class="form-label">Symbol Name</label>
+            <label for="symbol" class="form-label text-nowrap overflow-hidden">Symbol Name</label>
             <input
               name="symbol"
               id="symbol"
@@ -45,13 +46,13 @@
           </div>
           <div class="row mb-3">
             <div class="form-group col-6">
-              <label for="strategy" class="form-label">Choose a strategy</label>
+              <label for="strategy" class="form-label text-nowrap overflow-hidden">Choose a strategy</label>
               <select name="strategy" id="strategy" required class="form-select">
                 <option value="">Select a strategy</option>
               </select>
             </div>
             <div class="form-group col-6">
-              <label for="timeFrame" class="form-label">Choose a timeframe</label>
+              <label for="timeFrame" class="form-label text-nowrap overflow-hidden">Choose a timeframe</label>
               <select name="timeFrame" id="timeFrame" required class="form-select">
                 <option value="1s">1s</option>
                 <option value="1m" selected>1m</option>
@@ -84,26 +85,28 @@
 
     </main>
 
-    <main class="card shadow rounded p-5 mt-4">
-      <header class="mt-5">
-        <h4>Active trades</h4>
+    <main class="card shadow rounded p-3 mt-4">
+      <header class="border-bottom mb-3 pb-3">
+        <h5>Active trades</h5>
       </header>
-        <table class="table" style="text-align: center;">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Symbol</th>
-            <th scope="col">Time Frame</th>
-            <th scope="col">Strategy</th>
-            <th scope="col">Start Time</th>
-            <th scope="col">Action</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="table overflow-scroll" style="text-align: center;">
+          <thead class="overflow-hidden text-nowrap">
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Symbol</th>
+              <th scope="col">Time Frame</th>
+              <th scope="col">Strategy</th>
+              <th scope="col">Start Time</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </main>
 
     <!-- custom js -->
-    <script src="js/paperTrade.js"></script>
+    <script src="paper-trade/js/trade.js"></script>
   </body>
 </html>
