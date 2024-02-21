@@ -3,17 +3,16 @@
 ## Setup project
 
 1. `npm run setup`
-2. `npm run download`
-3. `npm start` -- it will generate all the trade info in result dir
-4. `npm run serve` -- to see the result in web browser
+2. `npm run build`
+3. `npm run download`
+4. `npm start` -- it will generate all the trade info in result dir
 5. `npm run clean` -- to clean the result and data dir
 
 ## How to add strategy
 1. Create a new file in `src/strategy`
 2. Add the new strategy class and extend `Strategy` class from `src/strategy.js`
 3. Import the strategy to `src/index.js` to use it
-4. `npm start` to generate the result
-5. `npm run serve` to see the result in web browser
+4. `npm start` to run the strategy
 
 ## How to add more symbols
 1. Go to the file called `src/symbolList.json`

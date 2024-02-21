@@ -8,7 +8,7 @@ const getResult = async () => {
         header: true,
         dynamicTyping: true,
       });
-      return { tradeInfo: response.tradeInfo, trades: trades.data };
+      return { tradeInfo: response.report, trades: trades.data };
     });
 };
 

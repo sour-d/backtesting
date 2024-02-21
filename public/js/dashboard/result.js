@@ -101,6 +101,7 @@ const twoFloatingPoints = (float) => +float.toFixed(2);
 
 const main = async () => {
   const { tradeInfo, trades } = await getResult();
+  console.log(tradeInfo, trades);
 
   generateReport(tradeInfo);
 

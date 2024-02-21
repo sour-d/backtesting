@@ -36,6 +36,12 @@
       integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
       crossorigin="anonymous"
     ></script>
+
+    <style>
+      td {
+        padding: 5px 10px;
+      }
+    </style>
   </head>
 
   <body class="text-body-secondary container">
@@ -44,10 +50,11 @@
     </header>
 
     <main class="mt-3 mb-3">
-      <div id="report" class="card shadow rounded p-5">
+      <div class="card shadow rounded p-5">
         <div class="mb-3 border-bottom pb-3">
           <h4>Strategy Report</h4>
         </div>
+        <div id="report"></div>
       </div>
       <div class="card shadow rounded mt-5 p-5">
         <h4 class="mb-5">Risk v/s Reward</h4>
@@ -77,7 +84,7 @@
 
     
     <!-- custom js -->
-    <script src="/js/data.js"></script>
+    <script src="/js/dashboard/data.js"></script>
 
     <script src="/js/charts/durationRewardChart.js"></script>
     <script src="/js/charts/profitLossChart.js"></script>
@@ -86,6 +93,10 @@
     <script src="/js/charts/accumulatedReward.js"></script>
     <script src="/js/charts/drawDownChart.js"></script>
 
-    <script src="/js/result.js"></script>
+    <script src="/js/dashboard/result.js"></script>
+
+    <script>
+      main();
+    </script>
   </body>
 </html>
