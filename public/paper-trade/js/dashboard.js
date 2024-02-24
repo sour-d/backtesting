@@ -1,16 +1,11 @@
-const handelResponse = (res) => {
-  if (res.status === "OK") {
-    window.open("/backtest/result");
-  } else {
-    alert("Something went wrong");
-  }
-};
+const RESULT_URL = "/paper-trade/outcome";
+const ACTIVE_STRATEGY_LIST_URL = "/api/paper-trade/list";
+const STRATEGIES_URL = "/api/strategies";
 
-const runStrategy = (event) => {
+const startPaperTrade = (event) => {
   event.stopPropagation();
 
-  const strategy = document.querySelector("#strategy").value;
-  const url = `/api/backtest`;
+  const url = "/api/paper-trade";
   const formData = new FormData(document.querySelector("form"));
 
   fetch(url, {
@@ -21,7 +16,12 @@ const runStrategy = (event) => {
     },
   })
     .then((res) => res.json())
-    .then(handelResponse);
+    .then((res) => {
+      if (res.id) {
+        return window.location.reload();
+      }
+      alert(res.message);
+    });
 };
 
 const parseTitle = (camelCase) => {
@@ -65,8 +65,54 @@ const renderConfigs = (strategies) => (event) => {
   });
 };
 
+const timeAgo = (timestamp) => dayjs(timestamp).fromNow();
+
+const createTableRow = (activeStrategy, rowNumber) => {
+  return `
+      <tr>
+        <td>${rowNumber}</td>
+        <td>${activeStrategy.symbol}</td>
+        <td>${activeStrategy.timeFrame}</td>
+        <td>${activeStrategy.strategy}</td>
+        <td>${timeAgo(activeStrategy.startTime)}</td>
+        <td>
+          <button id="${activeStrategy.id}" class="btn btn-link">
+            View
+          </button>
+        </td>
+      </tr>
+    `;
+};
+
+const createTable = (data) => {
+  const activeStrategies = data.sort((a, b) => b.startTime - a.startTime);
+
+  activeStrategies.forEach((activeStrategy, index) => {
+    document.querySelector("tbody").innerHTML += createTableRow(
+      activeStrategy,
+      index + 1
+    );
+    document
+      .getElementById(activeStrategy.id)
+      .addEventListener("click", viewResult.bind(null, activeStrategy.id));
+    console.log('done for', activeStrategy.id);
+  });
+};
+
+const viewResult = (id) => {
+  window.location.href = `${RESULT_URL}?id=${id}`;
+};
+
+const initiateTableCreation = () =>
+  fetch(ACTIVE_STRATEGY_LIST_URL)
+    .then((res) => res.json())
+    .then((res) => createTable(res))
+    .catch((err) => alert(err.message));
+
 document.body.onload = async () => {
-  fetch("/api/strategies")
+  dayjs.extend(dayjs_plugin_relativeTime);
+
+  fetch(STRATEGIES_URL)
     .then((res) => res.json())
     .then((strategies) => {
       Object.keys(strategies).forEach(createOptions);
@@ -75,7 +121,12 @@ document.body.onload = async () => {
         .addEventListener("change", renderConfigs(strategies));
     });
 
+  fetch(ACTIVE_STRATEGY_LIST_URL)
+    .then((res) => res.json())
+    .then((res) => createTable(res))
+    .catch((err) => alert(err.message));
+
   document
     .querySelector("#runStrategyBtn")
-    .addEventListener("click", runStrategy);
+    .addEventListener("click", startPaperTrade);
 };

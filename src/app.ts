@@ -1,13 +1,14 @@
-import fs from "fs";
 import express from "express";
 import ws from "express-ws";
 import morgan from "morgan";
-import backtest, { STRATEGIES } from "./strategyRunner";
+import { STRATEGIES } from "./strategyRunner";
 import path from "path";
-import { getFileName } from "./utils";
-import { log } from "console";
-import { restartPaperTrade, startPaperTrade } from "./handlers/paperTrade";
-import { addDbToRequest, addStrategyManager } from "./handlers/middlewares";
+import { injectDatabase, attachStrategyManager } from "./handlers/middlewares";
+import * as dotenv from 'dotenv';
+import staticRoutes from "./routes/static.routes";
+import backtestRoutes from "./routes/backtest.routes";
+import paperTradeRoutes from "./routes/paperTrade.routes";
+import handleWebsocketRequest from './handlers/websocket';
 
 declare module "express-serve-static-core" {
   interface Application {
@@ -16,96 +17,40 @@ declare module "express-serve-static-core" {
 }
 
 const app: express.Application = express();
-ws(app);
 
+ws(app);
+dotenv.config();
+
+// middlewares
 app.use(express.urlencoded());
 app.use(express.json());
 app.use(morgan("tiny"));
-app.use(addDbToRequest);
-app.use(addStrategyManager);
+app.use(injectDatabase);
+app.use(attachStrategyManager);
 
-app.get(["/", "/index", "/index.html"], (req, res) =>
-  res.sendFile(path.resolve("public", "index.html"))
-);
+// routes
+app.use(staticRoutes);
+app.use(backtestRoutes);
+app.use(paperTradeRoutes);
 
-app.get("/:type", (req, res) => {
-  const type: string = req.params.type;
-  res.sendFile(path.resolve("public", `${type}/trade.html`));
-});
-
-app.get("/:type/result", (req, res) => {
-  const type: string = req.params.type;
-  res.sendFile(path.resolve("public", `${type}/result.html`));
-});
-
-app.get("/api/backtest/result", (req, res) => {
-  res.sendFile(path.resolve("result", "backtest.json"));
-});
-
-app.get("/api/paper-trade/result", (req, res) => {
-  const { db } = req;
-  const id = req.query.id;
-
-  const quoteInfo = db.find(id);
-  const trades = fs.readFileSync(`result/${id}.csv`, "utf8");
-
-  res.json({ trades, tradeInfo: quoteInfo });
-});
-
+// common routes --------------------------------------------------
 app.get("/api/strategies", (req, res) => res.json(STRATEGIES));
 
 app.get("/api/downloaded-data", (req, res) => {
   res.header("Content-Type", "application/json");
   res.sendFile(path.resolve("", "symbolList.json"));
 });
+// common routes ends here ---------------------------------------
 
-app.post("/api/backtest", (req, res) => {
-  try {
-    const fileName: string = getFileName(req.body.stock);
-    backtest(fileName, req.body);
-  } catch (e) {
-    log(e);
-    res.json({});
-    return;
-  }
-  res.json({ status: "OK" });
-});
-
-app.post("/api/paper-trade", startPaperTrade);
-
-app.post("/api/paper-trade/:id/restart", restartPaperTrade);
-
-app.post("/api/paper-trade/:id/delete", (req, res) => {
-  const id = req.params.id;
-
-  // db.remove({ id }, {}, function (err: any, numRemoved: any) {
-  //   if (err) {
-  //     res.status(500).send(err);
-  //     return;
-  //   }
-  //   res.json({ status: "OK", removedCount: numRemoved });
-  // });
-});
-
-// app.post("/api/paper-trade", (req, res) => restartPaperTrade);
-
-app.get("/api/paper-trade/list", (req, res) => {
-  res.json(req.db.liveQuotes);
-});
-
-app.ws("/api/paper-trade/:id", (ws, req) => {
-  const id = req.params.id;
-  const { strategyManager } = req;
-  ws.sendText = (data: any) => ws.send(JSON.stringify(data));
-
-  strategyManager.channelLiveActivity(id, ws);
-});
+app.ws("/api/paper-trade/:id", handleWebsocketRequest);
 
 app.use(express.static("public"));
 
-const port: number = 3000;
 
-app.listen(port, () => {
-  console.log(`TypeScript with Express
-         http://localhost:${port}/`);
+const config = {
+  port: Number(process.env.PORT) || 3000,
+};
+
+app.listen(config.port, () => {
+  console.log(`Server running on http://localhost:${config.port}/`);
 });

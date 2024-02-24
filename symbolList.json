@@ -1,9 +1,6 @@
 {
   "Nifty 50": [
-    {
-      "name": "Nifty",
-      "symbol": "^NSEI"
-    },
+    { "name": "Nifty", "symbol": "^NSEI" },
     {
       "name": "Bank Nifty",
       "symbol": "^NSEBANK"

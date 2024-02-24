@@ -9,7 +9,7 @@ declare module "express-serve-static-core" {
   }
 }
 
-export const addDbToRequest = (
+export const injectDatabase = (
   req: Request,
   _res: Response,
   next: NextFunction
@@ -20,7 +20,7 @@ export const addDbToRequest = (
 
 const strategyManager = new LiveStrategyManager();
 
-export const addStrategyManager = (
+export const attachStrategyManager = (
   req: Request,
   _res: Response,
   next: NextFunction
