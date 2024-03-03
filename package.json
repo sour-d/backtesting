@@ -4,10 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run build && node build/app.js",
-    "setup": "rm -rf ./data ./result ./technicalData; mkdir data technicalData result;",
-    "download": "node downloadData.js",
+    "start": "yarn build && node build/app.js",
+    "setup": "yarn; rm -rf ./data ./result ./technicalData; mkdir data technicalData result;",
+    "download": "yarn build; node downloadData.js",
     "clean": "rm -rf ./data/*db ./result/* ./technicalData/*",
     "build": "npx tsc"
   },
