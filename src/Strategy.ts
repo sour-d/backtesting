@@ -148,7 +148,6 @@ class Strategy extends EventEmitter {
   protected trade(): void {
     if (this.alreadyTookPosition()) this.sell();
     else this.buy();
-    console.log("will emit now");
 
     this.emit("data", this.stock.now());
   }

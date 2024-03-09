@@ -27,7 +27,7 @@ const transformTradesData = (trades, timeframe) => {
   const transformedData = trades.map((trade, i) => {
     const duration = dayjs(trade["Selling Date"]).diff(
       dayjs(trade["Buying Date"]),
-      "day"
+      "day",
     );
     const profitOrLoss =
       (trade["Selling Price"] - trade["Buying Price"]) * trade["Total Stocks"];
@@ -35,8 +35,10 @@ const transformTradesData = (trades, timeframe) => {
       duration,
       profitOrLoss,
       id: i + 1,
-      buyingDate: dayjs(trade["Buying Date"]).format("DD-MMM-YY HH:mm:ss"),
-      sellingDate: dayjs(trade["Selling Date"]).format("DD-MMM-YY HH:mm:ss"),
+      buyingDate: dayjs(trade["Buying Date"]).format("DD-MM-YY  HH:mm:ss"),
+      sellingDate: dayjs(trade["Selling Date"]).format("DD-MM-YY  HH:mm:ss"),
+      buyingDateObj: dayjs(trade["Buying Date"]),
+      sellingDateObj: dayjs(trade["Selling Date"]),
       transactionAmount: trade["Total Stocks"] * trade["Buying Price"],
       reward: profitOrLoss ? profitOrLoss / trade["Risk"] : 0,
       risk: trade["Risk"],
@@ -54,7 +56,7 @@ const transformTradesData = (trades, timeframe) => {
         totalReward: trade.totalReward,
       };
     },
-    { totalProfitOrLoss: 0, totalReward: 0 }
+    { totalProfitOrLoss: 0, totalReward: 0 },
   );
 
   addDrawDown(transformedData);

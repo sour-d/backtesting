@@ -19,7 +19,7 @@ const parseQuotes = (filename: string): Quote[] => {
   // quotes.forEach((quote: Stock) => quote.Date = new Date(quote.Date));
 
   if (errors.length > 0) {
-    throw new Error("Failed to parse: " + errors[0].message );
+    throw new Error("Failed to parse: " + errors[0].message);
   }
 
   return quotes;

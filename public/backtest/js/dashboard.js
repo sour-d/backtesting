@@ -1,6 +1,18 @@
 const OUTCOME_URL = "/backtest/outcome";
-const BACKTEST_API_URL = '/api/backtest';
+const BACKTEST_API_URL = "/api/backtest";
 const STRATEGIES_URL = "/api/strategies";
+const AVAILABLE_DATA = "/api/available-data";
+
+const getFileName = (stock) => {
+  const {
+    name,
+    timeFrame = "1d",
+    from = "2005-01-01",
+    to = "2023-06-01",
+  } = stock;
+
+  return `${name}_${timeFrame}_${from}_${to}`;
+};
 
 const handelResponse = (res) => {
   if (res.status === "OK") {
@@ -66,7 +78,26 @@ const renderConfigs = (strategies) => (event) => {
   });
 };
 
-document.body.onload = async () => {
+const renderStockOptions = (datas) => {
+  Object.keys(datas).forEach((category) => {
+    datas[category].forEach((data) => {
+      const name = getFileName(data);
+      const op = document.createElement("option");
+      op.setAttribute("value", name);
+      op.innerText = name;
+      document.getElementById("stock").appendChild(op);
+    });
+  });
+};
+
+const fetchAvailableData = () =>
+  fetch(AVAILABLE_DATA)
+    .then((res) => res.json())
+    .then((availableDatas) => {
+      renderStockOptions(availableDatas);
+    });
+
+const fetchStrategies = () =>
   fetch(STRATEGIES_URL)
     .then((res) => res.json())
     .then((strategies) => {
@@ -76,6 +107,9 @@ document.body.onload = async () => {
         .addEventListener("change", renderConfigs(strategies));
     });
 
+document.body.onload = async () => {
+  fetchAvailableData();
+  fetchStrategies();
   document
     .querySelector("#runStrategyBtn")
     .addEventListener("click", runStrategy);

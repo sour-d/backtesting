@@ -4,11 +4,11 @@ import morgan from "morgan";
 import { STRATEGIES } from "./strategyRunner";
 import path from "path";
 import { injectDatabase, attachStrategyManager } from "./handlers/middlewares";
-import * as dotenv from 'dotenv';
+import * as dotenv from "dotenv";
 import staticRoutes from "./routes/static.routes";
 import backtestRoutes from "./routes/backtest.routes";
 import paperTradeRoutes from "./routes/paperTrade.routes";
-import handleWebsocketRequest from './handlers/websocket';
+import handleWebsocketRequest from "./handlers/websocket";
 
 declare module "express-serve-static-core" {
   interface Application {
@@ -22,7 +22,7 @@ ws(app);
 dotenv.config();
 
 // middlewares
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(morgan("tiny"));
 app.use(injectDatabase);
@@ -34,9 +34,9 @@ app.use(backtestRoutes);
 app.use(paperTradeRoutes);
 
 // common routes --------------------------------------------------
-app.get("/api/strategies", (req, res) => res.json(STRATEGIES));
+app.get("/api/strategies", (_req, res) => res.json(STRATEGIES));
 
-app.get("/api/downloaded-data", (req, res) => {
+app.get("/api/available-data", (_req, res) => {
   res.header("Content-Type", "application/json");
   res.sendFile(path.resolve("", "symbolList.json"));
 });
@@ -45,7 +45,6 @@ app.get("/api/downloaded-data", (req, res) => {
 app.ws("/api/paper-trade/:id", handleWebsocketRequest);
 
 app.use(express.static("public"));
-
 
 const config = {
   port: Number(process.env.PORT) || 3000,

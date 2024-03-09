@@ -7,7 +7,7 @@ export interface Quote {
   High: number;
   Low: number;
   Close: number;
-  Date: number;
+  Date: string;
   Volume: number;
 }
 
@@ -19,7 +19,7 @@ export class ExistingQuoteManager {
   constructor(
     quotes: TechnicalQuote[],
     startingQuoteDay: number = 1,
-    name: string = ""
+    name: string = "",
   ) {
     this.quotes = quotes;
     this.currentQuoteIndex = startingQuoteDay - 1;
@@ -98,7 +98,7 @@ export class LiveQuoteManager extends ExistingQuoteManager {
   constructor(
     quotes: LiveQuote,
     startingQuoteDay: number = 1,
-    name: string = ""
+    name: string = "",
   ) {
     super([], startingQuoteDay, name);
     this.currentQuoteIndex = -1;

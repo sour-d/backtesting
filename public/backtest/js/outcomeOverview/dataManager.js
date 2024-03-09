@@ -54,9 +54,8 @@ const updateActiveTradeWithLiveData = (data) => {
   const color = profit > 0 ? "text-success" : "text-danger";
 
   document.querySelector("#currentPrice").innerText = data.Close;
-  document.querySelector(
-    "#pnl-percentage"
-  ).innerHTML = `<h1 class="${color}">${symbol}${profitPercentage}%</h1>`;
+  document.querySelector("#pnl-percentage").innerHTML =
+    `<h1 class="${color}">${symbol}${profitPercentage}%</h1>`;
   document.querySelector("#pnl").innerText = profit;
 };
 
@@ -106,6 +105,7 @@ const main = async () => {
   generateReport(tradeInfo);
 
   const data = transformTradesData(trades, tradeInfo.timeFrame);
+  console.log("data", data);
   drawProfitLossChart(data);
   drawTotalProfitOverTime(data);
   drawDurationProfitChart(data);

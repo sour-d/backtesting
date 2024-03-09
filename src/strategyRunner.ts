@@ -5,12 +5,14 @@ import { Trades } from "./Trades";
 import FortyTwentyStrategy from "./strategy/FortyTwentyStrategy";
 import MovingAverageStrategy from "./strategy/MovingAverageStrategy";
 import TwoBreakingCandle from "./strategy/TwoBreakingCandle";
+import PriceActionStrategy from "./strategy/PriceActionStrategy";
 import LiveQuote from "./LiveQuote";
 
 export const STRATEGIES: any = {
   FortyTwentyStrategy,
   MovingAverageStrategy,
   TwoBreakingCandle,
+  PriceActionStrategy,
 };
 
 const persistBacktestResult = (stockName: string) => (outcomes: Trades) => {

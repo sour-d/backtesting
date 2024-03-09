@@ -13,7 +13,7 @@ const drawProfitLossChart = (data) => {
       },
     ],
     encoding: {
-      x: { field: "buyingDate", type: "ordinal", title: "Buying Date" },
+      x: { field: "id", type: "ordinal", title: "ID" },
       y: {
         field: "profitOrLoss",
         type: "quantitative",

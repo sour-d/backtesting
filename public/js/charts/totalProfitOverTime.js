@@ -3,9 +3,9 @@ const drawTotalProfitOverTime = (data) => {
     $schema: "https://vega.github.io/schema/vega-lite/v5.json",
     description: "Profit over time.",
     layer: [
-      { mark: { type: "line", point: true, tooltip: true }, height: 400 },
+      { mark: { type: "line" }, height: 400 },
       {
-        mark: { type: "line", point: true, tooltip: true },
+        mark: { type: "line" },
         height: 400,
         transform: [
           {
@@ -16,7 +16,11 @@ const drawTotalProfitOverTime = (data) => {
       },
     ],
     encoding: {
-      x: { field: "sellingDate", type: "ordinal", title: "Date" },
+      x: {
+        field: "id",
+        type: "ordinal",
+        title: "id",
+      },
       y: {
         field: "totalProfitOrLoss",
         type: "quantitative",

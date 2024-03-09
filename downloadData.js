@@ -30,6 +30,7 @@ const shouldDownloadData = (filename) => {
   let data;
 
   try {
+    console.log("filename", filename);
     data = parseQuotes(filename);
   } catch (error) {
     return true;
@@ -66,15 +67,16 @@ const downloadData = () => {
         axios
           .get(`${url}${symbol}`, {
             params: {
-              interval: "1d",
+              interval: timeFrame,
               period1,
               period2,
+              includeAdjustedClose: false,
             },
           })
           .then((res) => onReceivingData(res, filename))
           .catch(onReceivingError(name))
           .finally((_) => console.log(`${name} download complete`));
-      }
+      },
     );
   });
 };

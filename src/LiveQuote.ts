@@ -1,7 +1,7 @@
 import { log } from "console";
 
-const { EventEmitter } = require("events");
-const WebSocket = require("ws");
+import { EventEmitter } from "events";
+import WebSocket from "ws";
 
 const getTimeFrameInMs = (timeFrame: string) => {
   switch (timeFrame) {
@@ -29,6 +29,13 @@ const getTimeFrameInMs = (timeFrame: string) => {
 };
 
 class LiveQuote extends EventEmitter {
+  listeners: any;
+  isWsOpen: boolean;
+  timeFrameInMs: number | undefined;
+  intervalId: any;
+  id: string;
+  onTimeout: Function;
+
   constructor(
     symbol: string,
     timeFrame: string,
@@ -39,7 +46,7 @@ class LiveQuote extends EventEmitter {
     this.listeners = [];
     this.timeFrameInMs = getTimeFrameInMs(timeFrame);
     this.isWsOpen = false;
-    this.intervalId = null;
+    this.intervalId = undefined;
     this.id = id;
     this.onTimeout = onTimeout;
 
