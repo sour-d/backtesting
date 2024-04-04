@@ -1,5 +1,12 @@
-import { Strategy } from "./Strategy";
-import { TechnicalQuote } from "./restructureData";
+import { Request, Response, NextFunction } from "express";
+import { Strategy } from "../Strategy";
+import { TechnicalQuote } from "../restructureData";
+
+declare module "express-serve-static-core" {
+  interface Request {
+    strategyManager: LiveStrategyManager;
+  }
+}
 
 interface LiveStrategy {
   strategy: Strategy;
@@ -7,9 +14,9 @@ interface LiveStrategy {
   lastData: TechnicalQuote | null;
 }
 
-export default class LiveStrategyManager {
+class LiveStrategyManager {
   protected strategies: Map<string, LiveStrategy> = new Map();
-  constructor() {}
+  constructor() { }
 
   public manage(id: string, strategy: Strategy) {
     this.strategies.set(id, { strategy, activeTrade: null, lastData: null });
@@ -79,3 +86,14 @@ export default class LiveStrategyManager {
     return true;
   }
 }
+
+const strategyManager = new LiveStrategyManager();
+
+export const attachStrategyManager = (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) => {
+  req.strategyManager = strategyManager;
+  next();
+};

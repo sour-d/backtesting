@@ -68,7 +68,8 @@ const renderConfigs = (strategies) => (event) => {
 const timeAgo = (timestamp) => dayjs(timestamp).fromNow();
 
 const createTableRow = (activeStrategy, rowNumber) => {
-  return `
+  const tr = document.createElement("tr");
+  const content = `
       <tr>
         <td>${rowNumber}</td>
         <td>${activeStrategy.symbol}</td>
@@ -82,20 +83,20 @@ const createTableRow = (activeStrategy, rowNumber) => {
         </td>
       </tr>
     `;
+  tr.innerHTML = content;
+  return tr;
 };
 
 const createTable = (data) => {
   const activeStrategies = data.sort((a, b) => b.startTime - a.startTime);
 
   activeStrategies.forEach((activeStrategy, index) => {
-    document.querySelector("tbody").innerHTML += createTableRow(
-      activeStrategy,
-      index + 1
-    );
+    document
+      .querySelector("tbody")
+      .appendChild(createTableRow(activeStrategy, index + 1));
     document
       .getElementById(activeStrategy.id)
       .addEventListener("click", viewResult.bind(null, activeStrategy.id));
-    console.log('done for', activeStrategy.id);
   });
 };
 

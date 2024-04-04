@@ -1,5 +1,5 @@
 import { log } from "console";
-import LiveQuote from "./LiveQuote";
+import LiveQuote from "./middlewares/LiveQuote";
 import { TechnicalQuote, calculateTechnicals } from "./restructureData";
 
 export interface Quote {
@@ -9,6 +9,10 @@ export interface Quote {
   Close: number;
   Date: string;
   Volume: number;
+}
+
+export interface QuoteWithId extends Quote {
+  id: string;
 }
 
 export class ExistingQuoteManager {
@@ -98,12 +102,15 @@ export class LiveQuoteManager extends ExistingQuoteManager {
   constructor(
     quotes: LiveQuote,
     startingQuoteDay: number = 1,
+    id: string,
     name: string = "",
   ) {
     super([], startingQuoteDay, name);
     this.currentQuoteIndex = -1;
 
-    quotes.on("Quote", (quote: Quote) => {
+    quotes.on("Quote", (quote: QuoteWithId) => {
+      if (quote.id !== id) return;
+      log("got 1 a quote at ", new Date().toLocaleTimeString(), quote, id);
       const technicalQuote = calculateTechnicals(quote, this.quotes);
       this.quotes.push(technicalQuote);
       this.currentQuoteIndex++;
@@ -111,7 +118,7 @@ export class LiveQuoteManager extends ExistingQuoteManager {
       if (startingQuoteDay > this.currentQuoteIndex) return;
 
       this.listeners.forEach((listener) => listener());
-      log("got a quote at ", new Date().toLocaleTimeString());
+      log("got 2 a quote at ", new Date().toLocaleTimeString());
     });
   }
 

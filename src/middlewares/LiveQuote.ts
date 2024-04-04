@@ -1,7 +1,10 @@
-import { log } from "console";
+import { Request, Response, NextFunction } from "express";
 
 import { EventEmitter } from "events";
 import WebSocket from "ws";
+
+import { DefaultLogger, WS_KEY_MAP, WebsocketClient } from 'bybit-api';
+import { log } from "console";
 
 const getTimeFrameInMs = (timeFrame: string) => {
   switch (timeFrame) {
@@ -28,88 +31,65 @@ const getTimeFrameInMs = (timeFrame: string) => {
   }
 };
 
-class LiveQuote extends EventEmitter {
-  listeners: any;
-  isWsOpen: boolean;
+export default class LiveQuote extends EventEmitter {
   timeFrameInMs: number | undefined;
   intervalId: any;
-  id: string;
   onTimeout: Function;
 
-  constructor(
-    symbol: string,
-    timeFrame: string,
-    id: string,
-    onTimeout: Function
-  ) {
+  constructor(onTimeout: Function) {
     super();
-    this.listeners = [];
-    this.timeFrameInMs = getTimeFrameInMs(timeFrame);
-    this.isWsOpen = false;
-    this.intervalId = undefined;
-    this.id = id;
+    // this.listeners = [];
+    // this.timeFrameInMs = getTimeFrameInMs(timeFrame);
+    // this.isWsOpen = false;
+    // this.intervalId = undefined;
+    // this.id = id;
     this.onTimeout = onTimeout;
 
-    this.start(symbol, timeFrame, id);
+    // this.start(symbol, timeFrame, id);
   }
 
-  start(symbol: string, timeFrame: string, id: string) {
-    const ws = new WebSocket("wss://stream.binance.com:9443/ws");
+  subscribe(symbol: string, timeFrame: string, id: string) {
+    const wsClient = new WebsocketClient({ market: 'v5' });
 
-    const subscribeMsg = {
-      method: "SUBSCRIBE",
-      params: [`${symbol.toLowerCase()}@kline_${timeFrame}`],
-      id: 1,
-    };
-
-    let prevCandle: any;
-
-    ws.on("open", () => {
-      ws.send(JSON.stringify(subscribeMsg));
-    });
-
-    ws.on("message", (data: any) => {
-      this.isWsOpen = true;
-      const message = JSON.parse(data);
-      log("LiveQuotes got quote at ", new Date().toLocaleTimeString());
-      const quote = prevCandle?.k;
-      prevCandle = message;
-      if (!quote) return;
-      if (quote.T >= Date.now()) return;
-      log("emitting a quote at ", new Date().toLocaleTimeString());
-
-      this.emit("Quote", {
-        Date: +quote.T,
-        Open: +quote.o,
-        High: +quote.h,
-        Low: +quote.l,
-        Close: +quote.c,
-        Volume: +quote.v,
+    wsClient.on('update', ({ type, topic, data: quotes, ts, wsKey }: any) => {
+      quotes.forEach((quote: any) => {
+        console.log('got quote in LiveQuote from byBits', quote.confirm);
+        if (!quote.confirm) return;
+        console.log('quote: CONFIRMED');
+        this.emit("Quote", {
+          id,
+          Date: +quote.timestamp,
+          Open: +quote.open,
+          High: +quote.high,
+          Low: +quote.low,
+          Close: +quote.close,
+          Volume: +quote.volume,
+        });
       });
     });
-
-    this.intervalId = setInterval(() => {
-      if (!this.isWsOpen) {
-        console.log("WebSocket connection timeout", { symbol, timeFrame });
-        ws.close();
-        clearInterval(this.intervalId);
-        this.onTimeout();
-        this.emit("closed");
-      }
-      this.isWsOpen = false;
-    }, this.timeFrameInMs);
-
-    ws.on("error", (err: any) => {
-      console.error(`WebSocket error: ${err}`);
+    wsClient.on('open', (data: any) => {
+      console.log('connection opened open:', data.wsKey);
+    });
+    wsClient.on('response', (data: any) => {
+      console.log('log response: ', JSON.stringify(data, null, 2));
+    });
+    wsClient.on('reconnect', ({ wsKey }: { wsKey: any }) => {
+      console.log('ws automatically reconnecting.... ', wsKey);
+    });
+    wsClient.on('reconnected', (data: any) => {
+      console.log('ws has reconnected ', data?.wsKey);
+    });
+    wsClient.on('close', (data: any) => {
+      console.log('ws has been closed ', data?.wsKey);
+      this.onTimeout();
     });
 
-    ws.on("close", () => {
-      console.log("WebSocket connection closed");
-      this.emit("closed");
-    });
+    const topics = `kline.1.${symbol.toUpperCase()}`;
+
+    wsClient.subscribeV5(topics, 'spot');
   }
 
-  // start(symbol: string, timeFrame: string, id: string) {
+  // subscribe(symbol: string, timeFrame: string, id: string) {
   //   const data = [
   //     {
   //       e: "kline",
@@ -276,4 +256,19 @@ class LiveQuote extends EventEmitter {
   // }
 }
 
-export default LiveQuote;
+declare module "express-serve-static-core" {
+  interface Request {
+    liveQuote: LiveQuote;
+  }
+}
+
+const liveQuote = new LiveQuote(() => { });
+
+export const attachLiveQuoteManager = (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) => {
+  req.liveQuote = liveQuote;
+  next();
+};

@@ -1,4 +1,4 @@
-import { log } from "console";
+import { Request, Response, NextFunction } from "express";
 
 const fs = require("fs");
 
@@ -47,6 +47,13 @@ function updateAll(ids: string[], key: string, value: any) {
   ids.forEach((id) => update(id, key, value));
 }
 
+function updateAllWhere(condition: string[], key: string, value: any) {
+  const filteredData = data.filter(condition);
+  filteredData.forEach((data: any) => {
+    data[key] = value;
+  });
+}
+
 function remove(id: string) {
   data.filter((item: any) => item.id !== id);
 }
@@ -68,11 +75,27 @@ function find(id: string) {
   return data.find((item: any) => item.id === id);
 }
 
-module.exports = {
+const db = {
   update,
   updateAll,
+  updateAllWhere,
   remove,
   add,
   find,
   liveQuotes: data,
+};
+
+declare module "express-serve-static-core" {
+  interface Request {
+    db: any;
+  }
+}
+
+export const injectDatabase = (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) => {
+  req.db = db;
+  next();
 };

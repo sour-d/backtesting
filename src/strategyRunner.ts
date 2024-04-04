@@ -6,7 +6,7 @@ import FortyTwentyStrategy from "./strategy/FortyTwentyStrategy";
 import MovingAverageStrategy from "./strategy/MovingAverageStrategy";
 import TwoBreakingCandle from "./strategy/TwoBreakingCandle";
 import PriceActionStrategy from "./strategy/PriceActionStrategy";
-import LiveQuote from "./LiveQuote";
+import LiveQuote from "./middlewares/LiveQuote";
 
 export const STRATEGIES: any = {
   FortyTwentyStrategy,

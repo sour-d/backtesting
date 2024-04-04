@@ -1,6 +1,6 @@
 import { log } from "console";
 import { v4 as uuidv4 } from "uuid";
-import LiveQuote from "../LiveQuote";
+import LiveQuote from "../middlewares/LiveQuote";
 import { LiveQuoteManager } from "../QuoteManager";
 import { STRATEGIES } from "../strategyRunner";
 import fs, { WriteFileOptions } from "fs";
@@ -13,10 +13,10 @@ const setTimeEnd = (db: any, id: string) => () => {
 };
 
 export const startPaperTrade = (req: Request, res: Response) => {
-  const { db } = req;
-  const symbol: string = req.body.symbol;
-  const strategy: string = req.body.strategy;
-  const timeFrame: string = req.body.timeFrame;
+  const {
+    db, liveQuote,
+    body: { symbol, strategy, timeFrame }
+  } = req;
 
   if (!symbol || !strategy || !timeFrame)
     return res.status(400).json({ error: "Missing required fields" });
@@ -29,6 +29,7 @@ export const startPaperTrade = (req: Request, res: Response) => {
       timeFrame,
       strategy,
       id,
+      liveQuote,
       setTimeEnd(db, id)
     );
     req.strategyManager.manage(id, strategyInstance);
@@ -83,7 +84,7 @@ const persistTradeResult = (fileName: string) => {
     if (!trade) return;
     const row = "\r\n" + trade;
     const options: WriteFileOptions = { encoding: "utf-8", flag: "a" };
-    fs.writeFile(filePath, row, options, () => {});
+    fs.writeFile(filePath, row, options, () => { });
   };
 };
 
@@ -92,11 +93,13 @@ const paperTrade = (
   timeFrame: string,
   strategyName: string,
   id: string,
+  liveQuote: LiveQuote,
   onTimeout: Function
 ) => {
+  // need to change this
   const startingDay = 2;
-  const liveQuote = new LiveQuote(symbol, timeFrame, id, onTimeout);
-  const stock = new LiveQuoteManager(liveQuote, startingDay);
+  liveQuote.subscribe(symbol, timeFrame, id);
+  const stock = new LiveQuoteManager(liveQuote, startingDay, id);
 
   const strategyClass = STRATEGIES[strategyName]._class;
 

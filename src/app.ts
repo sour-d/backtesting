@@ -3,12 +3,14 @@ import ws from "express-ws";
 import morgan from "morgan";
 import { STRATEGIES } from "./strategyRunner";
 import path from "path";
-import { injectDatabase, attachStrategyManager } from "./handlers/middlewares";
 import * as dotenv from "dotenv";
 import staticRoutes from "./routes/static.routes";
 import backtestRoutes from "./routes/backtest.routes";
 import paperTradeRoutes from "./routes/paperTrade.routes";
-import handleWebsocketRequest from "./handlers/websocket";
+import handleWebsocketRequest from "./middlewares/websocket";
+import { injectDatabase } from "./middlewares/db";
+import { attachStrategyManager } from "./middlewares/LiveStrategyManager";
+import { attachLiveQuoteManager } from "./middlewares/LiveQuote";
 
 declare module "express-serve-static-core" {
   interface Application {
@@ -27,6 +29,7 @@ app.use(express.json());
 app.use(morgan("tiny"));
 app.use(injectDatabase);
 app.use(attachStrategyManager);
+app.use(attachLiveQuoteManager);
 
 // routes
 app.use(staticRoutes);
