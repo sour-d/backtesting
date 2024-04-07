@@ -5,3 +5,5 @@ build
 .vscode
 technicalData
 .env
+yarn.lock
+package-lock.json
