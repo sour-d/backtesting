@@ -1,0 +1,26 @@
+import axios from "axios";
+import fs from "fs";
+
+const pingWebsite = async (url: string) => {
+  try {
+    const response = await axios.get(url);
+    fs.writeFileSync(
+      "ping-log.txt",
+      `${response.data} ${new Date().toLocaleString()}\n`,
+      { flag: "a", encoding: "utf8" }
+    );
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const startPingInInterval = () => {
+  setImmediate(() => {
+    pingWebsite(process.env.URL + "/ping");
+  });
+  setInterval(() => {
+    pingWebsite(process.env.URL + "/ping");
+  }, 60000);
+};
+
+export default startPingInInterval;

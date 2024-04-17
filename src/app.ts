@@ -11,6 +11,8 @@ import handleWebsocketRequest from "./middlewares/websocket";
 import { injectDatabase } from "./middlewares/db";
 import { attachStrategyManager } from "./middlewares/LiveStrategyManager";
 import { attachLiveQuoteManager } from "./middlewares/LiveQuote";
+import fs from "fs";
+import startPingInInterval from "./ping";
 
 declare module "express-serve-static-core" {
   interface Application {
@@ -47,6 +49,19 @@ app.get("/api/available-data", (_req, res) => {
 
 app.ws("/api/paper-trade/:id", handleWebsocketRequest);
 
+app.get("/ping-status", (req, res) => {
+  if (!fs.existsSync("ping-log.txt")) fs.writeFileSync("ping-log.txt", "");
+  fs.readFile("ping-log.txt", "utf8", (err, data) => {
+    if (err) {
+      res.send("Error reading ping file");
+    } else {
+      res.send(data);
+    }
+  });
+});
+
+app.get("/ping", (req, res) => res.send("pong"));
+
 app.use(express.static("public"));
 
 const config = {
@@ -54,5 +69,6 @@ const config = {
 };
 
 app.listen(config.port, () => {
+  startPingInInterval();
   console.log(`Server running on http://localhost:${config.port}/`);
 });

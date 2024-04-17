@@ -7,3 +7,4 @@ technicalData
 .env
 yarn.lock
 package-lock.json
+ping-log.txt
