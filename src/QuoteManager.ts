@@ -23,7 +23,7 @@ export class ExistingQuoteManager {
   constructor(
     quotes: TechnicalQuote[],
     startingQuoteDay: number = 1,
-    name: string = "",
+    name: string = ""
   ) {
     this.quotes = quotes;
     this.currentQuoteIndex = startingQuoteDay - 1;
@@ -103,14 +103,13 @@ export class LiveQuoteManager extends ExistingQuoteManager {
     quotes: LiveQuote,
     startingQuoteDay: number = 1,
     id: string,
-    name: string = "",
+    name: string = ""
   ) {
     super([], startingQuoteDay, name);
     this.currentQuoteIndex = -1;
 
     quotes.on("Quote", (quote: QuoteWithId) => {
       if (quote.id !== id) return;
-      log("got 1 a quote at ", new Date().toLocaleTimeString(), quote, id);
       const technicalQuote = calculateTechnicals(quote, this.quotes);
       this.quotes.push(technicalQuote);
       this.currentQuoteIndex++;

@@ -44,7 +44,7 @@ const shouldDownloadData = (filename) => {
 };
 
 const downloadData = () => {
-  const url = "https://query1.finance.yahoo.com/v7/finance/download/";
+  const url = "https://query2.finance.yahoo.com/v7/finance/download/";
 
   console.log("Downloading data...");
   Object.keys(symbolList).forEach((categoryName) => {
@@ -70,13 +70,15 @@ const downloadData = () => {
               interval: timeFrame,
               period1,
               period2,
-              includeAdjustedClose: false,
+              // includeAdjustedClose: false,
             },
           })
-          .then((res) => onReceivingData(res, filename))
-          .catch(onReceivingError(name))
-          .finally((_) => console.log(`${name} download complete`));
-      },
+          .then((res) => {
+            onReceivingData(res, filename);
+            console.log(`${name} download complete`);
+          })
+          .catch(onReceivingError(name));
+      }
     );
   });
 };

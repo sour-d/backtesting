@@ -6,7 +6,7 @@ const pingWebsite = async (url: string) => {
     const response = await axios.get(url);
     fs.writeFileSync(
       "ping-log.txt",
-      `${response.data} ${new Date().toLocaleString()}\n`,
+      `<li>${response.data} ${new Date().toLocaleString()}</li>\n`,
       { flag: "a", encoding: "utf8" }
     );
   } catch (error) {
