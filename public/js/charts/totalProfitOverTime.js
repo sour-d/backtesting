@@ -5,7 +5,7 @@ const drawTotalProfitOverTime = (data) => {
     layer: [
       { mark: { type: "line" }, height: 400 },
       {
-        mark: { type: "line" },
+        mark: { type: "line", point: true },
         height: 400,
         transform: [
           {

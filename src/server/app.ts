@@ -1,7 +1,6 @@
 import express from "express";
 import ws from "express-ws";
 import morgan from "morgan";
-import { STRATEGIES } from "./handlers/strategyRunner";
 import path from "path";
 import * as dotenv from "dotenv";
 import staticRoutes from "./routes/static.routes";
@@ -10,6 +9,7 @@ import paperTradeRoutes from "./routes/paperTrade.routes";
 import handleWebsocketRequest from "../services/websocket";
 import fs from "fs";
 import startPingInInterval from "./ping";
+import { STRATEGIES } from "../trading/strategy";
 
 declare module "express-serve-static-core" {
   interface Application {
@@ -63,6 +63,6 @@ const config = {
 };
 
 app.listen(config.port, () => {
-  startPingInInterval();
+  process.env.KeepAlive && startPingInInterval();
   console.log(`Server running on http://localhost:${config.port}/`);
 });

@@ -1,18 +1,8 @@
 import fs from "fs";
 import { transformStockData } from "../../trading/parser/restructureData";
 import { Trades } from "../../trading/outcome/Trades";
-import FortyTwentyStrategy from "../../trading/strategy/FortyTwentyStrategy";
-import MovingAverageStrategy from "../../trading/strategy/MovingAverageStrategy";
-import TwoBreakingCandle from "../../trading/strategy/TwoBreakingCandle";
-import PriceActionStrategy from "../../trading/strategy/PriceActionStrategy";
 import { ExistingQuoteStorage } from "../../trading/quote/ExistingQuoteStorage";
-
-export const STRATEGIES: any = {
-  FortyTwentyStrategy,
-  MovingAverageStrategy,
-  TwoBreakingCandle,
-  PriceActionStrategy,
-};
+import { STRATEGIES } from "../../trading/strategy";
 
 const persistBacktestResult = (stockName: string) => (outcomes: Trades) => {
   fs.writeFileSync(

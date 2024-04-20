@@ -1,5 +1,5 @@
 import express from "express";
-import backtest from "../handlers/strategyRunner";
+import backtest from "../handlers/backtest";
 import { log } from "console";
 import path from "path";
 

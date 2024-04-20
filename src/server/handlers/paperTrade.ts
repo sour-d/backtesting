@@ -1,11 +1,11 @@
 import { log } from "console";
 import { v4 as uuidv4 } from "uuid";
 import LiveQuoteProvider from "../../services/LiveQuoteProvider";
-import { STRATEGIES } from "./strategyRunner";
 import fs, { WriteFileOptions } from "fs";
 import { Request, Response } from "express";
 import { LiveQuoteStorage } from "../../trading/quote/LiveQuoteStorage";
 import ServiceProvider from "../../services/ServiceProvider";
+import { STRATEGIES } from "../../trading/strategy";
 
 const setTimeEnd = (db: any, id: string) => () => {
   return () => {
