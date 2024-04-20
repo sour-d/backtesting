@@ -23,11 +23,12 @@ const calculateDuration = (buyingDate, sellingDate, timeframe) => {
   }
 };
 
-const transformTradesData = (trades, timeframe) => {
+const transformTradesData = (trades, timeFrame) => {
   const transformedData = trades.map((trade, i) => {
-    const duration = dayjs(trade["Selling Date"]).diff(
-      dayjs(trade["Buying Date"]),
-      "day",
+    const duration = calculateDuration(
+      trade["Selling Date"],
+      trade["Buying Date"],
+      timeFrame
     );
     const profitOrLoss =
       (trade["Selling Price"] - trade["Buying Price"]) * trade["Total Stocks"];
@@ -48,7 +49,10 @@ const transformTradesData = (trades, timeframe) => {
   });
 
   transformedData.reduce(
-    ({ totalProfitOrLoss, totalReward, currentCapital, highestCapital }, trade) => {
+    (
+      { totalProfitOrLoss, totalReward, currentCapital, highestCapital },
+      trade
+    ) => {
       trade.totalProfitOrLoss = trade.profitOrLoss + totalProfitOrLoss;
       trade.totalReward = trade.reward + totalReward;
       trade.currentCapital = currentCapital + trade.profitOrLoss;
@@ -56,7 +60,12 @@ const transformTradesData = (trades, timeframe) => {
 
       return trade;
     },
-    { totalProfitOrLoss: 0, totalReward: 0, currentCapital: 100000, highestCapital: 100000 },
+    {
+      totalProfitOrLoss: 0,
+      totalReward: 0,
+      currentCapital: 100000,
+      highestCapital: 100000,
+    }
   );
 
   addDrawDown(transformedData);
@@ -70,7 +79,8 @@ const addDrawDown = (tradeResults) => {
     const currentCapital = trade.currentCapital;
     const highestCapital = trade.highestCapital;
 
-    let drawDownPercentage = ((highestCapital - currentCapital) / highestCapital) * 100;
+    let drawDownPercentage =
+      ((highestCapital - currentCapital) / highestCapital) * 100;
     trade.drawDown = -1 * drawDownPercentage;
   }
 };

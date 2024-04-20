@@ -23,11 +23,12 @@ const calculateDuration = (buyingDate, sellingDate, timeframe) => {
   }
 };
 
-const transformTradesData = (trades, timeframe) => {
+const transformTradesData = (trades, timeFrame) => {
   const transformedData = trades.map((trade, i) => {
-    const duration = dayjs(trade["Selling Date"]).diff(
-      dayjs(trade["Buying Date"]),
-      "day"
+    const duration = calculateDuration(
+      trade["Selling Date"],
+      trade["Buying Date"],
+      timeFrame
     );
     const profitOrLoss =
       (trade["Selling Price"] - trade["Buying Price"]) * trade["Total Stocks"];
@@ -46,15 +47,23 @@ const transformTradesData = (trades, timeframe) => {
   });
 
   transformedData.reduce(
-    ({ totalProfitOrLoss, totalReward }, trade) => {
+    (
+      { totalProfitOrLoss, totalReward, currentCapital, highestCapital },
+      trade
+    ) => {
       trade.totalProfitOrLoss = trade.profitOrLoss + totalProfitOrLoss;
       trade.totalReward = trade.reward + totalReward;
-      return {
-        totalProfitOrLoss: trade.totalProfitOrLoss,
-        totalReward: trade.totalReward,
-      };
+      trade.currentCapital = currentCapital + trade.profitOrLoss;
+      trade.highestCapital = Math.max(highestCapital, trade.currentCapital);
+
+      return trade;
     },
-    { totalProfitOrLoss: 0, totalReward: 0 }
+    {
+      totalProfitOrLoss: 0,
+      totalReward: 0,
+      currentCapital: 100000,
+      highestCapital: 100000,
+    }
   );
 
   addDrawDown(transformedData);
@@ -63,22 +72,13 @@ const transformTradesData = (trades, timeframe) => {
 };
 
 const addDrawDown = (tradeResults) => {
-  const money = 100000;
-  let highestProfitLoss = 0;
-
   for (let i = 0; i < tradeResults.length; i++) {
     const trade = tradeResults[i];
-    const profitOrLoss = trade.profitOrLoss;
-    const totalProfitLoss = trade.totalProfitOrLoss;
+    const currentCapital = trade.currentCapital;
+    const highestCapital = trade.highestCapital;
 
-    if (totalProfitLoss > highestProfitLoss) {
-      trade.drawDown = 0;
-      highestProfitLoss = totalProfitLoss;
-    } else {
-      const total = money + highestProfitLoss;
-      let drawDownFromPeak = total - Math.abs(profitOrLoss);
-      let drawDownPercentage = (drawDownFromPeak / total) * 100;
-      trade.drawDown = drawDownPercentage - 100;
-    }
+    let drawDownPercentage =
+      ((highestCapital - currentCapital) / highestCapital) * 100;
+    trade.drawDown = -1 * drawDownPercentage;
   }
 };

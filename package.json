@@ -6,8 +6,8 @@
   "registry": "https://registry.npmjs.org",
   "scripts": {
     "dev@watch": "npx tsc --watch",
-    "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/app.ts",
-    "start": "yarn build && node build/app.js",
+    "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/server/app.ts",
+    "start": "yarn build && node build/server/app.js",
     "setup": "yarn; rm -rf ./data ./result ./technicalData; mkdir data technicalData result;",
     "download": "yarn build; node downloadData.js",
     "clean": "rm -rf ./data/*db ./result/* ./technicalData/*",
