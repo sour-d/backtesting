@@ -2,11 +2,13 @@
   "name": "trading-system",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "setup": "mkdir -p .output/data"
   },
   "dependencies": {
     "@emotion/cache": "latest",
@@ -16,6 +18,7 @@
     "@mui/material": "^5.15.15",
     "@mui/material-nextjs": "latest",
     "@mui/x-charts": "^7.3.2",
+    "broker": "https://github.com/sour-d/broker.git",
     "dayjs": "^1.11.11",
     "lodash": "^4.17.21",
     "next": "14.2.3",
