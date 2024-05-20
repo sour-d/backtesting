@@ -1,4 +1,4 @@
-const calcUpperWickValue = (quote) => {
+const upperWick = (quote) => {
   if (quote["Open"] >= quote["Close"]) {
     return quote["High"] - quote["Open"];
   }
@@ -6,7 +6,7 @@ const calcUpperWickValue = (quote) => {
   return quote["High"] - quote["Close"];
 };
 
-const calcLowerWickValue = (quote) => {
+const lowerWick = (quote) => {
   if (quote["Open"] <= quote["Close"]) {
     return quote["Open"] - quote["Low"];
   }
@@ -14,8 +14,14 @@ const calcLowerWickValue = (quote) => {
   return quote["Close"] - quote["Low"];
 };
 
-const calcCandleBodyValue = (quote) => {
+const body = (quote) => {
   return quote["Close"] - quote["Open"];
 };
 
-export default { calcCandleBodyValue, calcLowerWickValue, calcUpperWickValue };
+const calculateCandleProperty = (quote) => ({
+  Body: body(quote),
+  LowerWick: lowerWick(quote),
+  UpperWick: upperWick(quote),
+});
+
+export default calculateCandleProperty;

@@ -1,7 +1,7 @@
 import LiveQuoteProvider, {
   LiveQuoteObj,
 } from "../../services/LiveQuoteProvider";
-import { calculateTechnicals } from "../parser/restructureData";
+import { calculateTechnical } from "../parser/restructureData";
 import { ExistingQuoteStorage } from "./ExistingQuoteStorage";
 
 export class LiveQuoteStorage extends ExistingQuoteStorage {
@@ -26,7 +26,7 @@ export class LiveQuoteStorage extends ExistingQuoteStorage {
 
     quotes.on("Quote", ({ id, symbol, timeFrame, tick }: LiveQuoteObj) => {
       if (symbol !== this.symbol || timeFrame !== this.timeFrame) return;
-      const technicalQuote = calculateTechnicals(tick, this.quotes);
+      const technicalQuote = calculateTechnical(tick, this.quotes);
       this.quotes.push(technicalQuote);
       this.currentQuoteIndex++;
 
