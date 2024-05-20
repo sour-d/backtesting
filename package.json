@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "setup": "mkdir -p .output/data .output/dataWithTechnicalIndicators"
+    "setup": "mkdir -p .output/data .output/dataWithTechnicalIndicators .output/result"
   },
   "dependencies": {
     "@emotion/cache": "latest",

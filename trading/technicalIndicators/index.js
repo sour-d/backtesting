@@ -4,6 +4,14 @@ import { lowOfLast } from "./nDaysLow.js";
 import { movingAverageOf } from "./nDayMA.js";
 import calculateCandleProperty from "./candleStick.js";
 
+const fixTwoDecimal = (obj) => {
+  const result = {};
+  Object.entries(obj).forEach(([key, value]) => {
+    result[key] = +value.toFixed(2);
+  });
+  return result;
+};
+
 const Indicators = (quote, technicalQuotes) => {
   const { FortyDayMA, TwoHundredDayMA } = _.last(technicalQuotes)
     ?.indictors || { FortyDayMA: 0, TwoHundredDayMA: 0 };
@@ -16,7 +24,7 @@ const Indicators = (quote, technicalQuotes) => {
     ...calculateCandleProperty(quote),
   };
 
-  return { ...quote, indictors };
+  return { ...quote, ...fixTwoDecimal(indictors) };
 };
 
 export default Indicators;

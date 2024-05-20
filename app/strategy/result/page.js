@@ -2,7 +2,7 @@
 
 import { CircularProgress, Grid } from "@mui/material";
 import { useEffect, useState } from "react";
-import { transformTradesData } from "./transformResult";
+import { transformTradesData } from "../../../trading/outcome/transformResult";
 import Papa from "papaparse";
 import ResultDashboard from "@/components/ResultDasbboard/ResultDashboard";
 

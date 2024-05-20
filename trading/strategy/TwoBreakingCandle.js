@@ -1,4 +1,4 @@
-import { Strategy } from "./Strategy";
+import { Strategy } from "./Strategy.js";
 
 class TwoBreakingCandleNew extends Strategy {
   config;

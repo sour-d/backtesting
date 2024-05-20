@@ -46,4 +46,21 @@ const transformStockData = (filename) => {
   return technicalQuotes;
 };
 
-export { transformStockData, addTechnicalIndicator };
+const getStockData = (stockName) => {
+  const data_dir = "./.output/data/";
+  const technical_data_dir = "./.output/dataWithTechnicalIndicators/";
+
+  if (fs.existsSync(`${technical_data_dir}${stockName}.json`)) {
+    return JSON.parse(
+      fs.readFileSync(`${technical_data_dir}${stockName}.json`, "utf-8")
+    );
+  }
+
+  if (fs.existsSync(`${data_dir}${stockName}`)) {
+    return transformStockData(stockName);
+  }
+
+  throw new Error("Data not found");
+};
+
+export { transformStockData, addTechnicalIndicator, getStockData };

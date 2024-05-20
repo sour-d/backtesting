@@ -1,80 +1,71 @@
 import dayjs from "dayjs";
 import _ from "lodash";
 
-// const getResult = async () => {
-//   const type = window.location.pathname.split("/")[1];
-//   return await fetch(`/api/${type}/result${window.location.search}`)
-//     .then((res) => (res.status !== 200 ? alert("Data not found") : res))
-//     .then((response) => response.json())
-//     .then((response) => {
-//       const trades = Papa.parse(response.trades, {
-//         header: true,
-//         dynamicTyping: true,
-//       });
-//       return { tradeInfo: response.report, trades: trades.data };
-//     });
-// };
-
 const calculateDuration = (buyingDate, sellingDate, timeframe) => {
   switch (timeframe) {
     case "1d":
-      return dayjs(sellingDate).diff(dayjs(buyingDate), "day");
-    case "1h":
-      return dayjs(sellingDate).diff(dayjs(buyingDate), "hour");
-    case "1m":
-      return dayjs(sellingDate).diff(dayjs(buyingDate), "minute");
+      return dayjs(buyingDate).diff(dayjs(sellingDate), "day");
+    case "60":
+      return dayjs(buyingDate).diff(dayjs(sellingDate), "hour");
+    case "1":
+      return dayjs(buyingDate).diff(dayjs(sellingDate), "minute");
   }
+};
+
+const trimToTwoDecimal = (value) => {
+  if (typeof value === "string" || typeof value === "object") return value;
+  return +value.toFixed(2);
 };
 
 const aggregateLog = (trades) => {
   const result = [];
 
   trades.forEach((trade) => {
-    if (trade["Transaction Type"] === "buy") {
+    if (trade.transactionType === "buy") {
       result.push({
-        buyingDate: trade["Transaction Date"],
-        buyingPrice: trade["Price"],
-        quantity: trade["Quantity"],
-        risk: trade["Risk"],
+        buyingDate: trade.transactionDate,
+        buyingPrice: trade.price,
+        quantity: trade.quantity,
+        risk: trade.risk,
       });
     }
-    if (trade["Transaction Type"] === "sell") {
+    if (trade.transactionType === "sell") {
       result.push({
-        sellingDate: trade["Transaction Date"],
-        sellingPrice: trade["Price"],
-        quantity: trade["Quantity"],
-        risk: trade["Risk"],
+        sellingDate: trade.transactionDate,
+        sellingPrice: trade.price,
+        quantity: trade.quantity,
+        risk: trade.Risk,
       });
     }
 
-    if (trade["Transaction Type"] === "square-off") {
+    if (trade.transactionType === "square-off") {
       const lastTrade = _.last(result);
 
       if (lastTrade.buyingDate && lastTrade.buyingPrice) {
-        lastTrade.sellingDate = trade["Transaction Date"];
-        lastTrade.sellingPrice = trade["Price"];
-        lastTrade.stockLeft = lastTrade.quantity - trade["Quantity"];
+        lastTrade.sellingDate = trade.transactionDate;
+        lastTrade.sellingPrice = trade.price;
+        lastTrade.stockLeft = lastTrade.quantity - trade.quantity;
         return;
       }
 
       if (lastTrade.sellingDate && lastTrade.sellingPrice) {
-        lastTrade.buyingDate = trade["Transaction Date"];
-        lastTrade.buyingPrice = trade["Price"];
-        lastTrade.stockLeft = lastTrade.totalStocks - trade["Quantity"];
+        lastTrade.buyingDate = trade.transactionDate;
+        lastTrade.buyingPrice = trade.price;
+        lastTrade.stockLeft = lastTrade.totalStocks - trade.quantity;
         return;
       }
     }
   });
 
-  return result;
+  return _.last(result).sellingDate ? result : result.slice(0, -1);
 };
 
 export const transformTradesData = (trades, timeFrame) => {
   const aggregatedLog = aggregateLog(trades);
   const transformedData = aggregatedLog.map((trade, i) => {
     const duration = calculateDuration(
-      trade.sellingDate,
-      trade.buyingDate,
+      trade.sellingDate.DateUnix,
+      trade.buyingDate.DateUnix,
       timeFrame
     );
     const profitOrLoss =
@@ -83,10 +74,12 @@ export const transformTradesData = (trades, timeFrame) => {
       duration,
       profitOrLoss,
       id: i + 1,
-      buyingDate: dayjs(trade.buyingDate).format("DD-MM-YY  HH:mm:ss"),
-      sellingDate: dayjs(trade.sellingDate).format("DD-MM-YY  HH:mm:ss"),
-      buyingDateObj: dayjs(trade.buyingDate),
-      sellingDateObj: dayjs(trade.sellingDate),
+      buyingDate: dayjs(trade.buyingDate.DateUnix).format("DD-MM-YY  HH:mm:ss"),
+      sellingDate: dayjs(trade.sellingDate.DateUnix).format(
+        "DD-MM-YY  HH:mm:ss"
+      ),
+      buyingDateObj: dayjs(trade.buyingDate.DateUnix),
+      sellingDateObj: dayjs(trade.sellingDate.DateUnix),
       transactionAmount: trade.quantity * trade.buyingPrice,
       reward: profitOrLoss ? profitOrLoss / trade.risk : 0,
       risk: trade.risk,
@@ -117,7 +110,13 @@ export const transformTradesData = (trades, timeFrame) => {
 
   addDrawDown(transformedData);
 
-  return transformedData;
+  return transformedData.map((trade) => {
+    const trimmedTrade = {};
+    Object.keys(trade).forEach((key) => {
+      trimmedTrade[key] = trimToTwoDecimal(trade[key]);
+    });
+    return trimmedTrade;
+  });
 };
 
 const addDrawDown = (tradeResults) => {
@@ -129,5 +128,9 @@ const addDrawDown = (tradeResults) => {
     let drawDownPercentage =
       ((highestCapital - currentCapital) / highestCapital) * 100;
     trade.drawDown = -1 * drawDownPercentage;
+
+    const previousDrawDownDuration = tradeResults[i - 1]?.drawDownDuration || 0;
+    trade.drawDownDuration =
+      trade.drawDown < 0 ? previousDrawDownDuration + 1 : 0;
   }
 };

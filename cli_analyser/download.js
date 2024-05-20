@@ -28,6 +28,7 @@ const downloadFromLastDownloaded = async () => {
 };
 
 const downloadFromStartEnd = () => {
+  const filename = process.argv[6];
   const symbol = process.argv[2];
   const interval = process.argv[3];
   const start = process.argv[4] + "T00:00:00.000Z";
@@ -36,7 +37,7 @@ const downloadFromStartEnd = () => {
     end = start;
   }
 
-  downloader(symbol, interval, start, end);
+  downloader(symbol, interval, start, end, filename);
 };
 
 const main = () => {

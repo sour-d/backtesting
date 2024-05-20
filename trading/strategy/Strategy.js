@@ -1,7 +1,7 @@
-import { ExistingQuoteStorage } from "../quoteStorage/ExistingQuoteStorage";
-import { Trades } from "../outcome/Trades";
+import { ExistingQuoteStorage } from "../quoteStorage/ExistingQuoteStorage.js";
+import { Trades } from "../outcome/Trades.js";
 import { EventEmitter } from "events";
-import { transformStockData } from "../parser/restructureData";
+import { getStockData, transformStockData } from "../parser/restructureData.js";
 import { type } from "os";
 
 class Strategy extends EventEmitter {
@@ -21,7 +21,6 @@ class Strategy extends EventEmitter {
     persistTradesFn,
     config = Strategy.getDefaultConfig()
   ) {
-    console.log("inside strategy", { stockName, config });
     super();
 
     this.capital = config.capital;
@@ -32,7 +31,7 @@ class Strategy extends EventEmitter {
 
     this.currentTradeInfo = null;
 
-    this.stock = new ExistingQuoteStorage(transformStockData(stockName));
+    this.stock = new ExistingQuoteStorage(getStockData(stockName));
     this.trades = new Trades(this);
     // this.isLive = stock instanceof LiveQuoteStorage;
   }

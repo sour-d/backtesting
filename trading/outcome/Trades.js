@@ -1,5 +1,6 @@
-import { trimToDec } from "@/components/utils";
 import Papa from "papaparse";
+
+const trimToDec = (value) => +value.toFixed(2);
 
 export class Trades {
   capital;
@@ -14,7 +15,6 @@ export class Trades {
     this.risk = risk;
     this.stock = stockName;
     this.flushedTill = 0;
-    console.log("inside trades constructor", { capital, risk, stockName });
   }
 
   totalTrades() {

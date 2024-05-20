@@ -1,7 +1,7 @@
-import FortyTwentyStrategy from "./FortyTwentyStrategy";
-import MovingAverageStrategy from "./MovingAverageStrategy";
-import PriceActionStrategy from "./PriceActionStrategy";
-import TwoBreakingCandle from "./TwoBreakingCandle";
+import FortyTwentyStrategy from "./FortyTwentyStrategy.js";
+import MovingAverageStrategy from "./MovingAverageStrategy.js";
+import PriceActionStrategy from "./PriceActionStrategy.js";
+import TwoBreakingCandle from "./TwoBreakingCandle.js";
 
 const STRATEGIES = [
   FortyTwentyStrategy,

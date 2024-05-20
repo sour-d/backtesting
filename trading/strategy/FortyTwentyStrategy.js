@@ -1,4 +1,4 @@
-import { Strategy } from "./Strategy";
+import { Strategy } from "./Strategy.js";
 
 class FortyTwentyStrategy extends Strategy {
   config;
@@ -10,7 +10,7 @@ class FortyTwentyStrategy extends Strategy {
 
   static getDefaultConfig() {
     return {
-      buyWindow: 40,
+      buyWindow: 60,
       sellWindow: 20,
       capital: 100000,
       riskPercentage: 5,

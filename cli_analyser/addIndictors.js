@@ -1,7 +1,6 @@
 import { addTechnicalIndicator } from "../trading/parser/restructureData.js";
 import fs from "fs";
 import _ from "lodash";
-import { start } from "repl";
 
 const INPUT_FOLDER = "./.output/data/";
 const OUTPUT_FOLDER = "./.output/dataWithTechnicalIndicators/";
