@@ -4,10 +4,30 @@ import fs from "fs";
 import _ from "lodash";
 
 const getDateFormat = (date = dayjs().utc()) => {
-  return dayjs(date).format("YYYY-MM-DDTHH:mm:ss.SSS") + "Z";
+  return dayjs(date).toISOString();
 };
 
 const todaysDate = () => dayjs().utc().format("YYYY-MM-DD");
+const getFilename = (symbol, interval) =>
+  `./.output/data/${symbol}_${interval}.json`;
+
+const downloadDefaultData = async () => {
+  const symbol = process.env.DEFAULT_SYMBOL;
+  const interval = process.env.DEFAULT_INTERVAL;
+  const startDateString = process.env.DEFAULT_START_DATE + "T00:00:00.000Z";
+  const endDateString = process.env.DEFAULT_END_DATE + "T23:59:59.999Z";
+  console.log({
+    symbol,
+    interval,
+    startDateString,
+    endDateString,
+  });
+
+  const start = getDateFormat(startDateString);
+  const end = getDateFormat(endDateString);
+
+  downloader(symbol, interval, start, end, `${symbol}_${interval}_DEFAULT`);
+};
 
 const downloadFromLastDownloaded = async () => {
   const symbol = "BTCUSDT";
@@ -41,11 +61,16 @@ const downloadFromStartEnd = () => {
 };
 
 const main = () => {
-  if (process.argv.length > 2) {
-    downloadFromStartEnd();
-    return;
+  if (process.argv[2] === "--default") {
+    if (!process.env.DEFAULT_START_DATE) throw "need env";
+    return downloadDefaultData();
   }
-  downloadFromLastDownloaded();
+  if (process.argv[2] === "--continue") {
+    return downloadFromLastDownloaded();
+  }
+  if (process.argv.length > 2) {
+    return downloadFromStartEnd();
+  }
 };
 
 main();
