@@ -3,8 +3,13 @@ import { Strategy } from "./Strategy.js";
 class FortyTwentyStrategy extends Strategy {
   config;
 
-  constructor(stockName, persistTradesFn, config = this.getDefaultConfig()) {
-    super(stockName, persistTradesFn, config);
+  constructor(
+    stockName,
+    persistTradesFn,
+    config = this.getDefaultConfig(),
+    isLive = false
+  ) {
+    super(stockName, persistTradesFn, config, isLive);
     this.config = config;
   }
 
@@ -12,8 +17,8 @@ class FortyTwentyStrategy extends Strategy {
     return {
       buyWindow: 60,
       sellWindow: 20,
-      capital: 100000,
-      riskPercentage: 5,
+      capital: 100,
+      riskPercentage: 0.1,
     };
   }
 

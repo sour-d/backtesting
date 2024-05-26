@@ -1,3 +1,4 @@
+import { prepareResponse } from "@/app/utils";
 import strategies from "@/trading/strategy";
 import fs from "fs";
 
@@ -11,31 +12,22 @@ const persistBackTestResult = (stockName) => (outcomes) => {
 };
 
 export async function POST(req) {
-  const { strategyName, config } = await req.json();
+  const { strategyName, config, stockName } = await req.json();
   const Strategy = strategies.find(
     (strategy) => strategy.name === strategyName
   );
   if (!Strategy) {
-    return Response.json(
-      {
-        success: false,
-        message: "Strategy not found",
-        config,
-      },
-      { status: 500 }
-    );
+    return Response.json(prepareResponse("Strategy not found", true), {
+      status: 500,
+    });
   }
 
   const strategy = new Strategy(
-    "nifty",
-    persistBackTestResult("nifty"),
+    stockName,
+    persistBackTestResult(stockName),
     config
   );
   strategy.execute();
 
-  return Response.json({
-    success: true,
-    message: "Strategy executed",
-    config,
-  });
+  return Response.json(prepareResponse("Strategy executed", false));
 }

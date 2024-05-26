@@ -29,7 +29,7 @@ export default function Home() {
       </Grid>
       <Grid item>
         <Button
-          onClick={() => router.push("/strategy")}
+          onClick={() => router.push("/live")}
           sx={{ margin: "0 auto" }}
           variant="contained"
         >

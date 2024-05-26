@@ -2,7 +2,6 @@
   "name": "trading-system",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -22,6 +21,7 @@
     "broker": "https://github.com/sour-d/broker.git",
     "dayjs": "^1.11.11",
     "lodash": "^4.17.21",
+    "mathjs": "^12.4.2",
     "next": "14.2.3",
     "papaparse": "^5.4.1",
     "react": "^18",

@@ -19,28 +19,27 @@ const isRangeInvalid = (data, technicalData) => {
 const main = () => {
   if (process.argv[2]) {
     const filename = process.argv[2];
-    const data = JSON.parse(fs.readFileSync(`${INPUT_FOLDER}${filename}`));
+    const inputFilePath = `${INPUT_FOLDER}${filename}.json`;
+    const outputFilePath = `${OUTPUT_FOLDER}${filename}.json`;
+    const data = JSON.parse(fs.readFileSync(inputFilePath));
+
     let technicalData = [];
-    if (fs.existsSync(`${OUTPUT_FOLDER}${filename}`)) {
-      technicalData = JSON.parse(
-        fs.readFileSync(`${OUTPUT_FOLDER}${filename}`, "utf-8")
-      );
+    if (fs.existsSync(outputFilePath)) {
+      technicalData = JSON.parse(fs.readFileSync(outputFilePath, "utf-8"));
     }
 
     console.log(
       `adding total ${data.length - technicalData.length} indicators`
     );
-    console.log(data.length, technicalData.length);
     if (isRangeInvalid(data, technicalData)) throw "some thing went wrong";
 
     const dataWithIndicators = addTechnicalIndicator(
       data,
       technicalData.length
     );
-    const path = `./.output/dataWithTechnicalIndicators/${filename}`;
 
     fs.writeFileSync(
-      path,
+      outputFilePath,
       JSON.stringify([...technicalData, ...dataWithIndicators]),
       {
         encoding: "utf8",

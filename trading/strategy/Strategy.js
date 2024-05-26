@@ -19,7 +19,8 @@ class Strategy extends EventEmitter {
   constructor(
     stockName,
     persistTradesFn,
-    config = Strategy.getDefaultConfig()
+    config = Strategy.getDefaultConfig(),
+    isLive = false
   ) {
     super();
 
@@ -99,7 +100,13 @@ class Strategy extends EventEmitter {
       type: transactionType,
     };
 
-    this.updateTrades(this.stock.now(), price, position, risk, transactionType);
+    this.updateTrades(
+      this.stock.now(),
+      price,
+      position,
+      risk * position,
+      transactionType
+    );
   }
 
   exitPosition(

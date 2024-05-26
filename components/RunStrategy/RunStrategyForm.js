@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { use, useEffect } from "react";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
@@ -11,10 +11,10 @@ import ConfigForm from "./ConfigForm";
 import { camelCaseToStr } from "../utils";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import { Box } from "@mui/material";
+import { Box, TextField } from "@mui/material";
 
 const runStrategy = async (formData, onComplete, onError) => {
-  return fetch("/api/strategy/run", {
+  return fetch("/api/live/trade", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -36,9 +36,9 @@ const runStrategy = async (formData, onComplete, onError) => {
     });
 };
 
-export default function StrategyChoiceForm({ config }) {
-  const [strategies, setStrategies] = React.useState([]);
-  const [formData, setFormData] = React.useState({});
+export default function StrategyChoiceForm() {
+  const [strategiesConfig, setStrategies] = React.useState([]);
+  const [formData, setFormData] = React.useState({ stockName: "GALAUSDT" });
   const [message, setMessage] = React.useState({});
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function StrategyChoiceForm({ config }) {
   }, [message]);
 
   useEffect(() => {
-    fetch("/api/strategy/list")
+    fetch("/api/strategy-list")
       .then((res) => res.json())
       .then((data) => {
         setStrategies(data);
@@ -61,18 +61,31 @@ export default function StrategyChoiceForm({ config }) {
       <Box sx={{ margin: "0 auto" }} width="50%">
         <Grid container flexDirection="column" gap="14px">
           <FormControl fullWidth>
+            <TextField
+              id="stockName"
+              label="Enter stock name"
+              value={formData.stockName}
+              onChange={(e) => {
+                setFormData((oldValues) => ({
+                  ...oldValues,
+                  stockName: e.target.value.toUpperCase(),
+                }));
+              }}
+            />
+          </FormControl>
+          <FormControl fullWidth>
             <InputLabel id="selectStrategy">Select a strategy</InputLabel>
             <Select
               onChange={(e) =>
                 setFormData({
                   strategy: e.target.value,
-                  ...strategies[e.target.value],
+                  ...strategiesConfig[e.target.value],
                 })
               }
               labelId="selectStrategy"
               label="Select a strategy"
             >
-              {Object.keys(strategies).map((strategyName) => (
+              {Object.keys(strategiesConfig).map((strategyName) => (
                 <MenuItem value={strategyName}>
                   {camelCaseToStr(strategyName)}
                 </MenuItem>
@@ -81,7 +94,7 @@ export default function StrategyChoiceForm({ config }) {
           </FormControl>
           {formData?.strategy && (
             <ConfigForm
-              config={strategies[formData.strategy]}
+              config={strategiesConfig[formData.strategy]}
               values={formData}
               onChange={(key, val) =>
                 setFormData((oldData) => ({ ...oldData, ...{ [key]: val } }))

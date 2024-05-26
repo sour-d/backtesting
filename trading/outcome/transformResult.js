@@ -22,6 +22,7 @@ const aggregateLog = (trades) => {
 
   trades.forEach((trade) => {
     if (trade.transactionType === "buy") {
+      if (trade.risk === 0) return;
       result.push({
         buyingDate: trade.transactionDate,
         buyingPrice: trade.price,
@@ -30,6 +31,7 @@ const aggregateLog = (trades) => {
       });
     }
     if (trade.transactionType === "sell") {
+      if (trade.risk === 0) return;
       result.push({
         sellingDate: trade.transactionDate,
         sellingPrice: trade.price,
