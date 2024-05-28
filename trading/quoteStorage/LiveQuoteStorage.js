@@ -53,13 +53,8 @@ export class LiveQuoteStorage extends ExistingQuoteStorage {
   }
 
   onQuotes({ type, data, topic }) {
-    console.log(
-      "got a data inside LiveQuoteStorage",
-      JSON.stringify(data, null, 2)
-    );
     if (topic !== this.topic) return;
     const technicalQuote = addTechnicalIndicatorToLastQuote(data, this.quotes);
-    console.log({ technicalQuote });
     this.quotes.push(technicalQuote);
     this.currentQuoteIndex++;
 
