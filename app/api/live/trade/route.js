@@ -2,17 +2,16 @@ import { prepareResponse } from "@/app/utils";
 import strategies from "@/trading/strategy";
 import fs from "fs";
 
-const persistBackTestResult = (stockName) => (outcomes) => {
+const persistBackTestResult = (stockName, timeFrame) => (outcomes) => {
   fs.writeFileSync(
-    `result/backtest.json`,
-    JSON.stringify({ report: outcomes.getReport(), trades: outcomes.toCSV() }),
+    `${process.env.RESULT_OUTPUT_DIR}/${stockName}_${timeFrame}.json`,
+    JSON.stringify({ report: outcomes.getReport(), trades: outcomes.toJSON() }),
     "utf-8"
   );
-  fs.writeFileSync(`result/backtest.csv`, outcomes.toCSV(), "utf-8");
 };
 
 export async function POST(req) {
-  const { strategyName, config, stockName } = await req.json();
+  const { strategyName, timeFrame, config, stockName } = await req.json();
   const Strategy = strategies.find(
     (strategy) => strategy.name === strategyName
   );
@@ -24,8 +23,10 @@ export async function POST(req) {
 
   const strategy = new Strategy(
     stockName,
-    persistBackTestResult(stockName),
-    config
+    timeFrame,
+    persistBackTestResult(stockName, timeFrame),
+    config,
+    true
   );
   strategy.execute();
 

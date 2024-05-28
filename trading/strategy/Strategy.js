@@ -3,6 +3,7 @@ import { Trades } from "../outcome/Trades.js";
 import { EventEmitter } from "events";
 import { getStockData, transformStockData } from "../parser/restructureData.js";
 import { type } from "os";
+import { LiveQuoteStorage } from "../quoteStorage/LiveQuoteStorage.js";
 
 class Strategy extends EventEmitter {
   stock;
@@ -14,10 +15,11 @@ class Strategy extends EventEmitter {
   currentTradeInfo;
   risk;
   stockName;
-  // isLive;
+  isLive;
 
   constructor(
     stockName,
+    timeFrame,
     persistTradesFn,
     config = Strategy.getDefaultConfig(),
     isLive = false
@@ -31,8 +33,17 @@ class Strategy extends EventEmitter {
     this.stockName = stockName;
 
     this.currentTradeInfo = null;
+    this.isLive = isLive;
 
-    this.stock = new ExistingQuoteStorage(getStockData(stockName));
+    this.stock = isLive
+      ? new LiveQuoteStorage(
+          () => this.trade(),
+          10,
+          stockName,
+          timeFrame,
+          stockName
+        )
+      : new ExistingQuoteStorage(getStockData(stockName));
     this.trades = new Trades(this);
     // this.isLive = stock instanceof LiveQuoteStorage;
   }
@@ -124,6 +135,11 @@ class Strategy extends EventEmitter {
 
   trade() {
     this.emit("data", this.stock.now());
+    console.log({
+      l: this.stock.quotes.length,
+      ci: this.stock.currentQuoteIndex,
+    });
+    console.log("got a call to trade");
 
     if (this.currentTradeInfo?.position > 0) return this.squareOff();
     if (this.currentTradeInfo?.position < 0) return this.squareOff();
@@ -133,14 +149,12 @@ class Strategy extends EventEmitter {
   }
 
   execute() {
-    // if (this.stock instanceof LiveQuoteStorage) {
-    //   this.stock.subscribe(() => this.trade());
-    //   const intervalId = setInterval(() => {
-    //     const trades = this.trades.flush();
-    //     if (trades) this.persistTradesFn(trades);
-    //   }, 5000);
-    //   return;
-    // }
+    if (this.stock instanceof LiveQuoteStorage) {
+      setInterval(() => {
+        this.persistTradesFn(this.trades);
+      }, 5000);
+      return;
+    }
 
     if (this.stock instanceof ExistingQuoteStorage) {
       while (this.stock.hasData() && this.stock.move()) {

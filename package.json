@@ -18,6 +18,7 @@
     "@mui/material": "^5.15.15",
     "@mui/material-nextjs": "latest",
     "@mui/x-charts": "^7.3.2",
+    "axios": "^1.7.2",
     "broker": "https://github.com/sour-d/broker.git",
     "dayjs": "^1.11.11",
     "lodash": "^4.17.21",

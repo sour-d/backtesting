@@ -3,28 +3,32 @@
 import { CircularProgress, Grid } from "@mui/material";
 import { useEffect, useState } from "react";
 import { transformTradesData } from "../../../trading/outcome/transformResult";
-import Papa from "papaparse";
 import ResultDashboard from "@/components/ResultDasbboard/ResultDashboard";
+import showInfo from "./showInfo";
 
 export default function Result() {
   const [result, setResult] = useState({});
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    fetch("/api/strategy/result")
+    const filename = new URLSearchParams(window.location.search).get(
+      "filename"
+    );
+    fetch("/api/live/result?filename=" + filename)
       .then((res) => res.json())
       .then(({ success, message, data }) => {
         if (!success) return;
         console.log(data);
-        const { data: trades } = Papa.parse(data.trades, {
-          header: true,
-          dynamicTyping: true,
-        });
-        setResult({
-          info: data.report,
-          data: transformTradesData(trades, "1d"),
-        });
-        setIsLoaded(true);
+        const { trades, report } = data;
+        const parsedTrades = transformTradesData(trades, "1", report.capital);
+        console.log({ parsedTrades });
+        console.log(showInfo(parsedTrades));
+        // const { data: trad
+        // setResult({
+        //   info: data.report,
+        //   data: transformTradesData(trades, "1d"),
+        // });
+        // setIsLoaded(true);
       })
       .catch((err) => {
         console.log(err);

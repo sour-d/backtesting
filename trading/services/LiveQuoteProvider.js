@@ -1,18 +1,8 @@
-import { Request, Response, NextFunction } from "express";
-
 import { EventEmitter } from "events";
 
 import { WebsocketClient } from "bybit-api";
-import { Quote } from "../trading/quote/IQuote";
 
-export interface LiveQuoteObj {
-  id: string;
-  symbol: string;
-  timeFrame: string;
-  tick: Quote;
-}
-
-const timeFrameMap: { [key: string]: string } = {
+const timeFrameMap = {
   "1m": "1",
   "3m": "3",
   "5m": "5",
@@ -31,22 +21,22 @@ const timeFrameMap: { [key: string]: string } = {
 };
 
 export default class LiveQuoteProvider extends EventEmitter {
-  timeFrameInMs: number | undefined;
-  intervalId: any;
-  onTimeout: Function;
+  timeFrameInMs;
+  intervalId;
+  onTimeout;
 
-  constructor(onTimeout: Function) {
+  constructor(onTimeout) {
     super();
     this.onTimeout = onTimeout;
   }
 
-  subscribe(symbol: string, timeFrame: string, id: string) {
+  subscribe(symbol, timeFrame, id) {
     const wsClient = new WebsocketClient({ market: "v5" });
 
-    wsClient.on("update", ({ type, topic, data: quotes, ts, wsKey }: any) => {
-      quotes.forEach((quote: any) => {
+    wsClient.on("update", ({ type, topic, data: quotes, ts, wsKey }) => {
+      quotes.forEach((quote) => {
         if (!quote.confirm) return;
-        const liveQuoteObj: LiveQuoteObj = {
+        const liveQuoteObj = {
           id,
           symbol,
           timeFrame,
@@ -62,19 +52,19 @@ export default class LiveQuoteProvider extends EventEmitter {
         this.emit("Quote", liveQuoteObj);
       });
     });
-    wsClient.on("open", (data: any) => {
+    wsClient.on("open", (data) => {
       console.log("connection opened open:", data.wsKey);
     });
-    wsClient.on("response", (data: any) => {
+    wsClient.on("response", (data) => {
       console.log("log response: ", JSON.stringify(data, null, 2));
     });
-    wsClient.on("reconnect", ({ wsKey }: { wsKey: any }) => {
+    wsClient.on("reconnect", ({ wsKey }) => {
       console.log("ws automatically reconnecting.... ", wsKey);
     });
-    wsClient.on("reconnected", (data: any) => {
+    wsClient.on("reconnected", (data) => {
       console.log("ws has reconnected ", data?.wsKey);
     });
-    wsClient.on("close", (data: any) => {
+    wsClient.on("close", (data) => {
       console.log("ws has been closed ", data?.wsKey);
       this.onTimeout();
     });

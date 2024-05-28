@@ -1,10 +1,10 @@
 import _ from "lodash";
 
 const lowOfLast = (quote, prevQuotes, days) => {
-  const lastNDayQuotes = _.takeRight(prevQuotes, days - 1);
-  const highestDay = _.minBy(lastNDayQuotes, (q) => q.Low)?.Low || Infinity;
+  const lastNDayQuotes = _.takeRight(prevQuotes, days);
+  const lowestDay = _.minBy(lastNDayQuotes, (q) => q.low)?.low || Infinity;
 
-  return Math.min(highestDay, quote.Low);
+  return lowestDay;
 };
 
 export { lowOfLast };

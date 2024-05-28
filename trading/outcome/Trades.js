@@ -64,6 +64,9 @@ export class Trades {
 
     return Papa.unparse(tradesCSV);
   }
+  toJSON() {
+    return this.tradeResults;
+  }
 
   flush() {
     const trades = this.tradeResults.slice(this.flushedTill);

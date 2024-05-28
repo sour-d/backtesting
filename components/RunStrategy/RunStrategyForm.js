@@ -13,7 +13,13 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { Box, TextField } from "@mui/material";
 
-const runStrategy = async (formData, onComplete, onError) => {
+const runStrategy = async (
+  formData,
+  stockName,
+  timeFrame,
+  onComplete,
+  onError
+) => {
   return fetch("/api/live/trade", {
     method: "POST",
     headers: {
@@ -21,6 +27,8 @@ const runStrategy = async (formData, onComplete, onError) => {
     },
     body: JSON.stringify({
       strategyName: formData.strategy,
+      stockName: stockName,
+      timeFrame: timeFrame,
       config: formData,
     }),
   })
@@ -38,7 +46,9 @@ const runStrategy = async (formData, onComplete, onError) => {
 
 export default function StrategyChoiceForm() {
   const [strategiesConfig, setStrategies] = React.useState([]);
-  const [formData, setFormData] = React.useState({ stockName: "GALAUSDT" });
+  const [formData, setFormData] = React.useState({});
+  const [stockName, setStockName] = React.useState("GALAUSDT");
+  const [timeFrame, setTimeFrame] = React.useState("1");
   const [message, setMessage] = React.useState({});
 
   useEffect(() => {
@@ -55,24 +65,28 @@ export default function StrategyChoiceForm() {
 
   const onComplete = (data) => setMessage({ type: "success", data });
   const onError = (data) => setMessage({ type: "error", data });
+  console.log(formData);
 
   return (
     <>
       <Box sx={{ margin: "0 auto" }} width="50%">
         <Grid container flexDirection="column" gap="14px">
-          <FormControl fullWidth>
-            <TextField
-              id="stockName"
-              label="Enter stock name"
-              value={formData.stockName}
-              onChange={(e) => {
-                setFormData((oldValues) => ({
-                  ...oldValues,
-                  stockName: e.target.value.toUpperCase(),
-                }));
-              }}
-            />
-          </FormControl>
+          <TextField
+            id="stockName"
+            label="Enter stock name"
+            value={stockName}
+            onChange={(e) => {
+              setStockName(e.target.value.toUpperCase());
+            }}
+          />
+          <TextField
+            id="timeFrame"
+            label="Enter time frame"
+            value={timeFrame}
+            onChange={(e) => {
+              setTimeFrame(e.target.value);
+            }}
+          />
           <FormControl fullWidth>
             <InputLabel id="selectStrategy">Select a strategy</InputLabel>
             <Select
@@ -105,7 +119,9 @@ export default function StrategyChoiceForm() {
             <Button
               variant="contained"
               color="primary"
-              onClick={() => runStrategy(formData, onComplete, onError)}
+              onClick={() =>
+                runStrategy(formData, stockName, timeFrame, onComplete, onError)
+              }
             >
               Run Strategy
             </Button>
@@ -116,7 +132,7 @@ export default function StrategyChoiceForm() {
             open
             autoHideDuration={10000}
             TransitionComponent="SlideTransition"
-            anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
           >
             <Alert
               severity={message.type === "success" ? "success" : "error"}

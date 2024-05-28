@@ -4,8 +4,14 @@ class PriceActionStrategy extends Strategy {
   config;
   demandZones;
 
-  constructor(stockName, persistTradesFn, config = this.getDefaultConfig()) {
-    super(stockName, persistTradesFn, config);
+  constructor(
+    stockName,
+    timeFrame,
+    persistTradesFn,
+    config = this.getDefaultConfig(),
+    isLive = false
+  ) {
+    super(stockName, timeFrame, persistTradesFn, config, isLive);
     this.config = config;
     this.demandZones = Array(15).fill(null);
   }

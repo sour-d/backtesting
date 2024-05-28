@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { Strategy } from "../trading/strategy/Strategy";
-import { TechnicalQuote } from "../trading/parser/restructureData";
+import { Strategy } from "../strategy/Strategy";
+import { TechnicalQuote } from "../parser/restructureData";
 
 // declare module "express-serve-static-core" {
 //   interface Request {

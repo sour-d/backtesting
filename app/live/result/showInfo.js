@@ -1,18 +1,6 @@
-import { transformTradesData } from "../trading/outcome/transformResult.js";
-import fs from "fs";
-import { std } from "mathjs"; // Example library for standard deviation
-
-const resultDir = "./.output/result/";
-
-const trimToTwoDecimal = (value) => +value.toFixed(2);
+import { std } from "mathjs";
 
 const showInfo = (data, filename) => {
-  fs.writeFileSync(
-    `${resultDir}${filename}summary.json`,
-    JSON.stringify(data, null, 2),
-    "utf-8"
-  );
-
   const summary = {};
   summary.totalTrades = data.length;
   summary.win = data.filter((trade) => trade.profitOrLoss > 0).length;
@@ -76,24 +64,6 @@ const showInfo = (data, filename) => {
       ? summary.averageWinningReward / averageLosingReward
       : 0;
 
-  // Print the summary in a readable format
-  console.log("Summary:");
-  for (const key of Object.keys(summary)) {
-    console.log(`${key}: ${trimToTwoDecimal(summary[key])}`);
-  }
+  console.log("Summary:", summary);
 };
-
-const main = () => {
-  if (process.argv.length < 3) throw "Please provide a filename";
-
-  const filename = process.argv[2];
-  const filepath = `${resultDir}${filename}.json`;
-  if (!fs.existsSync(filepath)) throw "File not found";
-
-  const data = JSON.parse(fs.readFileSync(filepath, "utf-8"));
-
-  const parsedResult = transformTradesData(data.tradeResults, "1");
-  showInfo(parsedResult, filename);
-};
-
-main();
+export default showInfo;

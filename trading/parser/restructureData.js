@@ -29,15 +29,19 @@ const addTechnicalIndicator = (quotes, startFrom = 0) => {
   return technicalQuotes;
 };
 
+const addTechnicalIndicatorToLastQuote = (quote, technicalQuotes) => {
+  return getIndicator(quote, technicalQuotes);
+};
+
 const transformStockData = (filename) => {
   const stockData = parseQuotes(filename);
   const processedData = removeNulls(stockData);
 
   processedData.forEach((quote) => {
-    quote.Close = trimToTwoDecimal(quote.Close);
-    quote.Open = trimToTwoDecimal(quote.Open);
-    quote.Low = trimToTwoDecimal(quote.Low);
-    quote.High = trimToTwoDecimal(quote.High);
+    quote.close = trimToTwoDecimal(quote.close);
+    quote.open = trimToTwoDecimal(quote.open);
+    quote.low = trimToTwoDecimal(quote.low);
+    quote.high = trimToTwoDecimal(quote.high);
   });
 
   const technicalQuotes = addTechnicalIndicator(processedData);
@@ -64,4 +68,9 @@ const getStockData = (stockName) => {
   throw new Error("Data not found");
 };
 
-export { transformStockData, addTechnicalIndicator, getStockData };
+export {
+  transformStockData,
+  addTechnicalIndicator,
+  getStockData,
+  addTechnicalIndicatorToLastQuote,
+};

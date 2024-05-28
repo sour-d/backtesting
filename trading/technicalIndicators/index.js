@@ -13,18 +13,18 @@ const fixTwoDecimal = (obj) => {
 };
 
 const Indicators = (quote, technicalQuotes) => {
-  const { FortyDayMA, TwoHundredDayMA } = _.last(technicalQuotes)
-    ?.indictors || { FortyDayMA: 0, TwoHundredDayMA: 0 };
+  // const { FortyDayMA, TwoHundredDayMA } = _.last(technicalQuotes)
+  //   ?.indictors || { FortyDayMA: 0, TwoHundredDayMA: 0 };
 
   const indictors = {
-    FortyDayHigh: highOfLast(quote, technicalQuotes, 40),
-    TwentyDayLow: lowOfLast(quote, technicalQuotes, 20),
-    FortyDayMA: movingAverageOf(quote, FortyDayMA, 40),
-    TwoHundredDayMA: movingAverageOf(quote, TwoHundredDayMA, 200),
-    ...calculateCandleProperty(quote),
+    nineDayHigh: highOfLast(quote, technicalQuotes, 9),
+    twoDayLow: lowOfLast(quote, technicalQuotes, 2),
+    // FortyDayMA: movingAverageOf(quote, FortyDayMA, 40),
+    // TwoHundredDayMA: movingAverageOf(quote, TwoHundredDayMA, 200),
+    // ...calculateCandleProperty(quote),
   };
 
-  return { ...quote, ...fixTwoDecimal(indictors) };
+  return { ...quote, indicators: indictors };
 };
 
 export default Indicators;

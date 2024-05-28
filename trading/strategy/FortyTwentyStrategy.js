@@ -5,11 +5,12 @@ class FortyTwentyStrategy extends Strategy {
 
   constructor(
     stockName,
+    timeFrame,
     persistTradesFn,
     config = this.getDefaultConfig(),
     isLive = false
   ) {
-    super(stockName, persistTradesFn, config, isLive);
+    super(stockName, timeFrame, persistTradesFn, config, isLive);
     this.config = config;
   }
 
@@ -23,13 +24,15 @@ class FortyTwentyStrategy extends Strategy {
   }
 
   isHighBroken(today, highestDay) {
-    return today.High > highestDay.High;
+    return today.high > highestDay;
   }
 
   squareOff() {
     const today = this.stock.now();
-    const { Low: stopLoss } = this.stock.lowOfLast(this.config.sellWindow);
-    if (today.Low <= stopLoss) {
+    const stopLoss = today.indicators.twoDayLow;
+    console.log("checking if need to square off");
+    if (today.low <= stopLoss) {
+      console.log("-------- Square off signal detected ---------");
       this.exitPosition(stopLoss);
     }
   }
@@ -37,13 +40,14 @@ class FortyTwentyStrategy extends Strategy {
   sell() {}
 
   buy() {
-    const { buyWindow, sellWindow } = this.config;
     const today = this.stock.now();
-    const lastFortyDayHigh = this.stock.highOfLast(buyWindow);
+    const windowHigh = today.indicators.nineDayHigh;
 
-    if (this.isHighBroken(today, lastFortyDayHigh)) {
-      const { High: buyPrice } = this.stock.highOfLast(buyWindow);
-      const { Low: initialStopLoss } = this.stock.lowOfLast(sellWindow);
+    console.log("checking if need to buy");
+    if (this.isHighBroken(today, windowHigh)) {
+      console.log("-------- Buy signal detected ---------");
+      const buyPrice = today.indicators.nineDayHigh;
+      const initialStopLoss = today.indicators.twoDayLow;
       const riskForOneStock = buyPrice - initialStopLoss;
 
       this.takePosition(riskForOneStock, buyPrice);

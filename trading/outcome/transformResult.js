@@ -62,7 +62,7 @@ const aggregateLog = (trades) => {
   return _.last(result).sellingDate ? result : result.slice(0, -1);
 };
 
-export const transformTradesData = (trades, timeFrame) => {
+export const transformTradesData = (trades, timeFrame, capital) => {
   const aggregatedLog = aggregateLog(trades);
   const transformedData = aggregatedLog.map((trade, i) => {
     const duration = calculateDuration(
@@ -105,8 +105,8 @@ export const transformTradesData = (trades, timeFrame) => {
     {
       totalProfitOrLoss: 0,
       totalReward: 0,
-      currentCapital: 100000,
-      highestCapital: 100000,
+      currentCapital: capital,
+      highestCapital: capital,
     }
   );
 

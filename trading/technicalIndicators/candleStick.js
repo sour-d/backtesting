@@ -1,21 +1,21 @@
 const upperWick = (quote) => {
-  if (quote["Open"] >= quote["Close"]) {
-    return quote["High"] - quote["Open"];
+  if (quote["open"] >= quote["close"]) {
+    return quote["high"] - quote["open"];
   }
 
-  return quote["High"] - quote["Close"];
+  return quote["high"] - quote["close"];
 };
 
 const lowerWick = (quote) => {
-  if (quote["Open"] <= quote["Close"]) {
-    return quote["Open"] - quote["Low"];
+  if (quote["open"] <= quote["close"]) {
+    return quote["open"] - quote["low"];
   }
 
-  return quote["Close"] - quote["Low"];
+  return quote["close"] - quote["low"];
 };
 
 const body = (quote) => {
-  return quote["Close"] - quote["Open"];
+  return quote["close"] - quote["open"];
 };
 
 const calculateCandleProperty = (quote) => ({
