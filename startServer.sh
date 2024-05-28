@@ -1,4 +1,4 @@
 #! /bin/bash
 
 node preventColdStart.js &
-yarn dev
+yarn build && yarn start
