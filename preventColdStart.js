@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const main = () => {
+  console.log("Pinging");
   axios.get(process.env.PING_URL).then((res) => {});
 };
 
