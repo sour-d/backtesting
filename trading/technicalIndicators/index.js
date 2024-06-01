@@ -17,8 +17,8 @@ const Indicators = (quote, technicalQuotes) => {
   //   ?.indictors || { FortyDayMA: 0, TwoHundredDayMA: 0 };
 
   const indictors = {
-    nineDayHigh: highOfLast(quote, technicalQuotes, 9),
-    twoDayLow: lowOfLast(quote, technicalQuotes, 2),
+    nineDayHigh: highOfLast(quote, technicalQuotes, 62),
+    twoDayLow: lowOfLast(quote, technicalQuotes, 23),
     // FortyDayMA: movingAverageOf(quote, FortyDayMA, 40),
     // TwoHundredDayMA: movingAverageOf(quote, TwoHundredDayMA, 200),
     // ...calculateCandleProperty(quote),

@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import fs from "fs";
 import {
   addTechnicalIndicator,
   addTechnicalIndicatorToLastQuote,
@@ -57,6 +58,7 @@ export class LiveQuoteStorage extends ExistingQuoteStorage {
     const technicalQuote = addTechnicalIndicatorToLastQuote(data, this.quotes);
     this.quotes.push(technicalQuote);
     this.currentQuoteIndex++;
+    fs.writeFileSync("data.json", JSON.stringify(this.quotes));
 
     this.listener();
   }

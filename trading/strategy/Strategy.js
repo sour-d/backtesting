@@ -5,6 +5,10 @@ import { getStockData, transformStockData } from "../parser/restructureData.js";
 import { type } from "os";
 import { LiveQuoteStorage } from "../quoteStorage/LiveQuoteStorage.js";
 
+function float2int(value) {
+  return value | 0;
+}
+
 class Strategy extends EventEmitter {
   stock;
   capital;
@@ -16,6 +20,7 @@ class Strategy extends EventEmitter {
   risk;
   stockName;
   isLive;
+  lastPlacedOrder;
 
   constructor(
     stockName,
@@ -38,13 +43,14 @@ class Strategy extends EventEmitter {
     this.stock = isLive
       ? new LiveQuoteStorage(
           () => this.trade(),
-          10,
+          100,
           stockName,
           timeFrame,
           stockName
         )
       : new ExistingQuoteStorage(getStockData(stockName));
     this.trades = new Trades(this);
+    this.lastPlacedOrder = null;
     // this.isLive = stock instanceof LiveQuoteStorage;
   }
 
@@ -63,7 +69,7 @@ class Strategy extends EventEmitter {
     const affordableStocks =
       totalCost <= this.capital ? maxStocksByRisk : maxStocksByCapital;
 
-    return +affordableStocks.toFixed(2) - 0.01;
+    return float2int((+affordableStocks.toFixed(2) - 0.01).toFixed(2));
 
     // when fraction buy is not possible
     // return Math.floor(affordableStocks);
@@ -135,14 +141,14 @@ class Strategy extends EventEmitter {
 
   trade() {
     this.emit("data", this.stock.now());
-    console.log({
+    console.log("\n\n", {
       l: this.stock.quotes.length,
       ci: this.stock.currentQuoteIndex,
     });
     console.log("got a call to trade");
 
-    if (this.currentTradeInfo?.position > 0) return this.squareOff();
-    if (this.currentTradeInfo?.position < 0) return this.squareOff();
+    if (this.lastPlacedOrder?.status === "Filled") return this.squareOff();
+    // if (this.currentTradeInfo?.position < 0) return this.squareOff();
 
     if (this.sell()) return;
     if (this.buy()) return;

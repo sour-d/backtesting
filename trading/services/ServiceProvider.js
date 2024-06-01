@@ -11,7 +11,10 @@ export default class ServiceProvider {
   constructor() {
     ServiceProvider.instance = this;
     // this.db = db;
-    this.liveQuoteProvider = new LiveQuoteProvider([], !!process.env.TESTNET);
+    this.liveQuoteProvider = new LiveQuoteProvider(
+      [],
+      !!process.env.USE_TESTNET
+    );
     // this.strategyManager = new StrategyManager();
   }
 

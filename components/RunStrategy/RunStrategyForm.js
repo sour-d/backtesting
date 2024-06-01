@@ -47,7 +47,7 @@ const runStrategy = async (
 export default function StrategyChoiceForm() {
   const [strategiesConfig, setStrategies] = React.useState([]);
   const [formData, setFormData] = React.useState({});
-  const [stockName, setStockName] = React.useState("GALAUSDT");
+  const [stockName, setStockName] = React.useState("BTCUSDT");
   const [timeFrame, setTimeFrame] = React.useState("1");
   const [message, setMessage] = React.useState({});
 
