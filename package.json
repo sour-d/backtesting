@@ -1,14 +1,15 @@
 {
   "name": "trading-system",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "registry": "https://registry.npmjs.org",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
+    "dev": "nodemon --watch node build/server/app.js",
+    "predev": "yarn build:babel",
     "setup": "mkdir -p .output/data .output/dataWithTechnicalIndicators .output/result",
-    "clean": "rm -rf .output/*/*"
+    "clean": "rm -rf .output/*/*",
+    "build:babel": "babel src --out-dir build"
   },
   "dependencies": {
     "@emotion/cache": "latest",
@@ -21,8 +22,11 @@
     "axios": "^1.7.2",
     "broker": "https://github.com/sour-d/broker.git",
     "dayjs": "^1.11.11",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
     "lodash": "^4.17.21",
     "mathjs": "^12.4.2",
+    "morgan": "^1.10.0",
     "next": "14.2.3",
     "papaparse": "^5.4.1",
     "react": "^18",
@@ -30,6 +34,10 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@types/node": "^20.12.7"
+    "@babel/cli": "^7.24.6",
+    "@babel/core": "^7.24.6",
+    "@babel/preset-env": "^7.24.6",
+    "@types/node": "^20.12.7",
+    "nodemon": "^3.1.2"
   }
 }
