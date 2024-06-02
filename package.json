@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "nodemon --watch node build/server/app.js",
     "predev": "yarn build:babel",
-    "start": "yarn build:babel; node build/server/app.js",
+    "start": "node build/server/app.js",
     "setup": "mkdir -p .output/data .output/dataWithTechnicalIndicators .output/result",
     "clean": "rm -rf .output/*/*",
     "build:babel": "babel src --out-dir build"
