@@ -1,6 +1,6 @@
 import fs from "fs";
 
-export async function Result(req, res) {
+export function Result(req, res) {
   const filename = req.nextUrl.searchParams.get("filename");
 
   const data = fs.readFileSync(
