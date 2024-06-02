@@ -16,10 +16,10 @@ const pingWebsite = async (url) => {
 
 const startPingInInterval = () => {
   setImmediate(() => {
-    pingWebsite(process.env.KEEP_ALIVE + "/ping");
+    pingWebsite(process.env.PING_URL + "/ping");
   });
   setInterval(() => {
-    pingWebsite(process.env.URL + "/ping");
+    pingWebsite(process.env.PING_URL + "/ping");
   }, 60000);
 };
 
