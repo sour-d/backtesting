@@ -156,9 +156,9 @@ class Strategy extends EventEmitter {
 
   execute() {
     if (this.stock instanceof LiveQuoteStorage) {
-      setInterval(() => {
-        this.persistTradesFn(this.trades);
-      }, 5000);
+      // setInterval(() => {
+      //   this.persistTradesFn(this.trades);
+      // }, 5000);
       return;
     }
 

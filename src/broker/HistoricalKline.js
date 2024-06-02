@@ -64,6 +64,7 @@ const HistoricalKline = async (
 ) => {
   let allData = [];
   let fetchTill = getNewEnd(start, end);
+  console.lof("fetchTill", fetchTill, "end", end);
 
   while (end >= fetchTill) {
     await restClient(testnet)
@@ -82,9 +83,8 @@ const HistoricalKline = async (
         throw error;
       });
   }
-  return new Promise((resolve, reject) => {
-    resolve(allData);
-  });
+  console.log("allData", allData.length);
+  return allData;
 };
 
 export default HistoricalKline;

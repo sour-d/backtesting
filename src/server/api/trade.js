@@ -16,7 +16,7 @@ export function Trade(req, res) {
     (strategy) => strategy.name === strategyName
   );
   if (!Strategy) {
-    return Response.json(prepareResponse("Strategy not found", true), {
+    return res.json(prepareResponse("Strategy not found", true), {
       status: 500,
     });
   }
