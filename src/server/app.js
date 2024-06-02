@@ -70,6 +70,6 @@ const config = {
 };
 
 app.listen(config.port, () => {
-  process.env.KeepAlive && startPingInInterval();
+  process.env.KEEP_ALIVE && startPingInInterval();
   console.log(`Server running on http://localhost:${config.port}/`);
 });

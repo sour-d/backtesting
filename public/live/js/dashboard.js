@@ -30,7 +30,7 @@ const parseTitle = (camelCase) => {
 };
 
 const createOptions = (strategy) => {
-  const strategyInput = document.querySelector("#strategy");
+  const strategyInput = document.querySelector("#strategyName");
   const option = document.createElement("option");
   option.innerHTML = parseTitle(strategy);
   option.value = strategy;
@@ -119,7 +119,7 @@ document.body.onload = async () => {
     .then((strategies) => {
       Object.keys(strategies).forEach(createOptions);
       document
-        .querySelector("#strategy")
+        .querySelector("#strategyName")
         .addEventListener("change", renderConfigs(strategies));
     });
 

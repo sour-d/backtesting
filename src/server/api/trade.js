@@ -11,7 +11,7 @@ const persistBackTestResult = (stockName, timeFrame) => (outcomes) => {
 };
 
 export async function Trade(req, res) {
-  const { strategyName, timeFrame, config, stockName } = await req.json();
+  const { strategyName, timeFrame, stockName, ...config } = req.body;
   const Strategy = strategies.find(
     (strategy) => strategy.name === strategyName
   );

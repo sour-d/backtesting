@@ -20,6 +20,7 @@ export default class LiveQuoteProvider extends EventEmitter {
         if (!quote.confirm) return;
         const liveQuoteObj = {
           type: "quote",
+          topic: topic,
           data: {
             open: +quote.open,
             close: +quote.close,

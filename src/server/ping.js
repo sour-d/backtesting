@@ -16,7 +16,7 @@ const pingWebsite = async (url) => {
 
 const startPingInInterval = () => {
   setImmediate(() => {
-    pingWebsite(process.env.URL + "/ping");
+    pingWebsite(process.env.KEEP_ALIVE + "/ping");
   });
   setInterval(() => {
     pingWebsite(process.env.URL + "/ping");

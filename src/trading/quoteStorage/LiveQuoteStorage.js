@@ -45,6 +45,7 @@ export class LiveQuoteStorage extends ExistingQuoteStorage {
           this.symbol,
           this.timeFrame
         );
+        console.log("subscribed to ", this.topic);
 
         ServiceProvider.getInstance().liveQuoteProvider.on(
           this.topic,
@@ -58,7 +59,6 @@ export class LiveQuoteStorage extends ExistingQuoteStorage {
     const technicalQuote = addTechnicalIndicatorToLastQuote(data, this.quotes);
     this.quotes.push(technicalQuote);
     this.currentQuoteIndex++;
-    fs.writeFileSync("data.json", JSON.stringify(this.quotes));
 
     this.listener();
   }

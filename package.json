@@ -7,18 +7,12 @@
   "scripts": {
     "dev": "nodemon --watch node build/server/app.js",
     "predev": "yarn build:babel",
+    "start": "yarn build:babel; node build/server/app.js",
     "setup": "mkdir -p .output/data .output/dataWithTechnicalIndicators .output/result",
     "clean": "rm -rf .output/*/*",
     "build:babel": "babel src --out-dir build"
   },
   "dependencies": {
-    "@emotion/cache": "latest",
-    "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.11.5",
-    "@mui/icons-material": "latest",
-    "@mui/material": "^5.15.15",
-    "@mui/material-nextjs": "latest",
-    "@mui/x-charts": "^7.3.2",
     "axios": "^1.7.2",
     "broker": "https://github.com/sour-d/broker.git",
     "dayjs": "^1.11.11",
@@ -27,7 +21,6 @@
     "lodash": "^4.17.21",
     "mathjs": "^12.4.2",
     "morgan": "^1.10.0",
-    "next": "14.2.3",
     "papaparse": "^5.4.1",
     "react": "^18",
     "react-dom": "^18",
