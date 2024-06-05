@@ -10,7 +10,10 @@ import { fetchHistoricalData } from "../stock_data/downloader";
 
 const fetchInitialData = async (symbol, timeFrame, startingQuoteDay) => {
   const end = dayjs();
-  const start = end.subtract(startingQuoteDay, "minutes");
+  const start = end.subtract(
+    startingQuoteDay,
+    timeFrame < 60 ? "minutes" : "hours"
+  );
   const data = await fetchHistoricalData(symbol, timeFrame, start, end);
   console.log("fetched initial data", data.length);
   return addTechnicalIndicator(data);
