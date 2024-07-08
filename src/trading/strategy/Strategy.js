@@ -1,57 +1,45 @@
-import { ExistingQuoteStorage } from "../quoteStorage/ExistingQuoteStorage.js";
 import { Trades } from "../outcome/Trades.js";
-import { EventEmitter } from "events";
-import { getStockData, transformStockData } from "../parser/restructureData.js";
-import { type } from "os";
 import { LiveQuoteStorage } from "../quoteStorage/LiveQuoteStorage.js";
+import broker from "../../broker";
 
 function float2int(value) {
   return value | 0;
 }
 
-class Strategy extends EventEmitter {
+class Strategy {
   stock;
   capital;
   riskPercentage;
   trades;
   persistTradesFn;
-  // bought;
-  currentTradeInfo;
+  currentPosition;
   risk;
   stockName;
-  isLive;
-  lastPlacedOrder;
+  broker;
 
   constructor(
     stockName,
     timeFrame,
     persistTradesFn,
-    config = Strategy.getDefaultConfig(),
-    isLive = false
+    config = Strategy.getDefaultConfig()
   ) {
-    super();
-
     this.capital = config.capital;
     this.riskPercentage = config.riskPercentage;
     this.persistTradesFn = persistTradesFn;
     this.risk = this.capital * (this.riskPercentage / 100);
     this.stockName = stockName;
 
-    this.currentTradeInfo = null;
-    this.isLive = isLive;
+    this.currentPosition = null;
 
-    this.stock = isLive
-      ? new LiveQuoteStorage(
-          () => this.trade(),
-          100,
-          stockName,
-          timeFrame,
-          stockName
-        )
-      : new ExistingQuoteStorage(getStockData(stockName));
+    this.stock = new LiveQuoteStorage(
+      () => this.trade(),
+      100,
+      stockName,
+      timeFrame,
+      stockName
+    );
     this.trades = new Trades(this);
-    this.lastPlacedOrder = null;
-    // this.isLive = stock instanceof LiveQuoteStorage;
+    this.broker = new broker.Trade(this.stockName);
   }
 
   static getDefaultConfig() {
@@ -103,71 +91,166 @@ class Strategy extends EventEmitter {
     throw new Error("Method not implemented.");
   }
 
-  takePosition(risk, price, transactionType = "buy") {
+  async isLastOrderFilled() {
+    if (!this.currentPosition) return;
+    const { status, orderId } = this.currentPosition;
+    if (status === "Filled") return true;
+
+    return await this.broker.activeOrders().then((res) => {
+      const currentOrderInfo = res.find(
+        (orderInfo) => orderInfo.orderId === orderId
+      );
+      if (!currentOrderInfo?.orderId) {
+        console.log("------ Order Filled ------");
+        this.currentPosition.status = "Filled";
+        return true;
+      }
+    });
+  }
+
+  async placeTriggerOrder(risk, price, side = "buy", isMarketOrder = false) {
+    if (await this.isLastOrderFilled()) return;
+    if (this.currentPosition) {
+      const { pastPrice, pastRisk } = this.currentPosition;
+      if (pastPrice === price && pastRisk === risk) return;
+      cancelLastOrder();
+      this.currentPosition = null;
+    }
+
+    const stopLoss = side === "buy" ? price - risk : price + risk;
     const stockCanBeBought = this.stocksCanBeBought(risk, price);
-    const position =
-      transactionType === "buy" ? stockCanBeBought : stockCanBeBought * -1;
+    const quantity = stockCanBeBought;
     this.capital -= stockCanBeBought * price;
 
-    this.currentTradeInfo = {
-      transactionDate: this.stock.now(),
-      price,
-      position,
-      risk,
-      type: transactionType,
-    };
+    this.broker
+      .placeOrder(quantity, price, stopLoss, side, isMarketOrder)
+      .then((res) => {
+        if (!res || res.retMsg !== "OK") return;
+        const {
+          result: { orderId },
+        } = res;
 
-    this.updateTrades(
-      this.stock.now(),
-      price,
-      position,
-      risk * position,
-      transactionType
-    );
+        console.log("------ New Order Placed ------", orderId);
+        this.currentPosition = {
+          transactionDate: this.stock.now(),
+          price,
+          quantity,
+          risk,
+          side: side,
+          status: "pending",
+          orderId,
+        };
+      });
+    return true;
+    // this.updateTrades(
+    //   this.stock.now(),
+    //   price,
+    //   position,
+    //   risk * position,
+    //   transactionType
+    // );
   }
 
-  exitPosition(
-    price,
-    position = this.currentTradeInfo?.position || 0,
-    type = "square-off"
-  ) {
-    if (!this.currentTradeInfo) return;
+  async placeTpMarketOrder(risk, price, tpPrice, side = "Buy") {
+    if (await this.isLastOrderFilled()) return;
+    if (this.currentPosition) {
+      const { pastPrice, pastRisk } = this.currentPosition;
+      if (pastPrice === price && pastRisk === risk) return;
+      cancelLastOrder();
+      this.currentPosition = null;
+    }
 
-    this.capital += position * price;
-    this.updateTrades(this.stock.now(), price, position, 0, type);
+    const stopLoss = side === "Buy" ? price - risk : price + risk;
+    const quantity = this.stocksCanBeBought(risk, price);
+    this.capital -= quantity * price;
 
-    this.currentTradeInfo = null;
+    return await this.broker
+      .placeTpMarketOrder(quantity, tpPrice, stopLoss, side)
+      .then((res) => {
+        if (!res || res.retMsg !== "OK") return;
+        const {
+          result: { orderId },
+        } = res;
+
+        console.log("------ New Order Placed ------", orderId);
+        this.currentPosition = {
+          transactionDate: this.stock.now(),
+          price,
+          quantity,
+          risk,
+          side: side,
+          status: "pending",
+          orderId,
+        };
+        return true;
+      });
   }
 
-  trade() {
-    this.emit("data", this.stock.now());
-    console.log("\n\n", {
-      l: this.stock.quotes.length,
-      ci: this.stock.currentQuoteIndex,
-    });
-    console.log("got a call to trade");
+  async addTrailingStopLoss(stopLoss, type = "square-off") {
+    if (!this.currentPosition) return;
+    const isPositionClosed = await trade
+      .openPositions()
+      .then((res) => res?.size === 0);
 
-    if (this.lastPlacedOrder?.status === "Filled") return this.squareOff();
-    // if (this.currentTradeInfo?.position < 0) return this.squareOff();
-
-    if (this.sell()) return;
-    if (this.buy()) return;
-  }
-
-  execute() {
-    if (this.stock instanceof LiveQuoteStorage) {
-      // setInterval(() => {
-      //   this.persistTradesFn(this.trades);
-      // }, 5000);
+    if (isPositionClosed) {
+      console.log("-------- Position already exited ---------");
+      this.capital += position * price;
+      this.currentPosition = null;
       return;
     }
 
-    if (this.stock instanceof ExistingQuoteStorage) {
-      while (this.stock.hasData() && this.stock.move()) {
-        this.trade();
+    if (this.currentPosition.stopLoss === price) return;
+    console.log("-------- Modifying Stop Loss ---------", {
+      oldStopLoss: this.currentPosition.stopLoss,
+      newStopLoss: stopLoss,
+    });
+    this.broker.modifyPosition(stopLoss).then((res) => {
+      if (!res) return;
+      console.log("modified stop loss, retMsg", res.retMsg, res.result.orderId);
+      this.currentPosition.stopLoss = stopLoss;
+    });
+
+    // this.capital += position * price;
+    // this.updateTrades(this.stock.now(), price, position, 0, type);
+
+    // this.currentPosition = null;
+  }
+
+  async exitPosition() {}
+
+  async checkPosition() {
+    this.broker.openPositions().then((res) => {
+      if (res.size === 0) {
+        console.log("-------- Position already exited ---------");
+        this.currentPosition = null;
+        return;
       }
-      this.persistTradesFn(this.trades);
+    });
+  }
+
+  async forceExit(side) {
+    this.broker.exitPosition(side).then((res) => {
+      if (!res) return;
+      console.log("-------- Position Forced Exit ---------", res.retMsg);
+      this.currentPosition = null;
+    });
+  }
+
+  trade() {
+    console.log("-------- Got A Quote, Resuming Strategy ---------");
+
+    if (this.currentPosition?.status === "Filled") {
+      this.checkPosition();
+      this.squareOff();
+      return;
     }
+
+    if (this.buy()) return;
+    if (this.sell()) return;
+  }
+
+  execute() {
+    console.log("-------- Strategy Started ---------");
   }
 }
 

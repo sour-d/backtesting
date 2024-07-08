@@ -19,9 +19,9 @@ const body = (quote) => {
 };
 
 const calculateCandleProperty = (quote) => ({
-  Body: body(quote),
-  LowerWick: lowerWick(quote),
-  UpperWick: upperWick(quote),
+  body: body(quote),
+  lowerWick: lowerWick(quote),
+  upperWick: upperWick(quote),
 });
 
 export default calculateCandleProperty;

@@ -25,8 +25,7 @@ export function Trade(req, res) {
     stockName,
     timeFrame,
     persistBackTestResult(stockName, timeFrame),
-    config,
-    true
+    config
   );
   strategy.execute();
 

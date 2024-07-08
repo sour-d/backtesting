@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { Strategy } from "./Strategy.js";
 
 class MovingAverageStrategy extends Strategy {
@@ -7,49 +8,52 @@ class MovingAverageStrategy extends Strategy {
     stockName,
     timeFrame,
     persistTradesFn,
-    config = this.getDefaultConfig(),
-    isLive = false
+    config = this.getDefaultConfig()
   ) {
-    super(stockName, timeFrame, persistTradesFn, config, isLive);
+    super(stockName, timeFrame, persistTradesFn, config);
     this.config = config;
   }
 
   static getDefaultConfig() {
     return {
-      upperLimit: 20,
-      lowerLimit: 10,
-      stopLossWindow: 10,
-      capital: 100000,
-      riskPercentage: 5,
+      capital: 100,
+      riskPercentage: 1,
+      takeProfitPercentage: 0.005,
     };
   }
 
   buy() {
+    const { takeProfitPercentage } = this.config;
+    const today = this.stock.now();
     const yesterday = this.stock.prev();
-    const { upperLimit, lowerLimit } = this.config;
 
-    const upperLimitMA = this.stock.simpleMovingAverage(upperLimit);
-    const lowerLimitMA = this.stock.simpleMovingAverage(lowerLimit);
-    if (lowerLimitMA >= upperLimitMA && yesterday.Close > lowerLimitMA) {
-      const { Open: buyingPrice } = this.stock.now();
-      const { Low: initialStopLoss } = this.stock.lowOfLast(
-        this.config.stopLossWindow
-      );
-      const riskForOneStock = buyingPrice - initialStopLoss;
+    if (
+      today.close > today.ma20high &&
+      yesterday.close > yesterday.ma20high &&
+      today.close > today.ma60close
+    ) {
+      const { close: buyingPrice } = today;
+      const { low: initialStopLoss } = yesterday;
       if (initialStopLoss >= buyingPrice) return;
 
-      this.takePosition(riskForOneStock, buyingPrice);
+      const riskForOneStock = buyingPrice - initialStopLoss;
+      const tpPrice = buyingPrice + buyingPrice * takeProfitPercentage;
+      this.placeTpMarketOrder(riskForOneStock, buyingPrice, tpPrice, "Buy");
     }
   }
 
   sell() {}
 
   squareOff() {
-    const { lowerLimit } = this.config;
+    if (!this.currentPosition) return;
     const today = this.stock.now();
-    const lowerMA = this.stock.simpleMovingAverage(lowerLimit);
-    if (lowerMA >= today.Low) {
-      this.exitPosition(lowerMA);
+
+    const holdingDays = dayjs(today.dateUnix).diff(
+      dayjs(this.currentPosition.transactionDate.dateUnix),
+      "day"
+    );
+    if (holdingDays > 10) {
+      return this.forceExit("Sell");
     }
   }
 }

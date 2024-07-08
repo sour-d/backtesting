@@ -1,10 +1,10 @@
-import { HistoricalKline } from "../../broker";
+import broker from "../../broker";
 import dayjs from "dayjs";
 
 const fetchHistoricalData = async (symbol, interval, start, end, filename) => {
   const startMs = start.valueOf();
   const endMs = end.valueOf();
-  const OHCL = await HistoricalKline(
+  const OHCL = await broker.HistoricalKline(
     symbol,
     interval,
     startMs,

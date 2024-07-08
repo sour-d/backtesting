@@ -1,4 +1,4 @@
-import { klineStream as LiveQuoteProvider } from "../broker";
+import broker from "../broker";
 // import db from "./db";
 // import StrategyManager from "./LiveStrategyManager";
 
@@ -11,7 +11,7 @@ export default class ServiceProvider {
   constructor() {
     ServiceProvider.instance = this;
     // this.db = db;
-    this.liveQuoteProvider = new LiveQuoteProvider(
+    this.liveQuoteProvider = new broker.klineStream(
       [],
       !!process.env.USE_TESTNET
     );
