@@ -7,12 +7,21 @@ import ServiceProvider from "../../services/ServiceProvider";
 import { ExistingQuoteStorage } from "./ExistingQuoteStorage";
 import { fetchHistoricalData } from "../stock_data/downloader";
 
+const getTimeFrame = (timeFrame) => {
+  return {
+    1: "minutes",
+    3: "minutes",
+    5: "minutes",
+    15: "minutes",
+    30: "minutes",
+    60: "hours",
+    D: "days",
+  }[timeFrame];
+};
+
 const fetchInitialData = async (symbol, timeFrame, startingQuoteDay) => {
   const end = dayjs();
-  const start = end.subtract(
-    startingQuoteDay,
-    timeFrame < 60 ? "minutes" : "hours"
-  );
+  const start = end.subtract(startingQuoteDay, getTimeFrame(timeFrame));
   const data = await fetchHistoricalData(symbol, timeFrame, start, end);
   console.log("fetched initial data", data.length);
   return addTechnicalIndicator(data);

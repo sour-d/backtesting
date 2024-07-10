@@ -19,13 +19,26 @@ const restClient = (testnet) =>
     // demoTrading: true,
   });
 
-const getNewEnd = (start, end, addOneSecond = false) => {
+const getTimeFrame = (timeFrame) => {
+  return {
+    1: "hour",
+    3: "hour",
+    5: "hour",
+    15: "hour",
+    30: "hour",
+    60: "day",
+    D: "month",
+  }[timeFrame];
+};
+
+const getNewEnd = (start, end, interval, addOneSecond = false) => {
   let newStart = start;
   if (addOneSecond) {
     newStart = dayjs(start).add(1, "second").valueOf();
   }
+  const timeFrame = getTimeFrame(interval);
   const newEnd = dayjs(newStart)
-    .add(10, "hour")
+    .add(10, timeFrame)
     .subtract(1, "second")
     .valueOf();
   if (newEnd > end) {
@@ -63,7 +76,7 @@ const HistoricalKline = async (
   testnet = false
 ) => {
   let allData = [];
-  let fetchTill = getNewEnd(start, end);
+  let fetchTill = getNewEnd(start, end, interval);
 
   while (end >= fetchTill) {
     console.log({ start, fetchTill });
@@ -73,7 +86,7 @@ const HistoricalKline = async (
         const data = formatResponse(response);
         allData = allData.concat(data);
         start = fetchTill;
-        fetchTill = getNewEnd(start, end, true);
+        fetchTill = getNewEnd(start, end, interval, true);
         if (fetchTill === start) {
           fetchTill += 1;
           return;
