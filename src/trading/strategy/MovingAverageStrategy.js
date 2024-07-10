@@ -17,7 +17,7 @@ class MovingAverageStrategy extends Strategy {
   static getDefaultConfig() {
     return {
       capital: 100,
-      riskPercentage: 1,
+      riskPercentage: 5,
       takeProfitPercentage: 0.005,
     };
   }
@@ -26,11 +26,13 @@ class MovingAverageStrategy extends Strategy {
     const { takeProfitPercentage } = this.config;
     const today = this.stock.now();
     const yesterday = this.stock.prev();
+    const towDaysBeforeYesterday = this.stock.prev(2);
 
     if (
+      today.close > today.ma60close &&
       today.close > today.ma20high &&
       yesterday.close > yesterday.ma20high &&
-      today.close > today.ma60close
+      towDaysBeforeYesterday.close > towDaysBeforeYesterday.ma20high
     ) {
       const { close: buyingPrice } = today;
       const { low: initialStopLoss } = yesterday;
@@ -39,12 +41,34 @@ class MovingAverageStrategy extends Strategy {
       const riskForOneStock = buyingPrice - initialStopLoss;
       const tpPrice = buyingPrice + buyingPrice * takeProfitPercentage;
       this.placeTpMarketOrder(riskForOneStock, buyingPrice, tpPrice, "Buy");
+      return true;
     }
   }
 
-  sell() {}
+  sell() {
+    const { takeProfitPercentage } = this.config;
+    const today = this.stock.now();
+    const yesterday = this.stock.prev();
+    const dayBeforeYesterday = this.stock.prev(2);
+    if (
+      today.close < today.ma60close &&
+      today.close < today.ma20low &&
+      yesterday.close < yesterday.ma20low &&
+      dayBeforeYesterday.close < dayBeforeYesterday.ma20low
+    ) {
+      const { open: sellingPrice } = this.stock.now();
+      const { high: initialStopLoss } = dayBeforeYesterday;
+      console.log({ sellingPrice, initialStopLoss });
+      if (initialStopLoss <= sellingPrice) return;
 
-  squareOff() {
+      const riskForOneStock = initialStopLoss - sellingPrice;
+      const tpPrice = sellingPrice - sellingPrice * takeProfitPercentage;
+      this.placeTpMarketOrder(riskForOneStock, sellingPrice, tpPrice, "Sell");
+      return true;
+    }
+  }
+
+  shortSquareOff() {
     if (!this.currentPosition) return;
     const today = this.stock.now();
 
@@ -52,7 +76,20 @@ class MovingAverageStrategy extends Strategy {
       dayjs(this.currentPosition.transactionDate.dateUnix),
       "day"
     );
-    if (holdingDays > 10) {
+    if (holdingDays > 5) {
+      return this.forceExit("Buy");
+    }
+  }
+
+  longSquareOff() {
+    if (!this.currentPosition) return;
+    const today = this.stock.now();
+
+    const holdingDays = dayjs(today.dateUnix).diff(
+      dayjs(this.currentPosition.transactionDate.dateUnix),
+      "day"
+    );
+    if (holdingDays > 5) {
       return this.forceExit("Sell");
     }
   }

@@ -239,9 +239,14 @@ class Strategy {
   trade() {
     console.log("-------- Got A Quote, Resuming Strategy ---------");
 
-    if (this.currentPosition?.status === "Filled") {
-      this.checkPosition();
-      this.squareOff();
+    this.currentPosition && this.checkPosition();
+
+    if (this.currentPosition?.side === "Buy") {
+      this.longSquareOff();
+      return;
+    }
+    if (this.currentPosition?.side === "Sell") {
+      this.shortSquareOff();
       return;
     }
 
