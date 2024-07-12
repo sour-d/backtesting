@@ -2,13 +2,17 @@ import axios from "axios";
 import fs from "fs";
 
 const pingWebsite = async (url) => {
+  if (!fs.existsSync("ping-log.txt"))
+    fs.writeFileSync("ping-log.txt", `{start: ${new Date().toISOString()}}`);
+
+  const content = JSON.parse(fs.readFileSync("ping-log.txt", "utf8"));
+  content.end = new Date().toISOString();
   try {
     const response = await axios.get(url);
-    fs.writeFileSync(
-      "ping-log.txt",
-      `<li>${response.data} ${new Date().toLocaleString()}</li>\n`,
-      { flag: "a", encoding: "utf8" }
-    );
+    fs.writeFileSync("ping-log.txt", JSON.stringify(content), {
+      flag: "w",
+      encoding: "utf8",
+    });
   } catch (error) {
     console.error(error);
   }

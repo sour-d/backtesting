@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import { Strategy } from "./Strategy.js";
+import logger from "../../server/logger.js";
 
 class MovingAverageStrategy extends Strategy {
   config;
@@ -36,6 +37,7 @@ class MovingAverageStrategy extends Strategy {
     ) {
       const { close: buyingPrice } = today;
       const { low: initialStopLoss } = yesterday;
+      logger("buy", { buyingPrice, initialStopLoss });
       if (initialStopLoss >= buyingPrice) return;
 
       const riskForOneStock = buyingPrice - initialStopLoss;
@@ -58,7 +60,7 @@ class MovingAverageStrategy extends Strategy {
     ) {
       const { open: sellingPrice } = this.stock.now();
       const { high: initialStopLoss } = dayBeforeYesterday;
-      console.log({ sellingPrice, initialStopLoss });
+      logger("sell", { sellingPrice, initialStopLoss });
       if (initialStopLoss <= sellingPrice) return;
 
       const riskForOneStock = initialStopLoss - sellingPrice;

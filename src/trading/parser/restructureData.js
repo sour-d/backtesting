@@ -51,7 +51,6 @@ const transformStockData = (filename) => {
 };
 
 const getStockData = (stockName) => {
-  console.log("stockName", stockName);
   const data_dir = "./.output/data/";
   const technical_data_dir = "./.output/dataWithTechnicalIndicators/";
 

@@ -11,6 +11,7 @@ import startPingInInterval from "./ping";
 import { StrategyList } from "./api/strategyList";
 import { Trade } from "./api/trade";
 import { Result } from "./api/result";
+import logger, { clearLog } from "./logger";
 
 const app = express();
 
@@ -50,11 +51,22 @@ app.use(express.static("public/live/js"));
 
 // app.ws("/api/paper-trade/:id", handleWebsocketRequest);
 
-app.get("/ping-status", (req, res) => {
+app.get("/log/ping", (req, res) => {
   if (!fs.existsSync("ping-log.txt")) fs.writeFileSync("ping-log.txt", "");
   fs.readFile("ping-log.txt", "utf8", (err, data) => {
     if (err) {
       res.send("Error reading ping file");
+    } else {
+      res.send(data);
+    }
+  });
+});
+
+app.get("/log", (req, res) => {
+  if (!fs.existsSync("log.txt")) fs.writeFileSync("log.txt", "");
+  fs.readFile("log.txt", "utf8", (err, data) => {
+    if (err) {
+      res.send("Error reading log file");
     } else {
       res.send(data);
     }
@@ -71,5 +83,6 @@ const config = {
 
 app.listen(config.port, () => {
   process.env.KEEP_ALIVE && startPingInInterval();
-  console.log(`Server running on http://localhost:${config.port}/`);
+  clearLog();
+  logger(`Server running on http://localhost:${config.port}/`);
 });

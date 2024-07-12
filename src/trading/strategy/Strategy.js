@@ -1,6 +1,7 @@
 import { Trades } from "../outcome/Trades.js";
 import { LiveQuoteStorage } from "../quoteStorage/LiveQuoteStorage.js";
 import broker from "../../broker";
+import logger from "../../server/logger.js";
 
 function float2int(value) {
   return value | 0;
@@ -101,7 +102,7 @@ class Strategy {
         (orderInfo) => orderInfo.orderId === orderId
       );
       if (!currentOrderInfo?.orderId) {
-        console.log("------ Order Filled ------");
+        logger("------ Order Filled ------");
         this.currentPosition.status = "Filled";
         return true;
       }
@@ -130,7 +131,7 @@ class Strategy {
           result: { orderId },
         } = res;
 
-        console.log("------ New Order Placed ------", orderId);
+        logger("------ New Order Placed ------", orderId);
         this.currentPosition = {
           transactionDate: this.stock.now(),
           price,
@@ -167,12 +168,13 @@ class Strategy {
     return await this.broker
       .placeTpMarketOrder(quantity, tpPrice, stopLoss, side)
       .then((res) => {
+        logger("buy response", { res, price, quantity, risk, side });
         if (!res || res.retMsg !== "OK") return;
         const {
           result: { orderId },
         } = res;
 
-        console.log("------ New Order Placed ------", orderId);
+        logger("------ New Order Placed ------", orderId);
         this.currentPosition = {
           transactionDate: this.stock.now(),
           price,
@@ -193,20 +195,20 @@ class Strategy {
       .then((res) => res?.size === 0);
 
     if (isPositionClosed) {
-      console.log("-------- Position already exited ---------");
+      logger("-------- Position already exited ---------");
       this.capital += position * price;
       this.currentPosition = null;
       return;
     }
 
     if (this.currentPosition.stopLoss === price) return;
-    console.log("-------- Modifying Stop Loss ---------", {
+    logger("-------- Modifying Stop Loss ---------", {
       oldStopLoss: this.currentPosition.stopLoss,
       newStopLoss: stopLoss,
     });
     this.broker.modifyPosition(stopLoss).then((res) => {
       if (!res) return;
-      console.log("modified stop loss, retMsg", res.retMsg, res.result.orderId);
+      logger("modified stop loss, retMsg", res.retMsg, res.result.orderId);
       this.currentPosition.stopLoss = stopLoss;
     });
 
@@ -221,7 +223,7 @@ class Strategy {
   async checkPosition() {
     this.broker.openPositions().then((res) => {
       if (res.size === 0) {
-        console.log("-------- Position already exited ---------");
+        logger("-------- Position already exited ---------");
         this.currentPosition = null;
         return;
       }
@@ -231,13 +233,13 @@ class Strategy {
   async forceExit(side) {
     this.broker.exitPosition(side).then((res) => {
       if (!res) return;
-      console.log("-------- Position Forced Exit ---------", res.retMsg);
+      logger("-------- Position Forced Exit ---------", res.retMsg);
       this.currentPosition = null;
     });
   }
 
   trade() {
-    console.log("-------- Got A Quote, Resuming Strategy ---------");
+    logger("-------- Got A Quote, Resuming Strategy ---------");
 
     this.currentPosition && this.checkPosition();
 
@@ -255,7 +257,7 @@ class Strategy {
   }
 
   execute() {
-    console.log("-------- Strategy Started ---------");
+    logger("-------- Strategy Started ---------");
   }
 }
 

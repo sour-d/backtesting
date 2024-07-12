@@ -6,6 +6,7 @@ import {
 import ServiceProvider from "../../services/ServiceProvider";
 import { ExistingQuoteStorage } from "./ExistingQuoteStorage";
 import { fetchHistoricalData } from "../stock_data/downloader";
+import logger from "../../server/logger";
 
 const getTimeFrame = (timeFrame) => {
   return {
@@ -23,7 +24,7 @@ const fetchInitialData = async (symbol, timeFrame, startingQuoteDay) => {
   const end = dayjs();
   const start = end.subtract(startingQuoteDay, getTimeFrame(timeFrame));
   const data = await fetchHistoricalData(symbol, timeFrame, start, end);
-  console.log("fetched initial data", data.length);
+  logger("fetched initial data", data.length);
   return addTechnicalIndicator(data);
 };
 
@@ -56,7 +57,7 @@ export class LiveQuoteStorage extends ExistingQuoteStorage {
           this.symbol,
           this.timeFrame
         );
-        console.log("subscribed to ", this.topic);
+        logger("subscribed to ", this.topic);
 
         ServiceProvider.getInstance().liveQuoteProvider.on(
           this.topic,

@@ -1,5 +1,6 @@
 import { RestClientV5 } from "bybit-api";
 import dotenv from "dotenv";
+import logger from "../server/logger";
 dotenv.config();
 
 const testnet = process.env.USE_TESTNET === "true";
@@ -55,7 +56,7 @@ class Trade {
         timeInForce: "PostOnly",
       })
       .then((response) => {
-        console.log(response);
+        logger(response);
       })
       .catch((error) => {
         console.error(error);
@@ -219,6 +220,6 @@ class Trade {
 }
 
 // const trade = new Trade("GALAUSDT");
-// console.log(await trade.placeTpMarketOrder(100, 0.6, 0.02, "Buy"));
+// logger(await trade.placeTpMarketOrder(100, 0.6, 0.02, "Buy"));
 
 export default Trade;

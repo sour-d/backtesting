@@ -1,6 +1,7 @@
 import { EventEmitter } from "events";
 
 import { WebsocketClient } from "bybit-api";
+import logger from "../server/logger";
 
 export default class LiveQuoteProvider extends EventEmitter {
   timeFrameInMs;
@@ -33,19 +34,19 @@ export default class LiveQuoteProvider extends EventEmitter {
       });
     });
     wsClient.on("open", (data) => {
-      console.log("connection opened open:", data.wsKey);
+      logger("connection opened open:", data.wsKey);
     });
     wsClient.on("response", (data) => {
-      console.log("log response: ", JSON.stringify(data, null, 2));
+      logger("log response: ", JSON.stringify(data, null, 2));
     });
     wsClient.on("reconnect", ({ wsKey }) => {
-      console.log("ws automatically reconnecting.... ", wsKey);
+      logger("ws automatically reconnecting.... ", wsKey);
     });
     wsClient.on("reconnected", (data) => {
-      console.log("ws has reconnected ", data?.wsKey);
+      logger("ws has reconnected ", data?.wsKey);
     });
     wsClient.on("close", (data) => {
-      console.log("ws has been closed ", data?.wsKey);
+      logger("ws has been closed ", data?.wsKey);
       this.onTimeout();
     });
 
@@ -61,5 +62,5 @@ export default class LiveQuoteProvider extends EventEmitter {
 // const a = new LiveQuoteProvider(() => {}, true);
 // a.subscribe("BTCUSDT", "1");
 // a.on("kline.1.BTCUSDT", (data) => {
-//   console.log(data);
+//   logger(data);
 // });

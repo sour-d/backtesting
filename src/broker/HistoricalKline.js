@@ -5,6 +5,7 @@ import _ from "lodash";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js";
 import timezone from "dayjs/plugin/timezone.js";
+import logger from "../server/logger";
 
 dotenv.config();
 dayjs.extend(utc);
@@ -79,7 +80,7 @@ const HistoricalKline = async (
   let fetchTill = getNewEnd(start, end, interval);
 
   while (end >= fetchTill) {
-    console.log({ start, fetchTill });
+    logger({ start, fetchTill });
     await restClient(testnet)
       .getKline({ symbol, interval, start, end: fetchTill, limit: 1000 })
       .then((response) => {
@@ -93,10 +94,10 @@ const HistoricalKline = async (
         }
       })
       .catch((error) => {
-        console.log("error", JSON.stringify(error));
+        logger("error", JSON.stringify(error));
       });
   }
-  console.log("allData", allData.length);
+  logger("allData", allData.length);
   return allData;
 };
 
