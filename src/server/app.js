@@ -57,7 +57,7 @@ app.get("/log/ping", (req, res) => {
     if (err) {
       res.send("Error reading ping file");
     } else {
-      res.json(data);
+      res.json(JSON.parse(data));
     }
   });
 });
