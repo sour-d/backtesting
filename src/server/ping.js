@@ -5,7 +5,7 @@ const pingWebsite = async (url) => {
   if (!fs.existsSync("ping-log.txt"))
     fs.writeFileSync(
       "ping-log.txt",
-      JSON.stringify(`{start: ${new Date().toISOString()}}`)
+      JSON.stringify({ start: new Date().toISOString() })
     );
 
   const content = JSON.parse(fs.readFileSync("ping-log.txt", "utf8"));
