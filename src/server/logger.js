@@ -8,12 +8,22 @@ export function clearLog() {
 }
 
 export default function logger() {
-  const args = Array.from(arguments).map((arg) => JSON.stringify(arg));
+  const args = Array.from(arguments).map((arg) => {
+    if (typeof arg === "string") return arg;
+    if (typeof arg === "number") return arg;
+    return JSON.stringify(arg);
+  });
+  const content = fs.readFileSync("log.txt", "utf-8");
   fs.appendFileSync(
     "log.txt",
-    new Date().toISOString() + " -----> " + args.join(", ") + "\n\n",
+    "<p>" +
+      new Date().toISOString() +
+      " -----> " +
+      args.join(", ") +
+      "</p>" +
+      content,
     {
-      flag: "a",
+      flag: "w",
       encoding: "utf-8",
     }
   );

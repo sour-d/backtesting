@@ -37,9 +37,9 @@ class MovingAverageStrategy extends Strategy {
     ) {
       const { close: buyingPrice } = today;
       const { low: initialStopLoss } = yesterday;
-      logger("buy", { buyingPrice, initialStopLoss });
       if (initialStopLoss >= buyingPrice) return;
 
+      logger(this.stockName, "buy", { buyingPrice, initialStopLoss });
       const riskForOneStock = buyingPrice - initialStopLoss;
       const tpPrice = buyingPrice + buyingPrice * takeProfitPercentage;
       this.placeTpMarketOrder(riskForOneStock, buyingPrice, tpPrice, "Buy");
@@ -60,9 +60,9 @@ class MovingAverageStrategy extends Strategy {
     ) {
       const { open: sellingPrice } = this.stock.now();
       const { high: initialStopLoss } = dayBeforeYesterday;
-      logger("sell", { sellingPrice, initialStopLoss });
       if (initialStopLoss <= sellingPrice) return;
 
+      logger(this.stockName, "sell", { sellingPrice, initialStopLoss });
       const riskForOneStock = initialStopLoss - sellingPrice;
       const tpPrice = sellingPrice - sellingPrice * takeProfitPercentage;
       this.placeTpMarketOrder(riskForOneStock, sellingPrice, tpPrice, "Sell");

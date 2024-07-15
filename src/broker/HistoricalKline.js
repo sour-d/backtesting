@@ -97,7 +97,6 @@ const HistoricalKline = async (
         logger("error", JSON.stringify(error));
       });
   }
-  logger("allData", allData.length);
   return allData;
 };
 

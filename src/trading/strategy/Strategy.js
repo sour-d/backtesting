@@ -2,6 +2,7 @@ import { Trades } from "../outcome/Trades.js";
 import { LiveQuoteStorage } from "../quoteStorage/LiveQuoteStorage.js";
 import broker from "../../broker";
 import logger from "../../server/logger.js";
+import { log } from "console";
 
 function float2int(value) {
   return value | 0;
@@ -102,7 +103,7 @@ class Strategy {
         (orderInfo) => orderInfo.orderId === orderId
       );
       if (!currentOrderInfo?.orderId) {
-        logger("------ Order Filled ------");
+        logger(this.stockName, "------ Order Filled ------");
         this.currentPosition.status = "Filled";
         return true;
       }
@@ -123,6 +124,15 @@ class Strategy {
     const quantity = stockCanBeBought;
     this.capital -= stockCanBeBought * price;
 
+    logger(this.stockName, "------ Placing New Order ------", {
+      stockCanBeBought,
+      quantity,
+      price,
+      risk,
+      side,
+      isMarketOrder,
+    });
+
     this.broker
       .placeOrder(quantity, price, stopLoss, side, isMarketOrder)
       .then((res) => {
@@ -131,7 +141,7 @@ class Strategy {
           result: { orderId },
         } = res;
 
-        logger("------ New Order Placed ------", orderId);
+        logger(this.stockName, "------ New Order Placed ------", res);
         this.currentPosition = {
           transactionDate: this.stock.now(),
           price,
@@ -163,18 +173,28 @@ class Strategy {
 
     const stopLoss = side === "Buy" ? price - risk : price + risk;
     const quantity = this.stocksCanBeBought(risk, price);
+
+    logger(this.stockName, "-------- Capital Updated ---------", {
+      capital: this.capital,
+    });
     this.capital -= quantity * price;
 
+    logger(this.stockName, "------ Placing New Order ------", {
+      price,
+      quantity,
+      risk,
+      side,
+      amount: quantity * price,
+    });
     return await this.broker
       .placeTpMarketOrder(quantity, tpPrice, stopLoss, side)
       .then((res) => {
-        logger("buy response", { res, price, quantity, risk, side });
         if (!res || res.retMsg !== "OK") return;
         const {
           result: { orderId },
         } = res;
 
-        logger("------ New Order Placed ------", orderId);
+        logger(this.stockName, "------ New Order Placed ------", res);
         this.currentPosition = {
           transactionDate: this.stock.now(),
           price,
@@ -223,7 +243,13 @@ class Strategy {
   async checkPosition() {
     this.broker.openPositions().then((res) => {
       if (res.size === 0) {
-        logger("-------- Position already exited ---------");
+        logger(this.stockName, "-------- Position already exited ---------");
+
+        const { price, quantity } = this.currentPosition;
+        this.capital += price * quantity;
+        logger(this.stockName, "-------- Capital Updated ---------", {
+          capital: this.capital,
+        });
         this.currentPosition = null;
         return;
       }
@@ -233,13 +259,19 @@ class Strategy {
   async forceExit(side) {
     this.broker.exitPosition(side).then((res) => {
       if (!res) return;
-      logger("-------- Position Forced Exit ---------", res.retMsg);
+      logger(this.stockName, "-------- Position Forced Exit ---------", res);
+
+      const { price, quantity } = this.currentPosition;
+      this.capital += price * quantity;
+      logger(this.stockName, "-------- Capital Updated ---------", {
+        capital: this.capital,
+      });
       this.currentPosition = null;
     });
   }
 
   trade() {
-    logger("-------- Got A Quote, Resuming Strategy ---------");
+    logger(this.stockName, "-------- Got A Quote, Resuming Strategy ---------");
 
     this.currentPosition && this.checkPosition();
 
@@ -257,7 +289,7 @@ class Strategy {
   }
 
   execute() {
-    logger("-------- Strategy Started ---------");
+    logger(this.stockName, "-------- Strategy Started ---------");
   }
 }
 
