@@ -81,15 +81,19 @@ class Strategy {
     );
   }
 
-  buy() {
+  async buy() {
     throw new Error("Method not implemented.");
   }
 
-  sell() {
+  async sell() {
     throw new Error("Method not implemented.");
   }
 
-  squareOff() {
+  async longSquareOff() {
+    throw new Error("Method not implemented.");
+  }
+
+  async shortSquareOff() {
     throw new Error("Method not implemented.");
   }
 
@@ -208,40 +212,29 @@ class Strategy {
       });
   }
 
-  async addTrailingStopLoss(stopLoss, type = "square-off") {
+  async addTrailingStopLoss(stopLoss) {
     if (!this.currentPosition) return;
-    const isPositionClosed = await trade
-      .openPositions()
-      .then((res) => res?.size === 0);
 
-    if (isPositionClosed) {
-      logger("-------- Position already exited ---------");
-      this.capital += position * price;
-      this.currentPosition = null;
-      return;
-    }
-
-    if (this.currentPosition.stopLoss === price) return;
-    logger("-------- Modifying Stop Loss ---------", {
+    if (this.currentPosition.stopLoss === stopLoss) return;
+    logger(this.stockName, "-------- Modifying Stop Loss ---------", {
       oldStopLoss: this.currentPosition.stopLoss,
       newStopLoss: stopLoss,
     });
-    this.broker.modifyPosition(stopLoss).then((res) => {
+    return await this.broker.modifyPosition(stopLoss).then((res) => {
+      logger(
+        this.stockName,
+        "-------- Modified Stop Loss Response ---------",
+        res
+      );
       if (!res) return;
-      logger("modified stop loss, retMsg", res.retMsg, res.result.orderId);
       this.currentPosition.stopLoss = stopLoss;
     });
-
-    // this.capital += position * price;
-    // this.updateTrades(this.stock.now(), price, position, 0, type);
-
-    // this.currentPosition = null;
   }
 
   async exitPosition() {}
 
   async checkPosition() {
-    this.broker.openPositions().then((res) => {
+    return await this.broker.openPositions().then((res) => {
       if (res.size === 0) {
         logger(this.stockName, "-------- Position already exited ---------");
 
@@ -270,22 +263,22 @@ class Strategy {
     });
   }
 
-  trade() {
+  async trade() {
     logger(this.stockName, "-------- Got A Quote, Resuming Strategy ---------");
 
-    this.currentPosition && this.checkPosition();
+    this.currentPosition && (await this.checkPosition());
 
     if (this.currentPosition?.side === "Buy") {
-      this.longSquareOff();
+      await this.longSquareOff();
       return;
     }
     if (this.currentPosition?.side === "Sell") {
-      this.shortSquareOff();
+      await this.shortSquareOff();
       return;
     }
 
-    if (this.buy()) return;
-    if (this.sell()) return;
+    if (await this.buy()) return;
+    if (await this.sell()) return;
   }
 
   execute() {
