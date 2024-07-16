@@ -19,12 +19,10 @@ class MovingAverageStrategy extends Strategy {
     return {
       capital: 100,
       riskPercentage: 5,
-      takeProfitPercentage: 0.005,
     };
   }
 
   async buy() {
-    const { takeProfitPercentage } = this.config;
     const today = this.stock.now();
     const yesterday = this.stock.prev();
 
@@ -43,19 +41,12 @@ class MovingAverageStrategy extends Strategy {
         initialStopLoss,
       });
       const riskForOneStock = buyingPrice - initialStopLoss;
-      const tpPrice = buyingPrice + buyingPrice * takeProfitPercentage;
-      await this.placeTpMarketOrder(
-        riskForOneStock,
-        buyingPrice,
-        tpPrice,
-        "Buy"
-      );
+      await this.placeMarketOrder(riskForOneStock, buyingPrice, 0, "Buy", true);
       return true;
     }
   }
 
   async sell() {
-    const { takeProfitPercentage } = this.config;
     const today = this.stock.now();
     const yesterday = this.stock.prev();
     if (
@@ -73,12 +64,12 @@ class MovingAverageStrategy extends Strategy {
         initialStopLoss,
       });
       const riskForOneStock = initialStopLoss - sellingPrice;
-      const tpPrice = sellingPrice - sellingPrice * takeProfitPercentage;
-      await this.placeTpMarketOrder(
+      await this.placeMarketOrder(
         riskForOneStock,
         sellingPrice,
-        tpPrice,
-        "Sell"
+        0,
+        "Sell",
+        true
       );
       return true;
     }

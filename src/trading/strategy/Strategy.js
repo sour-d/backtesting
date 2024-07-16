@@ -114,18 +114,22 @@ class Strategy {
     });
   }
 
-  async placeTriggerOrder(risk, price, side = "buy", isMarketOrder = false) {
+  async placeTriggerOrder(risk, price, side = "Buy", isMarketOrder = false) {
     if (await this.isLastOrderFilled()) return;
     if (this.currentPosition) {
       const { pastPrice, pastRisk } = this.currentPosition;
       if (pastPrice === price && pastRisk === risk) return;
-      cancelLastOrder();
+      await cancelLastOrder();
       this.currentPosition = null;
     }
 
-    const stopLoss = side === "buy" ? price - risk : price + risk;
+    const stopLoss = side === "Buy" ? price - risk : price + risk;
     const stockCanBeBought = this.stocksCanBeBought(risk, price);
     const quantity = stockCanBeBought;
+
+    logger(this.stockName, "-------- Capital Updated ---------", {
+      capital: this.capital,
+    });
     this.capital -= stockCanBeBought * price;
 
     logger(this.stockName, "------ Placing New Order ------", {
@@ -166,7 +170,7 @@ class Strategy {
     // );
   }
 
-  async placeTpMarketOrder(risk, price, tpPrice, side = "Buy") {
+  async placeMarketOrder(risk, price, tpPrice, side = "Buy") {
     if (await this.isLastOrderFilled()) return;
     if (this.currentPosition) {
       const { pastPrice, pastRisk } = this.currentPosition;
@@ -191,7 +195,7 @@ class Strategy {
       amount: quantity * price,
     });
     return await this.broker
-      .placeTpMarketOrder(quantity, tpPrice, stopLoss, side)
+      .placeMarketOrder(quantity, tpPrice, stopLoss, side)
       .then((res) => {
         if (!res || res.retMsg !== "OK") return;
         const {
@@ -230,8 +234,6 @@ class Strategy {
       this.currentPosition.stopLoss = stopLoss;
     });
   }
-
-  async exitPosition() {}
 
   async checkPosition() {
     return await this.broker.openPositions().then((res) => {

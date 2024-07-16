@@ -179,7 +179,7 @@ class Trade {
       });
   };
 
-  placeTpMarketOrder = async (quantity, tpPrice, sl, side = "Buy") => {
+  placeMarketOrder = async (quantity, tpPrice, sl, side = "Buy") => {
     return this.clientInstance
       .submitOrder({
         category: "linear",
@@ -187,8 +187,12 @@ class Trade {
         side: side,
         qty: quantity.toString(),
         orderType: "Market",
-        timeInForce: "PostOnly",
-        takeProfit: tpPrice.toString(),
+        ...(!tpPrice
+          ? {
+              timeInForce: "PostOnly",
+              takeProfit: tpPrice.toString(),
+            }
+          : {}),
         stopLoss: sl.toString(),
       })
       .then((response) => {
