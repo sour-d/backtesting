@@ -27,6 +27,7 @@ class Strategy {
   ) {
     this.capital = config.capital;
     this.riskPercentage = config.riskPercentage;
+    this.canBuyFraction = config.canBuyFraction === "true";
     this.persistTradesFn = persistTradesFn;
     this.risk = this.capital * (this.riskPercentage / 100);
     this.stockName = stockName;
@@ -48,6 +49,7 @@ class Strategy {
     return {
       capital: 100000,
       riskPercentage: 5,
+      canBuyFraction: false,
     };
   }
 
@@ -59,7 +61,9 @@ class Strategy {
     const affordableStocks =
       totalCost <= this.capital ? maxStocksByRisk : maxStocksByCapital;
 
-    return float2int((+affordableStocks.toFixed(2) - 0.01).toFixed(2));
+    return this.canBuyFraction
+      ? +affordableStocks.toFixed(2)
+      : float2int(+affordableStocks.toFixed(2));
 
     // when fraction buy is not possible
     // return Math.floor(affordableStocks);
@@ -107,8 +111,12 @@ class Strategy {
         (orderInfo) => orderInfo.orderId === orderId
       );
       if (!currentOrderInfo?.orderId) {
-        logger(this.stockName, "------ Order Filled ------");
         this.currentPosition.status = "Filled";
+        logger(
+          this.stockName,
+          "------ Order Filled ------",
+          this.currentPosition
+        );
         return true;
       }
     });
@@ -128,7 +136,8 @@ class Strategy {
     const quantity = stockCanBeBought;
 
     logger(this.stockName, "-------- Capital Updated ---------", {
-      capital: this.capital,
+      oldCapital: this.capital,
+      newCapital: this.capital - stockCanBeBought * price,
     });
     this.capital -= stockCanBeBought * price;
 
@@ -156,7 +165,7 @@ class Strategy {
           quantity,
           risk,
           side: side,
-          status: "pending",
+          status: "Pending",
           orderId,
         };
       });
@@ -170,10 +179,10 @@ class Strategy {
     // );
   }
 
-  async placeMarketOrder(risk, price, tpPrice, side = "Buy") {
+  async placeOrder(risk, price, tpPrice, side = "Buy", isLimitOrder = false) {
     if (await this.isLastOrderFilled()) return;
     if (this.currentPosition) {
-      const { pastPrice, pastRisk } = this.currentPosition;
+      const { price: pastPrice, risk: pastRisk } = this.currentPosition;
       if (pastPrice === price && pastRisk === risk) return;
       cancelLastOrder();
       this.currentPosition = null;
@@ -183,24 +192,28 @@ class Strategy {
     const quantity = this.stocksCanBeBought(risk, price);
 
     logger(this.stockName, "-------- Capital Updated ---------", {
-      capital: this.capital,
+      oldCapital: this.capital,
+      newCapital: this.capital - quantity * price,
     });
     this.capital -= quantity * price;
 
     logger(this.stockName, "------ Placing New Order ------", {
       price,
-      quantity,
+      tpPrice,
+      stopLoss,
       risk,
+      quantity,
       side,
       amount: quantity * price,
     });
+
+    const limitPrice = isLimitOrder ? price : 0;
     return await this.broker
-      .placeMarketOrder(quantity, tpPrice, stopLoss, side)
+      .placeOrder(quantity, limitPrice, tpPrice, stopLoss, side)
       .then((res) => {
-        if (!res || res.retMsg !== "OK") return;
-        const {
-          result: { orderId },
-        } = res;
+        if (!res || res.retMsg !== "OK") {
+          return logger(this.stockName, "------ Order Failed ------", res);
+        }
 
         logger(this.stockName, "------ New Order Placed ------", res);
         this.currentPosition = {
@@ -209,14 +222,14 @@ class Strategy {
           quantity,
           risk,
           side: side,
-          status: "pending",
-          orderId,
+          status: "Pending",
+          orderId: res.result.orderId,
         };
         return true;
       });
   }
 
-  async addTrailingStopLoss(stopLoss) {
+  async updateStopLoss(stopLoss) {
     if (!this.currentPosition) return;
 
     if (this.currentPosition.stopLoss === stopLoss) return;
@@ -241,10 +254,11 @@ class Strategy {
         logger(this.stockName, "-------- Position already exited ---------");
 
         const { price, quantity } = this.currentPosition;
-        this.capital += price * quantity;
         logger(this.stockName, "-------- Capital Updated ---------", {
-          capital: this.capital,
+          oldCapital: this.capital,
+          newCapital: this.capital + price * quantity,
         });
+        this.capital += price * quantity;
         this.currentPosition = null;
         return;
       }
@@ -257,10 +271,11 @@ class Strategy {
       logger(this.stockName, "-------- Position Forced Exit ---------", res);
 
       const { price, quantity } = this.currentPosition;
-      this.capital += price * quantity;
       logger(this.stockName, "-------- Capital Updated ---------", {
-        capital: this.capital,
+        oldCapital: this.capital,
+        newCapital: this.capital + price * quantity,
       });
+      this.capital += price * quantity;
       this.currentPosition = null;
     });
   }

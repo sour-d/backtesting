@@ -32,8 +32,9 @@ class MovingAverageStrategy extends Strategy {
       today.body > 0 &&
       yesterday.body > 0
     ) {
-      const { close: buyingPrice } = today;
+      let { close: buyingPrice } = today;
       const { ma20low: initialStopLoss } = today;
+      buyingPrice = buyingPrice - 0.001 * buyingPrice;
       if (initialStopLoss >= buyingPrice) return;
 
       logger(this.stockName, "------ Buy condition matched -------", {
@@ -41,7 +42,7 @@ class MovingAverageStrategy extends Strategy {
         initialStopLoss,
       });
       const riskForOneStock = buyingPrice - initialStopLoss;
-      await this.placeMarketOrder(riskForOneStock, buyingPrice, 0, "Buy", true);
+      await this.placeOrder(riskForOneStock, buyingPrice, 0, "Buy", true);
       return true;
     }
   }
@@ -55,8 +56,9 @@ class MovingAverageStrategy extends Strategy {
       today.body < 0 &&
       yesterday.body < 0
     ) {
-      const { open: sellingPrice } = this.stock.now();
+      let { open: sellingPrice } = this.stock.now();
       const { ma20high: initialStopLoss } = today;
+      sellingPrice = sellingPrice + 0.001 * sellingPrice;
       if (initialStopLoss <= sellingPrice) return;
 
       logger(this.stockName, "------ Sell condition matched -------", {
@@ -64,13 +66,7 @@ class MovingAverageStrategy extends Strategy {
         initialStopLoss,
       });
       const riskForOneStock = initialStopLoss - sellingPrice;
-      await this.placeMarketOrder(
-        riskForOneStock,
-        sellingPrice,
-        0,
-        "Sell",
-        true
-      );
+      await this.placeOrder(riskForOneStock, sellingPrice, 0, "Sell", true);
       return true;
     }
   }
@@ -79,14 +75,14 @@ class MovingAverageStrategy extends Strategy {
     const today = this.stock.now();
     const { ma20high: newSL } = today;
 
-    return await this.addTrailingStopLoss(newSL);
+    return await this.updateStopLoss(newSL);
   }
 
   async longSquareOff() {
     const today = this.stock.now();
 
     const { ma20low: newSL } = today;
-    return await this.addTrailingStopLoss(newSL);
+    return await this.updateStopLoss(newSL);
   }
 }
 

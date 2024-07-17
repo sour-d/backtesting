@@ -2,6 +2,7 @@ import { RestClientV5 } from "bybit-api";
 import dotenv from "dotenv";
 import logger from "../server/logger";
 dotenv.config();
+// let logger = console.log;
 
 const testnet = process.env.USE_TESTNET === "true";
 
@@ -32,6 +33,7 @@ class Trade {
         category: "linear",
         stopLoss: sl.toString(),
         symbol: this.symbol,
+        positionIdx: 0,
       })
       .then((response) => {
         return response;
@@ -179,21 +181,18 @@ class Trade {
       });
   };
 
-  placeMarketOrder = async (quantity, tpPrice, sl, side = "Buy") => {
+  placeOrder = async (quantity, price, tp, sl, side = "Buy") => {
     return this.clientInstance
       .submitOrder({
         category: "linear",
         symbol: this.symbol,
         side: side,
         qty: quantity.toString(),
-        orderType: "Market",
-        ...(!tpPrice
-          ? {
-              timeInForce: "PostOnly",
-              takeProfit: tpPrice.toString(),
-            }
-          : {}),
-        stopLoss: sl.toString(),
+        timeInForce: "PostOnly",
+        orderType: !price ? "Market" : "Limit",
+        ...(price ? { price: price.toString() } : {}),
+        ...(tp ? { takeProfit: tp.toString() } : {}),
+        ...(sl ? { stopLoss: sl.toString() } : {}),
       })
       .then((response) => {
         return response;
@@ -201,6 +200,7 @@ class Trade {
       .catch((error) => {
         console.error(error);
       });
+    ``;
   };
 
   exitPosition = async (side) => {
@@ -223,7 +223,8 @@ class Trade {
   };
 }
 
-// const trade = new Trade("GALAUSDT");
-// logger(await trade.placeTpMarketOrder(100, 0.6, 0.02, "Buy"));
+// const trade = new Trade("ETHUSDT");
+// logger(await trade.placeOrder(101, 0, 2900, 2500, "Buy"));
+// logger(await trade.modifyPosition(2700));
 
 export default Trade;
