@@ -223,8 +223,10 @@ class Trade {
   };
 }
 
-// const trade = new Trade("ETHUSDT");
-// logger(await trade.placeOrder(101, 0, 2900, 2500, "Buy"));
+// const trade = new Trade("SOLUSDT");
+// logger(
+//   await trade.placeOrder(1, 500.0482432892432, 0, 480.024275500000000002, "Buy")
+// );
 // logger(await trade.modifyPosition(2700));
 
 export default Trade;

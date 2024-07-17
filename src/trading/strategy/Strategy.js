@@ -2,10 +2,19 @@ import { Trades } from "../outcome/Trades.js";
 import { LiveQuoteStorage } from "../quoteStorage/LiveQuoteStorage.js";
 import broker from "../../broker";
 import logger from "../../server/logger.js";
-import { log } from "console";
+import getInstrumentInfo from "../../broker/instrument.js";
 
 function float2int(value) {
   return value | 0;
+}
+
+function removeExtraZeroInFloat(float) {
+  return Number(float.toFixed(8));
+}
+
+function roundLikeSize(value, size = 0.00001) {
+  size = Number(size);
+  return removeExtraZeroInFloat(value - removeExtraZeroInFloat(value % size));
 }
 
 class Strategy {
@@ -18,6 +27,7 @@ class Strategy {
   risk;
   stockName;
   broker;
+  symbolInfo;
 
   constructor(
     stockName,
@@ -181,6 +191,10 @@ class Strategy {
 
   async placeOrder(risk, price, tpPrice, side = "Buy", isLimitOrder = false) {
     if (await this.isLastOrderFilled()) return;
+
+    price = roundLikeSize(price, this.symbolInfo?.priceFilter?.tickSize);
+    tpPrice = roundLikeSize(tpPrice, this.symbolInfo?.priceFilter?.tickSize);
+
     if (this.currentPosition) {
       const { price: pastPrice, risk: pastRisk } = this.currentPosition;
       if (pastPrice === price && pastRisk === risk) return;
@@ -188,14 +202,11 @@ class Strategy {
       this.currentPosition = null;
     }
 
-    const stopLoss = side === "Buy" ? price - risk : price + risk;
-    const quantity = this.stocksCanBeBought(risk, price);
+    let stopLoss = side === "Buy" ? price - risk : price + risk;
+    stopLoss = roundLikeSize(stopLoss, this.symbolInfo?.priceFilter?.tickSize);
 
-    logger(this.stockName, "-------- Capital Updated ---------", {
-      oldCapital: this.capital,
-      newCapital: this.capital - quantity * price,
-    });
-    this.capital -= quantity * price;
+    let quantity = this.stocksCanBeBought(risk, price);
+    quantity = roundLikeSize(quantity, this.symbolInfo?.lotSizeFilter?.qtyStep);
 
     logger(this.stockName, "------ Placing New Order ------", {
       price,
@@ -214,7 +225,6 @@ class Strategy {
         if (!res || res.retMsg !== "OK") {
           return logger(this.stockName, "------ Order Failed ------", res);
         }
-
         logger(this.stockName, "------ New Order Placed ------", res);
         this.currentPosition = {
           transactionDate: this.stock.now(),
@@ -225,12 +235,19 @@ class Strategy {
           status: "Pending",
           orderId: res.result.orderId,
         };
+        logger(this.stockName, "-------- Capital Updated ---------", {
+          oldCapital: this.capital,
+          newCapital: this.capital - quantity * price,
+        });
+        this.capital -= quantity * price;
         return true;
       });
   }
 
   async updateStopLoss(stopLoss) {
     if (!this.currentPosition) return;
+
+    stopLoss = roundLikeSize(stopLoss, this.symbolInfo?.priceFilter?.tickSize);
 
     if (this.currentPosition.stopLoss === stopLoss) return;
     logger(this.stockName, "-------- Modifying Stop Loss ---------", {
@@ -298,8 +315,10 @@ class Strategy {
     if (await this.sell()) return;
   }
 
-  execute() {
+  async execute() {
     logger(this.stockName, "-------- Strategy Started ---------");
+
+    this.symbolInfo = await getInstrumentInfo(this.stockName);
   }
 }
 
