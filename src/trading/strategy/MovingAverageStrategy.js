@@ -19,6 +19,7 @@ class MovingAverageStrategy extends Strategy {
     return {
       capital: 100,
       riskPercentage: 5,
+      limitPriceGap: 0.0003,
     };
   }
 
@@ -34,7 +35,7 @@ class MovingAverageStrategy extends Strategy {
     ) {
       let { close: buyingPrice } = today;
       const { ma20low: initialStopLoss } = today;
-      buyingPrice = buyingPrice - 0.001 * buyingPrice;
+      buyingPrice = buyingPrice - this.config.limitPriceGap * buyingPrice;
       if (initialStopLoss >= buyingPrice) return;
 
       logger(this.stockName, "------ Buy condition matched -------", {
@@ -58,7 +59,7 @@ class MovingAverageStrategy extends Strategy {
     ) {
       let { open: sellingPrice } = this.stock.now();
       const { ma20high: initialStopLoss } = today;
-      sellingPrice = sellingPrice + 0.001 * sellingPrice;
+      sellingPrice = sellingPrice + this.config.limitPriceGap * sellingPrice;
       if (initialStopLoss <= sellingPrice) return;
 
       logger(this.stockName, "------ Sell condition matched -------", {
