@@ -18,10 +18,10 @@ const body = (quote) => {
   return quote["close"] - quote["open"];
 };
 
-const calculateCandleProperty = (quote) => ({
-  body: body(quote),
-  lowerWick: lowerWick(quote),
-  upperWick: upperWick(quote),
-});
+const calculateCandleProperty = (quote) => {
+  quote.body = body(quote);
+  quote.lowerWick = lowerWick(quote);
+  quote.upperWick = upperWick(quote);
+};
 
 export default calculateCandleProperty;

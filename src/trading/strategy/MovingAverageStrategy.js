@@ -28,10 +28,10 @@ class MovingAverageStrategy extends Strategy {
     const yesterday = this.stock.prev();
 
     if (
-      today.close > today.ma60close &&
       today.close > today.ma20high &&
       today.body > 0 &&
-      yesterday.body > 0
+      yesterday.body > 0 &&
+      today.superTrendDirection === "Buy"
     ) {
       let { close: buyingPrice } = today;
       const { ma20low: initialStopLoss } = today;
@@ -48,6 +48,19 @@ class MovingAverageStrategy extends Strategy {
     }
   }
 
+  async longSquareOff() {
+    const today = this.stock.now();
+
+    if (today.superTrendDirection === "Sell") {
+      this.forceExit();
+      return this.sell();
+    }
+
+    const { ma20low: newSL } = today;
+    await this.updateStopLoss(newSL);
+    return this.sell();
+  }
+
   async sell() {
     const today = this.stock.now();
     const yesterday = this.stock.prev();
@@ -55,9 +68,10 @@ class MovingAverageStrategy extends Strategy {
       today.close < today.ma60close &&
       today.close < today.ma20low &&
       today.body < 0 &&
-      yesterday.body < 0
+      yesterday.body < 0 &&
+      today.superTrendDirection === "Sell"
     ) {
-      let { open: sellingPrice } = this.stock.now();
+      let { close: sellingPrice } = this.stock.now();
       const { ma20high: initialStopLoss } = today;
       sellingPrice = sellingPrice + this.config.limitPriceGap * sellingPrice;
       if (initialStopLoss <= sellingPrice) return;
@@ -74,16 +88,15 @@ class MovingAverageStrategy extends Strategy {
 
   async shortSquareOff() {
     const today = this.stock.now();
+
+    if (today.superTrendDirection === "Buy") {
+      await this.forceExit();
+      return this.buy();
+    }
+
     const { ma20high: newSL } = today;
-
-    return await this.updateStopLoss(newSL);
-  }
-
-  async longSquareOff() {
-    const today = this.stock.now();
-
-    const { ma20low: newSL } = today;
-    return await this.updateStopLoss(newSL);
+    await this.updateStopLoss(newSL);
+    return this.buy();
   }
 }
 
