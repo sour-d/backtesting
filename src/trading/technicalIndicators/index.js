@@ -1,8 +1,8 @@
 import _ from "lodash";
-import { highOfLast } from "./nDaysHigh.js";
-import { lowOfLast } from "./nDaysLow.js";
 import { movingAverageOf } from "./nDayMA.js";
 import calculateCandleProperty from "./candleStick.js";
+import calculateATR from "./atr.js";
+import calculateSuperTrendForQuote from "./superTrend.js";
 
 const fixTwoDecimal = (obj) => {
   const result = {};
