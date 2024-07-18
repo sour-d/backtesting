@@ -21,6 +21,8 @@ const getTimeFrame = (timeFrame) => {
 };
 
 const fetchInitialData = async (symbol, timeFrame, startingQuoteDay) => {
+  if (typeof timeFrame === "number" && timeFrame < 60)
+    startingQuoteDay *= timeFrame;
   const end = dayjs();
   const start = end.subtract(startingQuoteDay, getTimeFrame(timeFrame));
   const data = await fetchHistoricalData(symbol, timeFrame, start, end);
