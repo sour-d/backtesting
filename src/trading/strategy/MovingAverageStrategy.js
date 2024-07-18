@@ -52,7 +52,7 @@ class MovingAverageStrategy extends Strategy {
     const today = this.stock.now();
 
     if (today.superTrendDirection === "Sell") {
-      this.forceExit("Sell");
+      this.forceExit("Sell", today.close);
       return this.sell();
     }
 
@@ -89,7 +89,7 @@ class MovingAverageStrategy extends Strategy {
     const today = this.stock.now();
 
     if (today.superTrendDirection === "Buy") {
-      await this.forceExit("Buy");
+      await this.forceExit("Buy", today.close);
       return this.buy();
     }
 

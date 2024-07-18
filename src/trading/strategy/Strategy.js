@@ -268,12 +268,15 @@ class Strategy {
   async checkPosition() {
     return await this.broker.openPositions().then((res) => {
       if (res.size === 0) {
-        logger(this.stockName, "-------- Position already exited ---------");
+        const { stopLoss, quantity } = this.currentPosition;
+        logger(
+          this.stockName,
+          `-------- Position already exited with Stop Loss ${stopLoss}---------`
+        );
 
-        const { price, quantity } = this.currentPosition;
         logger(this.stockName, "-------- Capital Updated ---------", {
           oldCapital: this.capital,
-          newCapital: this.capital + price * quantity,
+          newCapital: this.capital + stopLoss * quantity,
         });
         this.capital += price * quantity;
         this.currentPosition = null;
@@ -282,12 +285,12 @@ class Strategy {
     });
   }
 
-  async forceExit(side) {
+  async forceExit(side, price) {
     this.broker.exitPosition(side).then((res) => {
       if (!res) return;
       logger(this.stockName, "-------- Position Forced Exit ---------", res);
 
-      const { price, quantity } = this.currentPosition;
+      const { quantity } = this.currentPosition;
       logger(this.stockName, "-------- Capital Updated ---------", {
         oldCapital: this.capital,
         newCapital: this.capital + price * quantity,
