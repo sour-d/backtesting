@@ -58,7 +58,6 @@ class MovingAverageStrategy extends Strategy {
 
     const { ma20low: newSL } = today;
     await this.updateStopLoss(newSL);
-    return this.sell();
   }
 
   async sell() {
@@ -96,7 +95,6 @@ class MovingAverageStrategy extends Strategy {
 
     const { ma20high: newSL } = today;
     await this.updateStopLoss(newSL);
-    return this.buy();
   }
 }
 
