@@ -1,4 +1,3 @@
-import logger from "../../server/logger";
 import broker from "../../broker";
 import dayjs from "dayjs";
 
@@ -13,7 +12,7 @@ const fetchHistoricalData = async (symbol, interval, start, end, filename) => {
     !!process.env.USE_TESTNET
   );
 
-  logger(
+  console.log(
     `${OHCL.length} records downloaded from ${dayjs(
       startMs
     ).toString()} to ${dayjs(

@@ -1,21 +1,19 @@
 import broker from "../broker";
-// import db from "./db";
-// import StrategyManager from "./LiveStrategyManager";
+import LiveStrategyManager from "./LiveStrategyManager";
 
 export default class ServiceProvider {
   static instance;
   db;
   liveQuoteProvider;
-  strategyManager;
+  liveStrategyManager;
 
   constructor() {
     ServiceProvider.instance = this;
-    // this.db = db;
     this.liveQuoteProvider = new broker.klineStream(
       [],
       !!process.env.USE_TESTNET
     );
-    // this.strategyManager = new StrategyManager();
+    this.liveStrategyManager = new LiveStrategyManager();
   }
 
   static getInstance() {

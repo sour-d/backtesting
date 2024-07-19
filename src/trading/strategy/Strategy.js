@@ -28,6 +28,8 @@ class Strategy {
   stockName;
   broker;
   symbolInfo;
+  logger;
+  strategyName;
 
   constructor(
     stockName,
@@ -35,7 +37,6 @@ class Strategy {
     persistTradesFn,
     config = Strategy.getDefaultConfig()
   ) {
-    this.capital = this.updateCapital();
     this.riskPercentage = config.riskPercentage;
     this.persistTradesFn = persistTradesFn;
     this.risk = this.capital * (this.riskPercentage / 100);
@@ -52,6 +53,8 @@ class Strategy {
     );
     this.trades = new Trades(this);
     this.broker = new broker.Trade(this.stockName);
+    this.capital = this.updateCapital();
+    this.strategyName = "";
   }
 
   static getDefaultConfig() {
@@ -62,8 +65,8 @@ class Strategy {
   }
 
   updateCapital() {
-    this.broker.getBalance().then((res) => {
-      logger(this.stockName, "-------- Capital Updated ---------", res);
+    broker.getBalance().then((res) => {
+      this.logger("-------- Capital Updated ---------", res);
       this.capital = res?.bal?.total ?? 0;
     });
     return this.capital;
@@ -126,11 +129,7 @@ class Strategy {
       );
       if (!currentOrderInfo?.orderId) {
         this.currentPosition.status = "Filled";
-        logger(
-          this.stockName,
-          "------ Order Filled ------",
-          this.currentPosition
-        );
+        this.logger("------ Order Filled ------", this.currentPosition);
         return true;
       }
     });
@@ -151,7 +150,7 @@ class Strategy {
 
     this.updateCapital();
 
-    logger(this.stockName, "------ Placing New Order ------", {
+    this.logger("------ Placing New Order ------", {
       stockCanBeBought,
       quantity,
       price,
@@ -168,7 +167,7 @@ class Strategy {
           result: { orderId },
         } = res;
 
-        logger(this.stockName, "------ New Order Placed ------", res);
+        this.logger("------ New Order Placed ------", res);
         this.currentPosition = {
           transactionDate: this.stock.now(),
           price,
@@ -208,7 +207,7 @@ class Strategy {
     let quantity = this.stocksCanBeBought(risk, price);
     quantity = roundLikeSize(quantity, this.symbolInfo?.lotSizeFilter?.qtyStep);
 
-    logger(this.stockName, "------ Placing New Order ------", {
+    this.logger("------ Placing New Order ------", {
       price,
       tpPrice,
       stopLoss,
@@ -223,9 +222,9 @@ class Strategy {
       .placeOrder(quantity, limitPrice, tpPrice, stopLoss, side)
       .then((res) => {
         if (!res || res.retMsg !== "OK") {
-          return logger(this.stockName, "------ New Order Failed ------", res);
+          return this.logger("------ New Order Failed ------", res);
         }
-        logger(this.stockName, "------ New Order Placed ------", res);
+        this.logger("------ New Order Placed ------", res);
         this.currentPosition = {
           transactionDate: this.stock.now(),
           price,
@@ -247,16 +246,12 @@ class Strategy {
     stopLoss = roundLikeSize(stopLoss, this.symbolInfo?.priceFilter?.tickSize);
 
     if (this.currentPosition.stopLoss === stopLoss) return;
-    logger(this.stockName, "-------- Modifying Stop Loss ---------", {
+    this.logger("-------- Modifying Stop Loss ---------", {
       oldStopLoss: this.currentPosition.stopLoss,
       newStopLoss: stopLoss,
     });
     return await this.broker.modifyPosition(stopLoss).then((res) => {
-      logger(
-        this.stockName,
-        "-------- Modified Stop Loss Response ---------",
-        res
-      );
+      this.logger("-------- Modified Stop Loss Response ---------", res);
       if (!res) return;
       this.currentPosition.stopLoss = stopLoss;
     });
@@ -266,9 +261,8 @@ class Strategy {
     return await this.broker.openPositions().then((res) => {
       if (res.size === 0) {
         const { stopLoss } = this.currentPosition;
-        logger(
-          this.stockName,
-          `-------- Position already exited with Stop Loss ${stopLoss}---------`
+        this.logger(
+          `-------- Position already exited with Stop Loss ${stopLoss} ---------`
         );
 
         this.updateCapital();
@@ -281,12 +275,8 @@ class Strategy {
   async forceExit(side) {
     return await this.broker.exitPosition(side).then((res) => {
       if (!res)
-        return logger(
-          this.stockName,
-          "-------- Position Exit Failed ---------",
-          res
-        );
-      logger(this.stockName, "-------- Position Forced Exit ---------", res);
+        return this.logger("-------- Position Exit Failed ---------", res);
+      this.logger("-------- Position Forced Exit ---------", res);
 
       this.updateCapital();
       this.currentPosition = null;
@@ -294,7 +284,7 @@ class Strategy {
   }
 
   async trade() {
-    logger(this.stockName, "-------- Got A Quote, Resuming Strategy ---------");
+    this.logger("-------- Got A Quote, Resuming Strategy ---------");
 
     this.currentPosition && (await this.checkPosition());
 
@@ -312,7 +302,7 @@ class Strategy {
   }
 
   async execute() {
-    logger(this.stockName, "-------- Strategy Started ---------");
+    this.logger("-------- Strategy Started ---------");
 
     this.symbolInfo = await getInstrumentInfo(this.stockName);
   }

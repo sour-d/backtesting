@@ -43,3 +43,5 @@ technicalData
 .env
 log.txt
 ping-status.txt
+
+.log

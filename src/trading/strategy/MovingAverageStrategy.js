@@ -13,6 +13,9 @@ class MovingAverageStrategy extends Strategy {
   ) {
     super(stockName, timeFrame, persistTradesFn, config);
     this.config = config;
+    this.strategyName = "MovingAverageStrategy";
+    this.timeFrame = timeFrame;
+    this.logger = logger(this);
   }
 
   static getDefaultConfig() {
@@ -38,7 +41,7 @@ class MovingAverageStrategy extends Strategy {
       buyingPrice = buyingPrice - this.config.limitPriceGap * buyingPrice;
       if (initialStopLoss >= buyingPrice) return;
 
-      logger(this.stockName, "------ Buy condition matched -------", {
+      logger("------ Buy condition matched -------", {
         buyingPrice,
         initialStopLoss,
       });
@@ -75,7 +78,7 @@ class MovingAverageStrategy extends Strategy {
       sellingPrice = sellingPrice + this.config.limitPriceGap * sellingPrice;
       if (initialStopLoss <= sellingPrice) return;
 
-      logger(this.stockName, "------ Sell condition matched -------", {
+      logger("------ Sell condition matched -------", {
         sellingPrice,
         initialStopLoss,
       });

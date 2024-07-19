@@ -4,13 +4,15 @@
   "description": "",
   "main": "index.js",
   "registry": "https://registry.npmjs.org",
+  "license": "UNLICENSED",
   "scripts": {
+    "setup": "mkdir -p .output/data .output/dataWithTechnicalIndicators .output/result .log",
+    "clean": "rm -rf .output/*/*",
+    "build:babel": "babel src --out-dir build",
     "dev": "nodemon --watch node build/server/app.js",
     "predev": "yarn build:babel",
     "start": "node build/server/app.js",
-    "setup": "mkdir -p .output/data .output/dataWithTechnicalIndicators .output/result",
-    "clean": "rm -rf .output/*/*",
-    "build:babel": "babel src --out-dir build"
+    "prestart": "yarn clean && yarn setup && yarn build:babel"
   },
   "dependencies": {
     "axios": "^1.7.2",

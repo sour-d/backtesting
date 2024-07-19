@@ -11,7 +11,7 @@ import startPingInInterval from "./ping";
 import { StrategyList } from "./api/strategyList";
 import { Trade } from "./api/trade";
 import { Result } from "./api/result";
-import logger, { clearLog } from "./logger";
+import liveStrategiesList from "./api/liveStrategiesList";
 
 const app = express();
 
@@ -29,6 +29,7 @@ app.use(morgan("tiny"));
 
 // common routes --------------------------------------------------
 app.get("/api/strategy-list", StrategyList);
+app.get("/api/live-strategies-list", liveStrategiesList);
 app.post("/api/live/trade", Trade);
 app.get("/api/live/result", Result);
 
@@ -62,9 +63,21 @@ app.get("/log/ping", (req, res) => {
   });
 });
 
-app.get("/log", (req, res) => {
-  if (!fs.existsSync("log.txt")) fs.writeFileSync("log.txt", "");
-  fs.readFile("log.txt", "utf8", (err, data) => {
+app.get("/live/log", (req, res) => {
+  const { strategy } = req.query;
+  if (!strategy) {
+    res.send("No strategy provided");
+    return;
+  }
+
+  const logFileName = `.log/${strategy}.txt`;
+
+  if (!fs.existsSync(logFileName)) {
+    res.send("No log file found");
+    return;
+  }
+
+  fs.readFile(logFileName, "utf8", (err, data) => {
     if (err) {
       res.send("Error reading log file");
     } else {
@@ -83,6 +96,5 @@ const config = {
 
 app.listen(config.port, () => {
   process.env.KEEP_ALIVE && startPingInInterval();
-  clearLog();
-  logger(`Server running on http://localhost:${config.port}/`);
+  console.log(`Server running on http://localhost:${config.port}/`);
 });

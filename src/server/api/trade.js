@@ -1,6 +1,7 @@
 import { prepareResponse } from "../../utils";
 import strategies from "../../trading/strategy";
 import fs from "fs";
+import ServiceProvider from "../../services/ServiceProvider";
 
 const persistBackTestResult = (stockName, timeFrame) => (outcomes) => {
   fs.writeFileSync(
@@ -27,6 +28,7 @@ export function Trade(req, res) {
     persistBackTestResult(stockName, timeFrame),
     config
   );
+  ServiceProvider.getInstance().liveStrategyManager.addStrategy(strategy);
   strategy.execute();
 
   return res.json(prepareResponse("Strategy executed", false));

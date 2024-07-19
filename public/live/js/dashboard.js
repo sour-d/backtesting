@@ -21,6 +21,7 @@ const startPaperTrade = (event) => {
         return window.location.reload();
       }
       alert(res.message);
+      location.reload();
     });
 };
 
