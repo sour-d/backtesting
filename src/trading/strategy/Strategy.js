@@ -35,7 +35,7 @@ class Strategy {
     persistTradesFn,
     config = Strategy.getDefaultConfig()
   ) {
-    this.capital = config.capital;
+    this.capital = this.updateCapital();
     this.riskPercentage = config.riskPercentage;
     this.canBuyFraction = config.canBuyFraction === "true";
     this.persistTradesFn = persistTradesFn;
@@ -57,10 +57,18 @@ class Strategy {
 
   static getDefaultConfig() {
     return {
-      capital: 100000,
+      // capital: 100000,
       riskPercentage: 5,
       canBuyFraction: false,
     };
+  }
+
+  updateCapital() {
+    this.broker.getBalance().then((res) => {
+      logger(this.stockName, "-------- Capital Updated ---------", res);
+      this.capital = res?.bal?.total ?? 0;
+    });
+    return this.capital;
   }
 
   stocksCanBeBought(riskForOneStock, buyingPrice) {
@@ -145,11 +153,7 @@ class Strategy {
     const stockCanBeBought = this.stocksCanBeBought(risk, price);
     const quantity = stockCanBeBought;
 
-    logger(this.stockName, "-------- Capital Updated ---------", {
-      oldCapital: this.capital,
-      newCapital: this.capital - stockCanBeBought * price,
-    });
-    this.capital -= stockCanBeBought * price;
+    this.updateCapital();
 
     logger(this.stockName, "------ Placing New Order ------", {
       stockCanBeBought,
@@ -223,7 +227,7 @@ class Strategy {
       .placeOrder(quantity, limitPrice, tpPrice, stopLoss, side)
       .then((res) => {
         if (!res || res.retMsg !== "OK") {
-          return logger(this.stockName, "------ Order Failed ------", res);
+          return logger(this.stockName, "------ New Order Failed ------", res);
         }
         logger(this.stockName, "------ New Order Placed ------", res);
         this.currentPosition = {
@@ -235,11 +239,8 @@ class Strategy {
           status: "Pending",
           orderId: res.result.orderId,
         };
-        logger(this.stockName, "-------- Capital Updated ---------", {
-          oldCapital: this.capital,
-          newCapital: this.capital - quantity * price,
-        });
-        this.capital -= quantity * price;
+
+        this.updateCapital();
         return true;
       });
   }
@@ -268,34 +269,30 @@ class Strategy {
   async checkPosition() {
     return await this.broker.openPositions().then((res) => {
       if (res.size === 0) {
-        const { stopLoss, quantity } = this.currentPosition;
+        const { stopLoss } = this.currentPosition;
         logger(
           this.stockName,
           `-------- Position already exited with Stop Loss ${stopLoss}---------`
         );
 
-        logger(this.stockName, "-------- Capital Updated ---------", {
-          oldCapital: this.capital,
-          newCapital: this.capital + stopLoss * quantity,
-        });
-        this.capital += stopLoss * quantity;
+        this.updateCapital();
         this.currentPosition = null;
         return;
       }
     });
   }
 
-  async forceExit(side, price) {
+  async forceExit(side) {
     return await this.broker.exitPosition(side).then((res) => {
-      if (!res) return;
+      if (!res)
+        return logger(
+          this.stockName,
+          "-------- Position Exit Failed ---------",
+          res
+        );
       logger(this.stockName, "-------- Position Forced Exit ---------", res);
 
-      const { quantity } = this.currentPosition;
-      logger(this.stockName, "-------- Capital Updated ---------", {
-        oldCapital: this.capital,
-        newCapital: this.capital + price * quantity,
-      });
-      this.capital += price * quantity;
+      this.updateCapital();
       this.currentPosition = null;
     });
   }

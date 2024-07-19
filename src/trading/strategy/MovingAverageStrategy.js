@@ -17,7 +17,7 @@ class MovingAverageStrategy extends Strategy {
 
   static getDefaultConfig() {
     return {
-      capital: 100,
+      // capital: 100,
       riskPercentage: 5,
       limitPriceGap: 0.0003,
     };
