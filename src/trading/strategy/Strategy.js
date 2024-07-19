@@ -278,7 +278,7 @@ class Strategy {
           oldCapital: this.capital,
           newCapital: this.capital + stopLoss * quantity,
         });
-        this.capital += price * quantity;
+        this.capital += stopLoss * quantity;
         this.currentPosition = null;
         return;
       }
@@ -286,7 +286,7 @@ class Strategy {
   }
 
   async forceExit(side, price) {
-    this.broker.exitPosition(side).then((res) => {
+    return await this.broker.exitPosition(side).then((res) => {
       if (!res) return;
       logger(this.stockName, "-------- Position Forced Exit ---------", res);
 
