@@ -37,7 +37,6 @@ class Strategy {
   ) {
     this.capital = this.updateCapital();
     this.riskPercentage = config.riskPercentage;
-    this.canBuyFraction = config.canBuyFraction === "true";
     this.persistTradesFn = persistTradesFn;
     this.risk = this.capital * (this.riskPercentage / 100);
     this.stockName = stockName;
@@ -59,7 +58,6 @@ class Strategy {
     return {
       // capital: 100000,
       riskPercentage: 5,
-      canBuyFraction: false,
     };
   }
 
@@ -79,9 +77,7 @@ class Strategy {
     const affordableStocks =
       totalCost <= this.capital ? maxStocksByRisk : maxStocksByCapital;
 
-    return this.canBuyFraction
-      ? +affordableStocks.toFixed(2)
-      : float2int(+affordableStocks.toFixed(2));
+    return +affordableStocks.toFixed(2);
 
     // when fraction buy is not possible
     // return Math.floor(affordableStocks);
