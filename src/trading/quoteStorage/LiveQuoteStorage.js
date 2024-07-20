@@ -20,19 +20,18 @@ const getTimeFrame = (timeFrame) => {
   }[timeFrame];
 };
 
-const fetchInitialData = async (symbol, timeFrame, startingQuoteDay) => {
+const fetchInitialData = async (
+  symbol,
+  timeFrame,
+  startingQuoteDay,
+  logger
+) => {
   if (typeof timeFrame === "number" && timeFrame < 60)
     startingQuoteDay *= timeFrame;
   const end = dayjs();
   const start = end.subtract(startingQuoteDay, getTimeFrame(timeFrame));
-  const data = await fetchHistoricalData(
-    symbol,
-    timeFrame,
-    start,
-    end,
-    this.logger
-  );
-  console.log("fetched initial data", data.length);
+  const data = await fetchHistoricalData(symbol, timeFrame, start, end, logger);
+  logger("fetched initial data", data.length);
   return addTechnicalIndicator(data);
 };
 

@@ -1,7 +1,7 @@
 import broker from "../../broker";
 import dayjs from "dayjs";
 
-const fetchHistoricalData = async (symbol, interval, start, end, filename) => {
+const fetchHistoricalData = async (symbol, interval, start, end, logger) => {
   const startMs = start.valueOf();
   const endMs = end.valueOf();
   const OHCL = await broker.HistoricalKline(
@@ -9,7 +9,8 @@ const fetchHistoricalData = async (symbol, interval, start, end, filename) => {
     interval,
     startMs,
     endMs,
-    !!process.env.USE_TESTNET
+    !!process.env.USE_TESTNET,
+    logger
   );
 
   console.log(

@@ -67,8 +67,14 @@ const formatResponse = (response) => {
     .reverse();
 };
 
-const HistoricalKline = async (symbol, interval, start, end, logger) => {
-  testnet = !!process.env.USE_TESTNET;
+const HistoricalKline = async (
+  symbol,
+  interval,
+  start,
+  end,
+  testnet,
+  logger
+) => {
   let allData = [];
   let fetchTill = getNewEnd(start, end, interval);
 

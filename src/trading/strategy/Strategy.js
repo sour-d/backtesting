@@ -45,6 +45,12 @@ class Strategy {
 
     this.currentPosition = null;
 
+    this.trades = new Trades(this);
+    this.capital = this.updateCapital();
+    this.strategyName = strategyName;
+    this.timeFrame = timeFrame;
+    this.logger = logger(this);
+    this.broker = new broker.Trade(this.stockName, this.logger);
     this.stock = new LiveQuoteStorage(
       () => this.trade(),
       100,
@@ -53,12 +59,6 @@ class Strategy {
       stockName,
       this.logger
     );
-    this.trades = new Trades(this);
-    this.capital = this.updateCapital();
-    this.strategyName = strategyName;
-    this.timeFrame = timeFrame;
-    this.logger = logger(this);
-    this.broker = new broker.Trade(this.stockName, this.logger);
   }
 
   static getDefaultConfig() {
