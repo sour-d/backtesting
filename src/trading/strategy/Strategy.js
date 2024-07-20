@@ -50,7 +50,8 @@ class Strategy {
       100,
       stockName,
       timeFrame,
-      stockName
+      stockName,
+      this.logger
     );
     this.trades = new Trades(this);
     this.capital = this.updateCapital();
@@ -70,7 +71,7 @@ class Strategy {
   updateCapital() {
     broker.getBalance().then((res) => {
       this.capital = res?.bal?.available ?? 0;
-      logger("-------- Fetched Capital ---------", res);
+      this.logger("-------- Fetched Capital ---------", res);
     });
     return this.capital;
   }
@@ -173,6 +174,7 @@ class Strategy {
 
   async placeOrder(risk, price, tpPrice, side = "Buy", isLimitOrder = false) {
     if (await this.isLastOrderFilled()) return;
+    await this.updateCapital();
 
     price = roundLikeSize(price, this.symbolInfo?.priceFilter?.tickSize);
     tpPrice = roundLikeSize(tpPrice, this.symbolInfo?.priceFilter?.tickSize);

@@ -25,7 +25,13 @@ const fetchInitialData = async (symbol, timeFrame, startingQuoteDay) => {
     startingQuoteDay *= timeFrame;
   const end = dayjs();
   const start = end.subtract(startingQuoteDay, getTimeFrame(timeFrame));
-  const data = await fetchHistoricalData(symbol, timeFrame, start, end);
+  const data = await fetchHistoricalData(
+    symbol,
+    timeFrame,
+    start,
+    end,
+    this.logger
+  );
   console.log("fetched initial data", data.length);
   return addTechnicalIndicator(data);
 };
@@ -40,7 +46,8 @@ export class LiveQuoteStorage extends ExistingQuoteStorage {
     startingQuoteDay = 1,
     symbol,
     timeFrame = 1,
-    name = ""
+    name = "",
+    logger
   ) {
     super([], startingQuoteDay, name);
     this.currentQuoteIndex = -1;
@@ -49,7 +56,7 @@ export class LiveQuoteStorage extends ExistingQuoteStorage {
     this.topic = `kline.${timeFrame}.${symbol}`;
     this.listener = listener;
 
-    fetchInitialData(symbol, timeFrame, startingQuoteDay)
+    fetchInitialData(symbol, timeFrame, startingQuoteDay, logger)
       .then((data) => {
         this.quotes = data;
         this.currentQuoteIndex = data.length - 1;

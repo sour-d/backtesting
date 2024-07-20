@@ -1,11 +1,9 @@
 import { RestClientV5 } from "bybit-api";
 import dotenv from "dotenv";
-import fs from "fs";
 import _ from "lodash";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js";
 import timezone from "dayjs/plugin/timezone.js";
-import logger from "../server/logger";
 
 dotenv.config();
 dayjs.extend(utc);
@@ -69,13 +67,8 @@ const formatResponse = (response) => {
     .reverse();
 };
 
-const HistoricalKline = async (
-  symbol,
-  interval,
-  start,
-  end,
-  testnet = false
-) => {
+const HistoricalKline = async (symbol, interval, start, end, logger) => {
+  testnet = !!process.env.USE_TESTNET;
   let allData = [];
   let fetchTill = getNewEnd(start, end, interval);
 
