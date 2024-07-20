@@ -70,6 +70,7 @@ class Strategy {
   updateCapital() {
     broker.getBalance().then((res) => {
       this.capital = res?.bal?.available ?? 0;
+      logger("-------- Fetched Capital ---------", res);
     });
     return this.capital;
   }

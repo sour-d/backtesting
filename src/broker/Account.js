@@ -12,13 +12,12 @@ const restClient = new RestClientV5({
   // demoTrading: true,
 });
 
-const getBalance = async () => {
+const getBalance = async (logger) => {
   const balResponse = await restClient
     .getWalletBalance({
       accountType: "CONTRACT",
     })
     .catch((e) => {
-      this.logger("-------- Error in fetching Capital ---------", e);
       return {
         success: false,
         error: e,
@@ -36,8 +35,6 @@ const getBalance = async () => {
       total: coin.equity,
     };
   });
-
-  this.logger("-------- Fetched Capital ---------", balance);
 
   return balance;
 };
