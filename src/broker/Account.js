@@ -18,12 +18,13 @@ const getBalance = async () => {
       accountType: "CONTRACT",
     })
     .catch((e) => {
+      this.logger("-------- Error in fetching Capital ---------", e);
       return {
         success: false,
         error: e,
-        coin: "USDT",
       };
     });
+
   const balance = {
     success: true,
     accountType: balResponse.result.list[0].accountType,
@@ -35,7 +36,8 @@ const getBalance = async () => {
       total: coin.equity,
     };
   });
-  // return balResponse;
+
+  this.logger("-------- Fetched Capital ---------", balance);
 
   return balance;
 };

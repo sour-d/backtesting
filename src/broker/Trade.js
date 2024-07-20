@@ -9,9 +9,11 @@ const testnet = process.env.USE_TESTNET === "true";
 class Trade {
   symbol;
   clientInstance;
+  logger;
 
-  constructor(symbol) {
+  constructor(symbol, logger = console.log) {
     this.symbol = symbol;
+    this.logger = logger;
 
     const client = (testnet) => {
       const args = {
@@ -28,6 +30,7 @@ class Trade {
   }
 
   modifyPosition = async (sl) => {
+    this.logger("-------- Modifying Stop Loss ---------", sl);
     return this.clientInstance
       .setTradingStop({
         category: "linear",
@@ -36,6 +39,7 @@ class Trade {
         positionIdx: 0,
       })
       .then((response) => {
+        this.logger("-------- Modified Stop Loss Response ---------", res);
         return response;
       })
       .catch((error) => {
@@ -127,7 +131,10 @@ class Trade {
         };
       })
       .catch((error) => {
-        console.error(error);
+        this.logger(
+          "-------- Error in fetching Open Positions ---------",
+          error
+        );
       });
   };
 
@@ -177,11 +184,21 @@ class Trade {
         return response.result.list;
       })
       .catch((error) => {
-        console.error(error);
+        this.logger(
+          "-------- Error in fetching Active Orders ---------",
+          error
+        );
       });
   };
 
   placeOrder = async (quantity, price, tp, sl, side = "Buy") => {
+    this.logger("------ Placing New Order ------", {
+      quantity,
+      ...(price ? { price: price.toString() } : {}),
+      ...(tp ? { takeProfit: tp.toString() } : {}),
+      ...(sl ? { stopLoss: sl.toString() } : {}),
+      side,
+    });
     return this.clientInstance
       .submitOrder({
         category: "linear",
@@ -195,10 +212,15 @@ class Trade {
         ...(sl ? { stopLoss: sl.toString() } : {}),
       })
       .then((response) => {
+        let message = "------ New Order Placed ------";
+        if (!res || res.retMsg !== "OK") {
+          message = "------ New Order Failed ------";
+        }
+        this.logger(message, response);
         return response;
       })
       .catch((error) => {
-        console.error(error);
+        this.logger(error);
       });
     ``;
   };
@@ -215,10 +237,14 @@ class Trade {
         side,
       })
       .then((response) => {
+        if (!response || response.retMsg !== "OK")
+          return this.logger("-------- Position Exit Failed ---------", res);
+
+        this.logger("-------- Position Forced Exit ---------", res);
         return response;
       })
       .catch((error) => {
-        console.error(error);
+        this.logger(error);
       });
   };
 }

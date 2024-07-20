@@ -11,11 +11,8 @@ class MovingAverageStrategy extends Strategy {
     persistTradesFn,
     config = this.getDefaultConfig()
   ) {
-    super(stockName, timeFrame, persistTradesFn, config);
+    super(stockName, timeFrame, "MovingAverageStrategy", persistTradesFn, config);
     this.config = config;
-    this.strategyName = "MovingAverageStrategy";
-    this.timeFrame = timeFrame;
-    this.logger = logger(this);
   }
 
   static getDefaultConfig() {
@@ -67,7 +64,6 @@ class MovingAverageStrategy extends Strategy {
     const today = this.stock.now();
     const yesterday = this.stock.prev();
     if (
-      today.close < today.ma60close &&
       today.close < today.ma20low &&
       today.body < 0 &&
       yesterday.body < 0 &&

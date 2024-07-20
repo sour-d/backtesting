@@ -34,6 +34,7 @@ class Strategy {
   constructor(
     stockName,
     timeFrame,
+    strategyName,
     persistTradesFn,
     config = Strategy.getDefaultConfig()
   ) {
@@ -52,9 +53,11 @@ class Strategy {
       stockName
     );
     this.trades = new Trades(this);
-    this.broker = new broker.Trade(this.stockName);
     this.capital = this.updateCapital();
-    this.strategyName = "";
+    this.strategyName = strategyName;
+    this.timeFrame = timeFrame;
+    this.logger = logger(this);
+    this.broker = new broker.Trade(this.stockName, this.logger);
   }
 
   static getDefaultConfig() {
@@ -66,8 +69,7 @@ class Strategy {
 
   updateCapital() {
     broker.getBalance().then((res) => {
-      this.logger("-------- Capital Updated ---------", res);
-      this.capital = res?.bal?.total ?? 0;
+      this.capital = res?.bal?.available ?? 0;
     });
     return this.capital;
   }
@@ -81,9 +83,6 @@ class Strategy {
       totalCost <= this.capital ? maxStocksByRisk : maxStocksByCapital;
 
     return +affordableStocks.toFixed(2);
-
-    // when fraction buy is not possible
-    // return Math.floor(affordableStocks);
   }
 
   updateTrades(
@@ -129,7 +128,7 @@ class Strategy {
       );
       if (!currentOrderInfo?.orderId) {
         this.currentPosition.status = "Filled";
-        this.logger("------ Order Filled ------", this.currentPosition);
+        this.logger("------ Last Order Filled ------", this.currentPosition);
         return true;
       }
     });
@@ -150,15 +149,6 @@ class Strategy {
 
     this.updateCapital();
 
-    this.logger("------ Placing New Order ------", {
-      stockCanBeBought,
-      quantity,
-      price,
-      risk,
-      side,
-      isMarketOrder,
-    });
-
     this.broker
       .placeOrder(quantity, price, stopLoss, side, isMarketOrder)
       .then((res) => {
@@ -167,7 +157,6 @@ class Strategy {
           result: { orderId },
         } = res;
 
-        this.logger("------ New Order Placed ------", res);
         this.currentPosition = {
           transactionDate: this.stock.now(),
           price,
@@ -179,13 +168,6 @@ class Strategy {
         };
       });
     return true;
-    // this.updateTrades(
-    //   this.stock.now(),
-    //   price,
-    //   position,
-    //   risk * position,
-    //   transactionType
-    // );
   }
 
   async placeOrder(risk, price, tpPrice, side = "Buy", isLimitOrder = false) {
@@ -207,24 +189,12 @@ class Strategy {
     let quantity = this.stocksCanBeBought(risk, price);
     quantity = roundLikeSize(quantity, this.symbolInfo?.lotSizeFilter?.qtyStep);
 
-    this.logger("------ Placing New Order ------", {
-      price,
-      tpPrice,
-      stopLoss,
-      risk,
-      quantity,
-      side,
-      amount: quantity * price,
-    });
-
     const limitPrice = isLimitOrder ? price : 0;
     return await this.broker
       .placeOrder(quantity, limitPrice, tpPrice, stopLoss, side)
       .then((res) => {
-        if (!res || res.retMsg !== "OK") {
-          return this.logger("------ New Order Failed ------", res);
-        }
-        this.logger("------ New Order Placed ------", res);
+        if (!res || res.retMsg !== "OK") return;
+
         this.currentPosition = {
           transactionDate: this.stock.now(),
           price,
@@ -246,12 +216,8 @@ class Strategy {
     stopLoss = roundLikeSize(stopLoss, this.symbolInfo?.priceFilter?.tickSize);
 
     if (this.currentPosition.stopLoss === stopLoss) return;
-    this.logger("-------- Modifying Stop Loss ---------", {
-      oldStopLoss: this.currentPosition.stopLoss,
-      newStopLoss: stopLoss,
-    });
+
     return await this.broker.modifyPosition(stopLoss).then((res) => {
-      this.logger("-------- Modified Stop Loss Response ---------", res);
       if (!res) return;
       this.currentPosition.stopLoss = stopLoss;
     });
@@ -274,9 +240,7 @@ class Strategy {
 
   async forceExit(side) {
     return await this.broker.exitPosition(side).then((res) => {
-      if (!res)
-        return this.logger("-------- Position Exit Failed ---------", res);
-      this.logger("-------- Position Forced Exit ---------", res);
+      if (!res) return;
 
       this.updateCapital();
       this.currentPosition = null;
