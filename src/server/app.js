@@ -34,12 +34,33 @@ app.post("/api/live/trade", Trade);
 app.get("/api/live/result", Result);
 
 // web ---------------
+app.get("/", (_req, res) => {
+  res.sendFile(path.resolve("", "public", "index.html"));
+});
 app.get("/live", (_req, res) => {
   res.sendFile(path.resolve("", "public", "live/index.html"));
 });
 
-app.get("/live/result", (_req, res) => {
-  res.sendFile(path.resolve("", "public", "live/result.html"));
+// app.get("/live/result", (_req, res) => {
+//   res.sendFile(path.resolve("", "public", "live/result.html"));
+// });
+
+app.get("/live/quotes", (req, res) => {
+  const { file } = req.query;
+  if (file) {
+    const content = fs.readFileSync(path.resolve("", ".output", file), "utf8");
+    res.json(JSON.parse(content).reverse());
+    return;
+  }
+  const files = fs.readdirSync(".output");
+  res.send(
+    files
+      .map(
+        (file) =>
+          `<li><a href="/live/quotes?file=${file}" target="_blank">${file}</a></li>`
+      )
+      .join("")
+  );
 });
 
 app.use(express.static("public/live/js"));

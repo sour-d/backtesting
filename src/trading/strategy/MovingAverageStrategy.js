@@ -1,6 +1,5 @@
 import dayjs from "dayjs";
 import { Strategy } from "./Strategy.js";
-import logger from "../../server/logger.js";
 
 class MovingAverageStrategy extends Strategy {
   config;
@@ -11,7 +10,13 @@ class MovingAverageStrategy extends Strategy {
     persistTradesFn,
     config = this.getDefaultConfig()
   ) {
-    super(stockName, timeFrame, "MovingAverageStrategy", persistTradesFn, config);
+    super(
+      stockName,
+      timeFrame,
+      "MovingAverageStrategy",
+      persistTradesFn,
+      config
+    );
     this.config = config;
   }
 
@@ -38,7 +43,7 @@ class MovingAverageStrategy extends Strategy {
       buyingPrice = buyingPrice - this.config.limitPriceGap * buyingPrice;
       if (initialStopLoss >= buyingPrice) return;
 
-      logger("------ Buy condition matched -------", {
+      this.logger("------ Buy condition matched -------", {
         buyingPrice,
         initialStopLoss,
       });
@@ -74,7 +79,7 @@ class MovingAverageStrategy extends Strategy {
       sellingPrice = sellingPrice + this.config.limitPriceGap * sellingPrice;
       if (initialStopLoss <= sellingPrice) return;
 
-      logger("------ Sell condition matched -------", {
+      this.logger("------ Sell condition matched -------", {
         sellingPrice,
         initialStopLoss,
       });

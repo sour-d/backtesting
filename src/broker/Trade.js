@@ -213,7 +213,7 @@ class Trade {
       })
       .then((response) => {
         let message = "------ New Order Placed ------";
-        if (!res || res.retMsg !== "OK") {
+        if (!response || response.retMsg !== "OK") {
           message = "------ New Order Failed ------";
         }
         this.logger(message, response);

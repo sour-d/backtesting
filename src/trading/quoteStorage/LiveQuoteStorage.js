@@ -6,6 +6,7 @@ import {
 import ServiceProvider from "../../services/ServiceProvider";
 import { ExistingQuoteStorage } from "./ExistingQuoteStorage";
 import { fetchHistoricalData } from "../stock_data/downloader";
+import fs from "fs";
 
 const getTimeFrame = (timeFrame) => {
   return {
@@ -71,6 +72,11 @@ export class LiveQuoteStorage extends ExistingQuoteStorage {
     if (topic !== this.topic) return;
     const technicalQuote = addTechnicalIndicatorToLastQuote(data, this.quotes);
     this.quotes.push(technicalQuote);
+
+    fs.writeFileSync(`.output/${topic}.json`, JSON.stringify(this.quotes), {
+      flag: "w",
+      encoding: "utf-8",
+    });
     this.currentQuoteIndex++;
 
     this.listener();

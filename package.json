@@ -6,7 +6,7 @@
   "registry": "https://registry.npmjs.org",
   "license": "UNLICENSED",
   "scripts": {
-    "setup": "mkdir -p .output/data .output/dataWithTechnicalIndicators .output/result .log",
+    "setup": "mkdir -p .output .log",
     "clean": "rm -rf .output/*/*",
     "build:babel": "babel src --out-dir build",
     "dev": "nodemon --watch node build/server/app.js",

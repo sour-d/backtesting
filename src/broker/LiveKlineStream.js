@@ -2,6 +2,7 @@ import { EventEmitter } from "events";
 
 import { WebsocketClient } from "bybit-api";
 import logger from "../server/logger";
+import dayjs from "dayjs";
 
 export default class LiveQuoteProvider extends EventEmitter {
   timeFrameInMs;
@@ -23,6 +24,13 @@ export default class LiveQuoteProvider extends EventEmitter {
           type: "quote",
           topic: topic,
           data: {
+            date: dayjs(+quote.timestamp)
+              .tz("Asia/Kolkata")
+              .format("YYYY-MM-DD"),
+            time: dayjs(+quote.timestamp)
+              .tz("Asia/Kolkata")
+              .format("HH:mm:ss"),
+            dateUnix: +quote.end,
             open: +quote.open,
             close: +quote.close,
             high: +quote.high,
