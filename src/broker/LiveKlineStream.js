@@ -1,7 +1,9 @@
 import { EventEmitter } from "events";
 
-import { WebsocketClient } from "bybit-api";
 import dayjs from "dayjs";
+import dotenv from "dotenv";
+import { websocketClient } from "./Client";
+dotenv.config();
 
 export default class LiveQuoteProvider extends EventEmitter {
   timeFrameInMs;
@@ -12,10 +14,7 @@ export default class LiveQuoteProvider extends EventEmitter {
     super();
     this.onTimeout = onTimeout;
     this.testnet = testnet;
-    const wsClient = new WebsocketClient({
-      market: "v5",
-      testnet: this.testnet,
-    });
+    const wsClient = websocketClient();
     wsClient.on("update", ({ type, topic, data: quotes, ts, wsKey }) => {
       quotes.forEach((quote) => {
         if (!quote.confirm) return;
@@ -55,6 +54,10 @@ export default class LiveQuoteProvider extends EventEmitter {
     wsClient.on("close", (data) => {
       console.log("ws has been closed ", data?.wsKey);
       this.onTimeout();
+    });
+
+    wsClient.on("error", (err) => {
+      console.error("error", err);
     });
 
     this.wsClient = wsClient;

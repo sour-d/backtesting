@@ -9,7 +9,6 @@ const fetchHistoricalData = async (symbol, interval, start, end, logger) => {
     interval,
     startMs,
     endMs,
-    !!process.env.USE_TESTNET,
     logger
   );
 

@@ -26,6 +26,7 @@ const fetchInitialData = async (
   startingQuoteDay,
   logger
 ) => {
+  timeFrame = isNaN(Number(timeFrame)) ? timeFrame : Number(timeFrame);
   if (typeof timeFrame === "number" && timeFrame < 60)
     startingQuoteDay *= timeFrame;
   const end = dayjs();

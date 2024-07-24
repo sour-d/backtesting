@@ -9,10 +9,7 @@ export default class ServiceProvider {
 
   constructor() {
     ServiceProvider.instance = this;
-    this.liveQuoteProvider = new broker.klineStream(
-      [],
-      !!process.env.USE_TESTNET
-    );
+    this.liveQuoteProvider = new broker.klineStream([]);
     this.liveStrategyManager = new LiveStrategyManager();
   }
 

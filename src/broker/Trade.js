@@ -1,8 +1,6 @@
-import { RestClientV5 } from "bybit-api";
 import dotenv from "dotenv";
+import { getRestClient } from "./Client";
 dotenv.config();
-
-const testnet = process.env.USE_TESTNET === "true";
 
 class Trade {
   symbol;
@@ -13,18 +11,7 @@ class Trade {
     this.symbol = symbol;
     this.logger = logger;
 
-    const client = (testnet) => {
-      const args = {
-        testnet: testnet,
-        key: testnet ? process.env.TESTNET_API_KEY : process.env.API_KEY,
-        secret: testnet
-          ? process.env.TESTNET_API_SECRET
-          : process.env.API_SECRET,
-      };
-
-      return new RestClientV5(args);
-    };
-    this.clientInstance = client(testnet);
+    this.clientInstance = getRestClient();
   }
 
   modifyPosition = async (sl) => {

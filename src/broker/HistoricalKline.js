@@ -4,19 +4,12 @@ import _ from "lodash";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js";
 import timezone from "dayjs/plugin/timezone.js";
+import { getRestClient } from "./Client";
 
 dotenv.config();
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const restClient = (testnet) =>
-  new RestClientV5({
-    key: process.env.TESTNET_API_KEY,
-    secret: process.env.TESTNET_API_SECRET,
-    parseAPIRateLimits: true,
-    testnet: testnet,
-    // demoTrading: true,
-  });
 
 const getTimeFrame = (timeFrame) => {
   return {
@@ -72,7 +65,6 @@ const HistoricalKline = async (
   interval,
   start,
   end,
-  testnet,
   logger
 ) => {
   let allData = [];
@@ -80,7 +72,7 @@ const HistoricalKline = async (
 
   while (end >= fetchTill) {
     logger({ start, fetchTill });
-    await restClient(testnet)
+    await getRestClient()
       .getKline({ symbol, interval, start, end: fetchTill, limit: 1000 })
       .then((response) => {
         const data = formatResponse(response);

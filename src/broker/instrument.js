@@ -1,9 +1,10 @@
-const { RestClientV5 } = require("bybit-api");
+import dotenv from "dotenv";
+import { getRestClient } from "./Client";
+
+dotenv.config();
 
 const getInstrumentInfo = async (symbol) => {
-  const client = new RestClientV5({
-    testnet: true,
-  });
+  const client = getRestClient();
 
   return await client
     .getInstrumentsInfo({
