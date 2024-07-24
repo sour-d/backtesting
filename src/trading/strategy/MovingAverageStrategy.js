@@ -55,14 +55,30 @@ class MovingAverageStrategy extends Strategy {
 
   async longSquareOff() {
     const today = this.stock.now();
+    const yesterday = this.stock.prev();
 
-    if (today.superTrendDirection === "Sell") {
-      this.forceExit("Sell", today.close);
+    if (
+      today.ma20high > today.close &&
+      today.ma20high > today.open &&
+      today.body < 0
+    ) {
+      this.forceExit("Sell");
       return this.sell();
     }
 
-    const { ma20low: newSL } = today;
-    await this.updateStopLoss(newSL);
+    if (
+      yesterday.ma20high > yesterday.close &&
+      today.ma20high > today.close &&
+      today.body < 0
+    ) {
+      this.forceExit("Sell");
+      return this.sell();
+    }
+
+    if (today.superTrendDirection === "Sell") {
+      this.forceExit("Sell");
+      return this.sell();
+    }
   }
 
   async sell() {
@@ -91,14 +107,30 @@ class MovingAverageStrategy extends Strategy {
 
   async shortSquareOff() {
     const today = this.stock.now();
+    const yesterday = this.stock.prev();
 
-    if (today.superTrendDirection === "Buy") {
-      await this.forceExit("Buy", today.close);
+    if (
+      today.close > today.ma20low &&
+      today.open > today.ma20low &&
+      today.body > 0
+    ) {
+      this.forceExit("Sell");
       return this.buy();
     }
 
-    const { ma20high: newSL } = today;
-    await this.updateStopLoss(newSL);
+    if (
+      yesterday.close > yesterday.ma20low &&
+      today.close > today.ma20low &&
+      today.body > 0
+    ) {
+      this.forceExit("Sell");
+      return this.buy();
+    }
+
+    if (today.superTrendDirection === "Buy") {
+      await this.forceExit("Buy");
+      return this.buy();
+    }
   }
 }
 
