@@ -32,7 +32,7 @@ class MovingAverageStrategy extends Strategy {
     const today = this.stock.now();
     const yesterday = this.stock.prev();
 
-    console.log("buy condition", { today, yesterday });
+    this.logger("buy condition", { today, yesterday });
 
     if (
       today.close > today.ma20high &&
@@ -64,7 +64,7 @@ class MovingAverageStrategy extends Strategy {
       today.ma20high > today.open &&
       today.body < 0
     ) {
-      this.forceExit("Sell");
+      await this.forceExit("Sell");
       return this.sell();
     }
 
@@ -73,12 +73,12 @@ class MovingAverageStrategy extends Strategy {
       today.ma20high > today.close &&
       today.body < 0
     ) {
-      this.forceExit("Sell");
+      await this.forceExit("Sell");
       return this.sell();
     }
 
     if (today.superTrendDirection === "Sell") {
-      this.forceExit("Sell");
+      await this.forceExit("Sell");
       return this.sell();
     }
   }
@@ -87,7 +87,7 @@ class MovingAverageStrategy extends Strategy {
     const today = this.stock.now();
     const yesterday = this.stock.prev();
 
-    console.log("sell condition", { today, yesterday });
+    this.logger("sell condition", { today, yesterday });
 
     if (
       today.close < today.ma20low &&
@@ -119,7 +119,7 @@ class MovingAverageStrategy extends Strategy {
       today.open > today.ma20low &&
       today.body > 0
     ) {
-      this.forceExit("Buy");
+      await this.forceExit("Buy");
       return this.buy();
     }
 
@@ -128,7 +128,7 @@ class MovingAverageStrategy extends Strategy {
       today.close > today.ma20low &&
       today.body > 0
     ) {
-      this.forceExit("Buy");
+      await this.forceExit("Buy");
       return this.buy();
     }
 

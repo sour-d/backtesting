@@ -242,7 +242,7 @@ class Strategy {
   }
 
   async forceExit(side) {
-    console.log("inside Force Exit", {
+    this.logger("inside Force Exit", {
       today: this.stock.now(),
       yesterday: this.stock.prev(),
     });
