@@ -242,6 +242,10 @@ class Strategy {
   }
 
   async forceExit(side) {
+    console.log("inside Force Exit", {
+      today: this.stock.now(),
+      yesterday: this.stock.prev(),
+    });
     return await this.broker.exitPosition(side).then((res) => {
       if (!res) return;
 

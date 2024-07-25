@@ -223,9 +223,9 @@ class Trade {
       })
       .then((response) => {
         if (!response || response.retMsg !== "OK")
-          return this.logger("-------- Position Exit Failed ---------", res);
+          return this.logger("-------- Position Exit Failed ---------", response);
 
-        this.logger("-------- Position Forced Exit ---------", res);
+        this.logger("-------- Position Forced Exit ---------", response);
         return response;
       })
       .catch((error) => {
