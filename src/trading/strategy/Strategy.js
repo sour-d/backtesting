@@ -77,6 +77,12 @@ class Strategy {
   }
 
   stocksCanBeBought(riskForOneStock, buyingPrice) {
+    this.logger("-------- Calculating Stocks to Buy ---------", {
+      risk: riskForOneStock,
+      price: buyingPrice,
+      capital: this.capital,
+      risk: this.risk,
+    });
     const maxStocksByCapital = this.capital / buyingPrice;
     const maxStocksByRisk = this.risk / riskForOneStock;
 
@@ -257,6 +263,7 @@ class Strategy {
   async trade() {
     this.logger("-------- Got A Quote, Resuming Strategy ---------");
 
+    this.updateCapital();
     this.currentPosition && (await this.checkPosition());
 
     if (this.currentPosition?.side === "Buy") {
