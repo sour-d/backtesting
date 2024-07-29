@@ -38,19 +38,16 @@ class Strategy {
     persistTradesFn,
     config = Strategy.getDefaultConfig()
   ) {
-    this.riskPercentage = config.riskPercentage;
-    this.persistTradesFn = persistTradesFn;
-    this.risk = this.capital * (this.riskPercentage / 100);
     this.stockName = stockName;
-
-    this.currentPosition = null;
+    this.strategyName = strategyName;
+    this.capital = config.capital;
+    this.riskPercentage = config.riskPercentage;
+    this.risk = this.capital * (this.riskPercentage / 100);
+    this.timeFrame = timeFrame;
 
     this.trades = new Trades(this);
-    this.capital = this.updateCapital();
-    this.strategyName = strategyName;
-    this.timeFrame = timeFrame;
-    this.logger = logger(this);
     this.broker = new broker.Trade(this.stockName, this.logger);
+    this.logger = logger(this);
     this.stock = new LiveQuoteStorage(
       () => this.trade(),
       100,
@@ -59,6 +56,9 @@ class Strategy {
       stockName,
       this.logger
     );
+
+    this.currentPosition = null;
+    this.persistTradesFn = persistTradesFn;
   }
 
   static getDefaultConfig() {
