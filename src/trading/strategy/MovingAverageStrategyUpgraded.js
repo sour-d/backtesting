@@ -32,17 +32,16 @@ class MovingAverageStrategyUpgraded extends Strategy {
   async buy() {
     const today = this.stock.now();
     const yesterday = this.stock.prev();
-    const dayBeforeYesterday = this.stock.prev(2);
 
     this.logger("buy condition", { today, yesterday });
 
     if (
-      dayBeforeYesterday.close < dayBeforeYesterday.ma20close &&
-      yesterday.close > yesterday.ma20close &&
-      yesterday.body > 0
+      yesterday.close < yesterday.ma20close &&
+      today.close > today.ma20close &&
+      today.body > 0
     ) {
       let { close: buyingPrice } = today;
-      const initialStopLoss = Math.min(yesterday.low, dayBeforeYesterday.low);
+      const initialStopLoss = Math.min(today.low, yesterday.low);
       buyingPrice = buyingPrice - this.config.limitPriceGap * buyingPrice;
       if (initialStopLoss >= buyingPrice) return;
 
@@ -71,7 +70,6 @@ class MovingAverageStrategyUpgraded extends Strategy {
   async sell() {
     const today = this.stock.now();
     const yesterday = this.stock.prev();
-    const dayBeforeYesterday = this.stock.prev(2);
 
     this.logger("sell condition", { today, yesterday });
 
@@ -81,7 +79,7 @@ class MovingAverageStrategyUpgraded extends Strategy {
       today.body < 0
     ) {
       let { close: sellingPrice } = today;
-      const initialStopLoss = Math.max(yesterday.high, dayBeforeYesterday.high);
+      const initialStopLoss = Math.max(today.high, yesterday.high);
       sellingPrice = sellingPrice + this.config.limitPriceGap * sellingPrice;
       if (initialStopLoss <= sellingPrice) return;
 
