@@ -15,12 +15,12 @@ const fixTwoDecimal = (obj) => {
 const Indicators = (quote, technicalQuotes) => {
   calculateCandleProperty(quote);
 
-  movingAverageOf(quote, technicalQuotes, 20, "high");
-  movingAverageOf(quote, technicalQuotes, 20, "low");
-  movingAverageOf(quote, technicalQuotes, 60, "close");
+  movingAverageOf(quote, technicalQuotes, 20, "close");
+  // movingAverageOf(quote, technicalQuotes, 20, "low");
+  // movingAverageOf(quote, technicalQuotes, 60, "close");
 
-  calculateATR(quote, technicalQuotes, 10);
-  calculateSuperTrendForQuote(quote, technicalQuotes, 2);
+  // calculateATR(quote, technicalQuotes, 10);
+  // calculateSuperTrendForQuote(quote, technicalQuotes, 2);
   return quote;
 };
 
