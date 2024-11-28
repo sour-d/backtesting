@@ -209,6 +209,7 @@ class Strategy {
           price,
           quantity,
           risk,
+          stopLoss,
           side: side,
           status: "Pending",
           orderId: res.result.orderId,
