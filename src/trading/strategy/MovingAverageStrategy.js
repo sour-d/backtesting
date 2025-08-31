@@ -36,11 +36,10 @@ class MovingAverageStrategy extends Strategy {
     if (!today || !yesterday) return;
 
     if (
-      // today.close > today.ma20high &&
-      // today.body > 0 &&
-      // yesterday.body > 0 &&
-      // today.superTrendDirection === "Buy"
-      true
+      today.close > today.ma20high &&
+      today.body > 0 &&
+      yesterday.body > 0 &&
+      today.superTrendDirection === "Buy"
     ) {
       let buyingPrice = today.close;
       buyingPrice = buyingPrice - parseFloat(this.config.limitPriceGap) * buyingPrice;

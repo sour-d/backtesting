@@ -51,7 +51,7 @@ class Strategy {
     this.logger = logger(this);
     this.stock = new LiveQuoteStorage(
       () => this.trade(),
-      100,
+      200,
       stockName,
       timeFrame,
       stockName,

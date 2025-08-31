@@ -42,7 +42,7 @@ technicalData
 .output
 .env
 log.txt
-ping-status.txt
+ping-log.txt
 
 .log
-.log/ping-status.txt
+.log
