@@ -45,3 +45,4 @@ log.txt
 ping-status.txt
 
 .log
+.log/ping-status.txt

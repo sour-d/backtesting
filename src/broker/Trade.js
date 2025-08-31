@@ -190,7 +190,7 @@ class Trade {
         symbol: this.symbol,
         side: side,
         qty: quantity.toString(),
-        timeInForce: "PostOnly",
+        timeInForce: "GTC",
         orderType: !price ? "Market" : "Limit",
         ...(price ? { price: price.toString() } : {}),
         ...(tp ? { takeProfit: tp.toString() } : {}),

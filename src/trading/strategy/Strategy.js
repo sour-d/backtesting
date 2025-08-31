@@ -40,8 +40,9 @@ class Strategy {
   ) {
     this.stockName = stockName;
     this.strategyName = strategyName;
-    this.capital = config.capital;
-    this.riskPercentage = config.riskPercentage;
+    this.capital = parseInt(config.capital);
+    this.riskPercentage = parseFloat(config.riskPercentage);
+    this.precise = parseInt(config.precise) || 0;
     this.risk = this.capital * (this.riskPercentage / 100);
     this.timeFrame = timeFrame;
 
@@ -77,12 +78,6 @@ class Strategy {
   }
 
   stocksCanBeBought(riskForOneStock, buyingPrice) {
-    this.logger("-------- Calculating Stocks to Buy ---------", {
-      risk: riskForOneStock,
-      price: buyingPrice,
-      capital: this.capital,
-      risk: this.risk,
-    });
     const maxStocksByCapital = this.capital / buyingPrice;
     const maxStocksByRisk = this.risk / riskForOneStock;
 
@@ -90,7 +85,16 @@ class Strategy {
     const affordableStocks =
       totalCost <= this.capital ? maxStocksByRisk : maxStocksByCapital;
 
-    return +affordableStocks.toFixed(2);
+    this.logger("-------- Calculating Stocks to Buy ---------", {
+      risk: riskForOneStock,
+      price: buyingPrice,
+      capital: this.capital,
+      risk: this.risk,
+      quantity: +affordableStocks.toFixed(this.precise),
+      quantity_raw: affordableStocks
+    });
+
+    return +affordableStocks.toFixed(this.precise);
   }
 
   updateTrades(

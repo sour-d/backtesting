@@ -25,24 +25,26 @@ class MovingAverageStrategy extends Strategy {
       capital: 100,
       riskPercentage: 5,
       limitPriceGap: 0.0003,
+      precise: 0
     };
   }
 
   async buy() {
     const today = this.stock.now();
     const yesterday = this.stock.prev();
-
-    this.logger("buy condition", { today, yesterday });
+    this.logger("Buy Condition", { today, yesterday });
+    if (!today || !yesterday) return;
 
     if (
-      today.close > today.ma20high &&
-      today.body > 0 &&
-      yesterday.body > 0 &&
-      today.superTrendDirection === "Buy"
+      // today.close > today.ma20high &&
+      // today.body > 0 &&
+      // yesterday.body > 0 &&
+      // today.superTrendDirection === "Buy"
+      true
     ) {
-      let { close: buyingPrice } = today;
-      const { ma20low: initialStopLoss } = today;
-      buyingPrice = buyingPrice - this.config.limitPriceGap * buyingPrice;
+      let buyingPrice = today.close;
+      buyingPrice = buyingPrice - parseFloat(this.config.limitPriceGap) * buyingPrice;
+      const initialStopLoss = buyingPrice * 0.96;
       if (initialStopLoss >= buyingPrice) return;
 
       this.logger("------ Buy condition matched -------", {
@@ -59,27 +61,10 @@ class MovingAverageStrategy extends Strategy {
     const today = this.stock.now();
     const yesterday = this.stock.prev();
 
-    if (
-      today.ma20high > today.close &&
-      today.ma20high > today.open &&
-      today.body < 0
-    ) {
-      await this.forceExit("Sell");
-      return this.sell();
-    }
-
-    if (
-      yesterday.ma20high > yesterday.close &&
-      today.ma20high > today.close &&
-      today.body < 0
-    ) {
-      await this.forceExit("Sell");
-      return this.sell();
-    }
-
-    if (today.superTrendDirection === "Sell") {
-      await this.forceExit("Sell");
-      return this.sell();
+    if (!today || !yesterday) return;
+    const ma20high_yesterday = yesterday.ma20high;
+    if (ma20high_yesterday > today.low && today.body < 0) {
+      await this.updateStopLoss(ma20high_yesterday);
     }
   }
 
@@ -88,6 +73,7 @@ class MovingAverageStrategy extends Strategy {
     const yesterday = this.stock.prev();
 
     this.logger("sell condition", { today, yesterday });
+    if (!today || !yesterday) return;
 
     if (
       today.close < today.ma20low &&
@@ -95,16 +81,16 @@ class MovingAverageStrategy extends Strategy {
       yesterday.body < 0 &&
       today.superTrendDirection === "Sell"
     ) {
-      let { close: sellingPrice } = this.stock.now();
-      const { ma20high: initialStopLoss } = today;
-      sellingPrice = sellingPrice + this.config.limitPriceGap * sellingPrice;
+      let sellingPrice = today.close;
+      sellingPrice = sellingPrice + parseFloat(this.config.limitPriceGap) * sellingPrice;
+      const initialStopLoss = sellingPrice * 1.04;
+      const riskForOneStock = initialStopLoss - sellingPrice;
       if (initialStopLoss <= sellingPrice) return;
 
       this.logger("------ Sell condition matched -------", {
         sellingPrice,
         initialStopLoss,
       });
-      const riskForOneStock = initialStopLoss - sellingPrice;
       await this.placeOrder(riskForOneStock, sellingPrice, 0, "Sell", true);
       return true;
     }
@@ -114,27 +100,10 @@ class MovingAverageStrategy extends Strategy {
     const today = this.stock.now();
     const yesterday = this.stock.prev();
 
-    if (
-      today.close > today.ma20low &&
-      today.open > today.ma20low &&
-      today.body > 0
-    ) {
-      await this.forceExit("Buy");
-      return this.buy();
-    }
-
-    if (
-      yesterday.close > yesterday.ma20low &&
-      today.close > today.ma20low &&
-      today.body > 0
-    ) {
-      await this.forceExit("Buy");
-      return this.buy();
-    }
-
-    if (today.superTrendDirection === "Buy") {
-      await this.forceExit("Buy");
-      return this.buy();
+    if (!today || !yesterday) return;
+    const ma20low_yesterday = yesterday.ma20low;
+    if (today.high > ma20low_yesterday && today.body > 0) {
+      await this.updateStopLoss(ma20low_yesterday);
     }
   }
 }

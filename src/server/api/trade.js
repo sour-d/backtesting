@@ -26,7 +26,7 @@ export function Trade(req, res) {
     stockName,
     timeFrame,
     persistBackTestResult(stockName, timeFrame),
-    config
+    { ...config, capital: parseInt(config.capital), precise: parseInt(config.precise),  }
   );
   ServiceProvider.getInstance().liveStrategyManager.addStrategy(strategy);
   strategy.execute();
