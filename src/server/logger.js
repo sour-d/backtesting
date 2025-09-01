@@ -1,42 +1,28 @@
-import fs from "fs";
-import { logFileName, logFilePath } from "../utils";
+import pool from "../db/index";
+
+const isProd = process.env.ENV === "prod";
 
 export function clearLog() {
-  fs.writeFileSync("log.txt", "", {
-    flag: "w",
-    encoding: "utf-8",
-  });
+  if (isProd) {
+    pool.query("TRUNCATE TABLE logs");
+  }
 }
 
-const formatContent = (contents, identifier) => {
-  return (
-    "<p>" +
-    new Date().toISOString() +
-    " -----> " +
-    identifier +
-    " : " +
-    contents.join(", ") +
-    "</p>\n"
-  );
-};
-
 export default function logger({ stockName, timeFrame, strategyName }) {
-  const identifier = logFileName(stockName, timeFrame, strategyName);
-  const path = logFilePath(stockName, timeFrame, strategyName);
-  let content = "";
+  const identifier = `${stockName}-${timeFrame}-${strategyName}`;
 
-  return (...rawArgs) => {
-    const args = Array.from(rawArgs).map((arg) => {
-      if (typeof arg === "string") return arg;
-      if (typeof arg === "number") return arg;
-      return JSON.stringify(arg);
-    });
-
-    content = formatContent(args, identifier) + content;
-    fs.appendFileSync(path, content, {
-      flag: "w",
-      encoding: "utf-8",
-    });
-    console.log("DEBUG ----->", ...rawArgs);
+  return async (...rawArgs) => {
+    if (isProd) {
+      try {
+        await pool.query(
+          "INSERT INTO logs (identifier, data) VALUES ($1, $2)",
+          [identifier, JSON.stringify(rawArgs)]
+        );
+      } catch (err) {
+        console.error("Error inserting log into database", err);
+      }
+    } else {
+      console.log("DEBUG ----->", ...rawArgs);
+    }
   };
 }

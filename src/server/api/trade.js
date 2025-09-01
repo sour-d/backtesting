@@ -11,7 +11,7 @@ const persistBackTestResult = (stockName, timeFrame) => (outcomes) => {
   );
 };
 
-export function Trade(req, res) {
+export async function Trade(req, res) {
   const { strategyName, timeFrame, stockName, ...config } = req.body;
   const Strategy = strategies.find(
     (strategy) => strategy.name === strategyName
@@ -28,7 +28,7 @@ export function Trade(req, res) {
     persistBackTestResult(stockName, timeFrame),
     { ...config, capital: parseInt(config.capital), precise: parseInt(config.precise),  }
   );
-  ServiceProvider.getInstance().liveStrategyManager.addStrategy(strategy);
+  await ServiceProvider.getInstance().liveStrategyManager.addStrategy(strategy);
   strategy.execute();
 
   return res.json(prepareResponse("Strategy executed", false));

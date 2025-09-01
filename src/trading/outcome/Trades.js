@@ -9,12 +9,16 @@ export class Trades {
   tradeResults;
   flushedTill;
 
-  constructor({ capital, risk, stockName }) {
-    this.tradeResults = [];
+  constructor({ capital, risk, stockName, tradeResults = [] }) {
+    this.tradeResults = tradeResults;
     this.capital = capital;
     this.risk = risk;
     this.stock = stockName;
     this.flushedTill = 0;
+  }
+
+  static fromJSON(data) {
+    return new Trades(data);
   }
 
   totalTrades() {
@@ -65,7 +69,12 @@ export class Trades {
     return Papa.unparse(tradesCSV);
   }
   toJSON() {
-    return this.tradeResults;
+    return {
+      capital: this.capital,
+      risk: this.risk,
+      stockName: this.stock,
+      tradeResults: this.tradeResults,
+    };
   }
 
   flush() {

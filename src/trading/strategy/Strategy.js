@@ -30,14 +30,17 @@ class Strategy {
   symbolInfo;
   logger;
   strategyName;
+  id;
 
   constructor(
     stockName,
     timeFrame,
     strategyName,
     persistTradesFn,
-    config = Strategy.getDefaultConfig()
+    config = Strategy.getDefaultConfig(),
+    state = {}
   ) {
+    this.id = state.id;
     this.stockName = stockName;
     this.strategyName = strategyName;
     this.capital = parseInt(config.capital);
@@ -46,7 +49,7 @@ class Strategy {
     this.risk = this.capital * (this.riskPercentage / 100);
     this.timeFrame = timeFrame;
 
-    this.trades = new Trades(this);
+    this.trades = state.trades ? Trades.fromJSON(state.trades) : new Trades(this);
     this.broker = new broker.Trade(this.stockName, this.logger);
     this.logger = logger(this);
     this.stock = new LiveQuoteStorage(
@@ -58,8 +61,18 @@ class Strategy {
       this.logger
     );
 
-    this.currentPosition = null;
+    this.currentPosition = state.currentPosition || null;
     this.persistTradesFn = persistTradesFn;
+    this.symbolInfo = state.symbolInfo || null;
+  }
+
+  toJSON() {
+    return {
+      id: this.id,
+      trades: this.trades.toJSON(),
+      currentPosition: this.currentPosition,
+      symbolInfo: this.symbolInfo,
+    };
   }
 
   static getDefaultConfig() {

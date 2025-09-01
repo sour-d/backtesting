@@ -11,6 +11,7 @@ export default class ServiceProvider {
     ServiceProvider.instance = this;
     this.liveQuoteProvider = new broker.klineStream([]);
     this.liveStrategyManager = new LiveStrategyManager();
+    this.liveStrategyManager.loadStrategies();
   }
 
   static getInstance() {
