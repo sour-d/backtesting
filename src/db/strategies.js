@@ -1,4 +1,4 @@
-import pool from "./index";
+import pool from "./index.js";
 
 export const createStrategy = async (strategy) => {
   const { strategyName, stockName, timeFrame, config, state } = strategy;

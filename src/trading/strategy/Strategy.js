@@ -3,6 +3,7 @@ import { LiveQuoteStorage } from "../quoteStorage/LiveQuoteStorage.js";
 import broker from "../../broker";
 import logger from "../../server/logger.js";
 import getInstrumentInfo from "../../broker/instrument.js";
+import { createOrder as storeOrderDetails } from "../../db/orders.js";
 
 function float2int(value) {
   return value | 0;
@@ -110,21 +111,21 @@ class Strategy {
     return +affordableStocks.toFixed(this.precise);
   }
 
-  updateTrades(
-    transactionDate,
-    price,
-    quantity,
-    risk,
-    transactionType = "buy"
-  ) {
-    this.trades.addTradeResult(
-      transactionDate,
-      price,
-      quantity,
-      risk,
-      transactionType
-    );
-  }
+  // updateTrades(
+  //   transactionDate,
+  //   price,
+  //   quantity,
+  //   risk,
+  //   transactionType = "buy"
+  // ) {
+  //   this.trades.addTradeResult(
+  //     transactionDate,
+  //     price,
+  //     quantity,
+  //     risk,
+  //     transactionType
+  //   );
+  // }
 
   async buy() {
     throw new Error("Method not implemented.");
@@ -143,57 +144,23 @@ class Strategy {
   }
 
   async isLastOrderFilled() {
-    if (!this.currentPosition) return;
-    const { status, orderId } = this.currentPosition;
+    const { orderId, status } = this.currentPosition || {};
     if (status === "Filled") return true;
 
-    return await this.broker.activeOrders().then((res) => {
+    return await this.broker.activeOrders().then(async (res) => {
       const currentOrderInfo = res.find(
         (orderInfo) => orderInfo.orderId === orderId
       );
       if (!currentOrderInfo?.orderId) {
         this.currentPosition.status = "Filled";
+        await updateOrderStatus(orderId, "Filled");
         this.logger("------ Last Order Filled ------", this.currentPosition);
         return true;
       }
     });
   }
 
-  async placeTriggerOrder(risk, price, side = "Buy", isMarketOrder = false) {
-    if (await this.isLastOrderFilled()) return;
-    if (this.currentPosition) {
-      const { pastPrice, pastRisk } = this.currentPosition;
-      if (pastPrice === price && pastRisk === risk) return;
-      await cancelLastOrder();
-      this.currentPosition = null;
-    }
-
-    const stopLoss = side === "Buy" ? price - risk : price + risk;
-    const stockCanBeBought = this.stocksCanBeBought(risk, price);
-    const quantity = stockCanBeBought;
-
-    this.updateCapital();
-
-    this.broker
-      .placeOrder(quantity, price, stopLoss, side, isMarketOrder)
-      .then((res) => {
-        if (!res || res.retMsg !== "OK") return;
-        const {
-          result: { orderId },
-        } = res;
-
-        this.currentPosition = {
-          transactionDate: this.stock.now(),
-          price,
-          quantity,
-          risk,
-          side: side,
-          status: "Pending",
-          orderId,
-        };
-      });
-    return true;
-  }
+  cancelLastOrder() { }
 
   async placeOrder(risk, price, tpPrice, side = "Buy", isLimitOrder = false) {
     if (await this.isLastOrderFilled()) return;
@@ -205,7 +172,7 @@ class Strategy {
     if (this.currentPosition) {
       const { price: pastPrice, risk: pastRisk } = this.currentPosition;
       if (pastPrice === price && pastRisk === risk) return;
-      cancelLastOrder();
+      this.cancelLastOrder();
       this.currentPosition = null;
     }
 
@@ -221,16 +188,22 @@ class Strategy {
       .then((res) => {
         if (!res || res.retMsg !== "OK") return;
 
-        this.currentPosition = {
-          transactionDate: this.stock.now(),
-          price,
-          quantity,
-          risk,
-          stopLoss,
-          side: side,
-          status: "Pending",
+        const orderDetails = {
           orderId: res.result.orderId,
+          strategyId: this.id,
+          price,
+          timestamp: this.stock.now(),
+          quantity: quantity,
+          risk,
+          stoploss: stopLoss,
+          takeprofit: tpPrice,
+          orderType: isLimitOrder ? "Limit" : "Market",
+          side,
+          status: "Pending",
         };
+
+        this.currentPosition = orderDetails;
+        storeOrderDetails(orderDetails);
 
         this.updateCapital();
         return true;
