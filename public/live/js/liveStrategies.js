@@ -4,7 +4,7 @@ const fetchLiveStrategies = () => {
 
 const addLiveStrategies = async () => {
   const liveStrategies = await fetchLiveStrategies();
-  console.log(liveStrategies);
+  // Strategies data fetched successfully
 
   const tableTbody = document.getElementById("live-strategies-table");
   Object.keys(liveStrategies).forEach((strategyKey, index) => {

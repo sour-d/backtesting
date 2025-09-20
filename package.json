@@ -10,12 +10,15 @@
     "setup": "mkdir -p .output .log",
     "clean": "rm -rf .output/*/*",
     "build:babel": "babel src --out-dir build",
-    "dev": "nodemon --watch node build/server/app.js",
+    "dev": "node build/app.js",
     "predev": "yarn build:babel",
-    "start": "node build/server/app.js",
+    "dev:watch": "nodemon --watch src --exec \"yarn build:babel && node build/app.js\"",
+    "start": "node build/app.js",
     "prestart": "yarn clean && yarn setup && yarn build:babel",
-    "db:init": "node build/db/init-db.js",
-    "pre-db:init": "yarn build:babel"
+    "db:init": "node build/modules/database/schema.js",
+    "pre-db:init": "yarn build:babel",
+    "db:clear": "node build/modules/database/clear-db.js",
+    "pre-db:clear": "yarn build:babel"
   },
   "dependencies": {
     "axios": "^1.7.2",
