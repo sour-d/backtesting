@@ -1,4 +1,4 @@
-import pool from "../db/index.js";
+import pool from "../database/index.js";
 
 const isProd = process.env.ENV === "prod";
 

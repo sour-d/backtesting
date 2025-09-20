@@ -1,7 +1,7 @@
 import { Trades } from "../outcome/Trades.js";
 import { LiveQuoteStorage } from "../quoteStorage/LiveQuoteStorage.js";
-import logger from "../../server/logger.js";
-import getInstrumentInfo from "../../broker/instrument.js";
+import logger from "../../logger/index.js";
+import getInstrumentInfo from "../../exchange/instrument.js";
 
 /**
  * BaseStrategy abstract class that defines the core functionality and interface

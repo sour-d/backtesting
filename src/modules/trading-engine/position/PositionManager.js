@@ -1,4 +1,4 @@
-import { updateOrderStatus } from "../../db/orders.js";
+import { updateOrderStatus } from "../../database/orders.js";
 
 /**
  * Helper function to round a value to a specific size

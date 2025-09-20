@@ -3,7 +3,7 @@ import {
   addTechnicalIndicator,
   addTechnicalIndicatorToLastQuote,
 } from "../parser/restructureData.js";
-import ServiceProvider from "../../services/ServiceProvider.js";
+import ServiceProvider from "../../core-services/service-provider.js";
 import { ExistingQuoteStorage } from "./ExistingQuoteStorage.js";
 import { fetchHistoricalData } from "../stock_data/downloader.js";
 import fs from "fs";

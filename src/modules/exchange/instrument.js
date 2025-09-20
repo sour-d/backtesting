@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { getRestClient } from "./Client.js";
+import { getRestClient } from "./client.js";
 
 dotenv.config();
 

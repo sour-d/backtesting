@@ -1,6 +1,6 @@
-import getBalance from "./Account.js";
-import klineStream from "./LiveKlineStream.js";
-import HistoricalKline from "./HistoricalKline.js";
-import Trade from "./Trade.js";
+import getBalance from "./account.js";
+import klineStream from "./live-data-stream.js";
+import HistoricalKline from "./historical-data.js";
+import Trade from "./trade.js";
 
 export default { getBalance, klineStream, HistoricalKline, Trade };

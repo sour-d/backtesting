@@ -1,4 +1,4 @@
-import broker from "../../broker/index.js";
+import broker from "../../exchange/index.js";
 import dayjs from "dayjs";
 
 const fetchHistoricalData = async (symbol, interval, start, end, logger) => {

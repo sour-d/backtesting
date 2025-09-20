@@ -1,11 +1,6 @@
-import { Trades } from "../outcome/Trades.js";
-import { LiveQuoteStorage } from "../quoteStorage/LiveQuoteStorage.js";
 import _ from "lodash";
-import { v4 } from "uuid";
-import broker from "../../broker/index.js";
-import logger from "../../server/logger.js";
-import getInstrumentInfo from "../../broker/instrument.js";
-import { createOrder as storeOrderDetails } from "../../db/orders.js";
+import broker from "../../exchange/index.js";
+import getInstrumentInfo from "../../exchange/instrument.js";
 import { OrderManager } from "../order/OrderManager.js";
 import { PositionManager } from "../position/PositionManager.js";
 import { RiskManager } from "../risk/RiskManager.js";

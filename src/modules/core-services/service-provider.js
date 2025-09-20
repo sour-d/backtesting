@@ -1,5 +1,5 @@
-import broker from "../broker/index.js";
-import LiveStrategyManager from "./LiveStrategyManager.js";
+import broker from "../exchange/index.js";
+import LiveStrategyManager from "./strategy-manager.js";
 
 export default class ServiceProvider {
   static instance;

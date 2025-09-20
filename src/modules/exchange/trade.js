@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
-import dayjs from "dayjs";
-import { getRestClient } from "./Client.js";
+import { getRestClient } from "./client.js";
 dotenv.config();
 
 class Trade {

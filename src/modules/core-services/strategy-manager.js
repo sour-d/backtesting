@@ -1,8 +1,7 @@
-import { createStrategy, getAllStrategies, getSpecificStrategy, updateStrategyState } from "../db/strategies.js";
-import { logFileName } from "../utils.js";
-import strategies from "../trading/strategy/index.js";
-import StrategyFactory from "./StrategyFactory.js";
-import logger from "../server/logger.js";
+import { createStrategy, getAllStrategies, getSpecificStrategy, updateStrategyState } from "../database/strategies.js";
+import { logFileName } from "../utils/index.js";
+import StrategyFactory from "./strategy-factory.js";
+import logger from "../logger/index.js";
 
 const isProd = process.env.ENV === "prod";
 const STRATEGY_UPDATE_INTERVAL = process.env.STRATEGY_UPDATE_INTERVAL || 5000;

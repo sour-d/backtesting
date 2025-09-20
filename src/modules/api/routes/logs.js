@@ -1,5 +1,5 @@
 import express from 'express';
-import { getLogs, getStrategyLogs, getComponentLogs, getErrorLogs } from '../logUtils.js';
+import { getLogs, getStrategyLogs, getComponentLogs, getErrorLogs } from '../log-utils.js';
 
 const router = express.Router();
 

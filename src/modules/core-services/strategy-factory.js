@@ -3,8 +3,8 @@
  * Factory class for creating strategy instances with proper validation and error handling
  */
 
-import strategies from "../trading/strategy/index.js";
-import logger from "../server/logger.js";
+import strategies from "../trading-engine/strategy/index.js";
+import logger from "../logger/index.js";
 
 /**
  * Factory class for creating strategy instances

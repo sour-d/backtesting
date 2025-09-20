@@ -1,7 +1,7 @@
-import { prepareResponse } from "../../utils.js";
-import strategies from "../../trading/strategy/index.js";
+import { prepareResponse } from "../../utils/index.js";
+import strategies from "../../trading-engine/strategy/index.js";
 import fs from "fs";
-import ServiceProvider from "../../services/ServiceProvider.js";
+import ServiceProvider from "../../core-services/service-provider.js";
 
 const persistBackTestResult = (stockName, timeFrame) => (outcomes) => {
   fs.writeFileSync(

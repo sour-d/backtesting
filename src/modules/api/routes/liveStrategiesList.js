@@ -1,4 +1,4 @@
-import ServiceProvider from "../../services/ServiceProvider.js";
+import ServiceProvider from "../../core-services/service-provider.js";
 
 const liveStrategiesList = (req, res) => {
   const { liveStrategyManager } = ServiceProvider.getInstance();

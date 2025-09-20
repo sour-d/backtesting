@@ -1,4 +1,4 @@
-import strategies from "../../trading/strategy/index.js";
+import strategies from "../../trading-engine/strategy/index.js";
 
 export function StrategyList(req, res) {
   const strategyWithConfig = {};

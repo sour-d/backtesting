@@ -2,7 +2,7 @@ import { EventEmitter } from "events";
 
 import dayjs from "dayjs";
 import dotenv from "dotenv";
-import { websocketClient } from "./Client.js";
+import { websocketClient } from "./client.js";
 dotenv.config();
 
 export default class LiveQuoteProvider extends EventEmitter {

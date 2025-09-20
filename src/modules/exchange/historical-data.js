@@ -3,7 +3,7 @@ import _ from "lodash";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js";
 import timezone from "dayjs/plugin/timezone.js";
-import { getRestClient } from "./Client.js";
+import { getRestClient } from "./client.js";
 
 dotenv.config();
 dayjs.extend(utc);
