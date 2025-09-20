@@ -16,6 +16,7 @@
     "start": "node build/app.js",
     "prestart": "yarn clean && yarn setup && yarn build:babel",
     "db:init": "node build/modules/database/schema.js",
+    "db:drop": "node build/modules/database/clear-db.js",
     "pre-db:init": "yarn build:babel",
     "db:clear": "node build/modules/database/clear-db.js",
     "pre-db:clear": "yarn build:babel"
