@@ -1,4 +1,3 @@
-import dayjs from "dayjs";
 import { Strategy } from "./Strategy.js";
 
 /**
@@ -10,14 +9,12 @@ class MovingAverageStrategy extends Strategy {
   constructor(
     stockName,
     timeFrame,
-    persistTradesFn,
     config = this.getDefaultConfig()
   ) {
     super(
       stockName,
       timeFrame,
       "MovingAverageStrategy",
-      persistTradesFn,
       config
     );
     this.config = config;
@@ -35,7 +32,7 @@ class MovingAverageStrategy extends Strategy {
   async buy() {
     const today = this.stock.now();
     const yesterday = this.stock.prev();
-    this.logger.info("Buy Condition", { today, yesterday });
+    this.logger.info("Buy Condition check", { today, yesterday });
     if (!today || !yesterday) return;
 
     if (
@@ -49,7 +46,7 @@ class MovingAverageStrategy extends Strategy {
       const initialStopLoss = buyingPrice * 0.96;
       if (initialStopLoss >= buyingPrice) return;
 
-      this.logger.info("------ Buy condition matched -------", {
+      this.logger.info("Buy condition matched", {
         buyingPrice,
         initialStopLoss,
       });
@@ -65,6 +62,7 @@ class MovingAverageStrategy extends Strategy {
 
     if (!today || !yesterday) return;
     const ma20high_yesterday = yesterday.ma20high;
+    this.logger.info("Long Square off check", { today, ma20high_yesterday });
     if (ma20high_yesterday > today.low && today.body < 0) {
       await this.updateStopLoss(ma20high_yesterday);
     }
@@ -74,7 +72,7 @@ class MovingAverageStrategy extends Strategy {
     const today = this.stock.now();
     const yesterday = this.stock.prev();
 
-    this.logger.info("sell condition", { today, yesterday });
+    this.logger.info("Sell Condition Check", { today, yesterday });
     if (!today || !yesterday) return;
 
     if (
@@ -89,7 +87,7 @@ class MovingAverageStrategy extends Strategy {
       const riskForOneStock = initialStopLoss - sellingPrice;
       if (initialStopLoss <= sellingPrice) return;
 
-      this.logger.info("------ Sell condition matched -------", {
+      this.logger.info("Sell condition matched", {
         sellingPrice,
         initialStopLoss,
       });
@@ -104,6 +102,7 @@ class MovingAverageStrategy extends Strategy {
 
     if (!today || !yesterday) return;
     const ma20low_yesterday = yesterday.ma20low;
+    this.logger.info("Short Square off check", { today, ma20low_yesterday });
     if (today.high > ma20low_yesterday && today.body > 0) {
       await this.updateStopLoss(ma20low_yesterday);
     }

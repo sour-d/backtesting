@@ -6,13 +6,11 @@ import broker from "../../exchange/index.js";
 class RiskManager {
   /**
    * Constructor for the RiskManager class
-   * @param {string} stockName - The name of the stock
    * @param {Function} logger - Logger function
    * @param {Object} config - Configuration for risk management
    * @param {Object} state - Optional state to restore from persistence
    */
-  constructor(stockName, logger, config = {}, state = {}) {
-    this.stockName = stockName;
+  constructor(logger, config = {}, state = {}) {
     this.logger = logger;
     this.capital = state.capital || parseInt(config.capital) || 0;
     this.riskPercentage = state.riskPercentage || parseFloat(config.riskPercentage) || 5;
@@ -26,7 +24,6 @@ class RiskManager {
    */
   toJSON() {
     return {
-      stockName: this.stockName,
       capital: this.capital,
       riskPercentage: this.riskPercentage,
       precise: this.precise,
@@ -41,7 +38,7 @@ class RiskManager {
   updateCapital() {
     broker.getBalance().then((res) => {
       this.capital = res?.bal?.available ?? 0;
-      this.logger.info("-------- Fetched Capital ---------", res);
+      this.logger.info("Fetched Capital", res);
     }).catch((err) => {
       this.logger.error("Failed to fetch capital", err);
     });
@@ -97,23 +94,23 @@ class RiskManager {
    * @returns {number} The number of stocks that can be bought
    */
   stocksCanBeBought(riskForOneStock, buyingPrice) {
-    const maxStocksByCapital = this.capital / buyingPrice;
-    const maxStocksByRisk = this.risk / riskForOneStock;
+    const maxStocksByCapital = parseFloat(this.capital / buyingPrice);
+    const maxStocksByRisk = parseFloat(this.risk / riskForOneStock);
 
     const totalCost = maxStocksByRisk * buyingPrice;
     const affordableStocks =
       totalCost <= this.capital ? maxStocksByRisk : maxStocksByCapital;
 
-    this.logger.info("-------- Calculating Stocks to Buy ---------", {
+    this.logger.info("Stocks quantity calculation", {
       risk: riskForOneStock,
       price: buyingPrice,
       capital: this.capital,
       risk: this.risk,
-      quantity: +affordableStocks.toFixed(this.precise),
+      quantity: affordableStocks.toFixed(this.precise),
       quantity_raw: affordableStocks
     });
 
-    return +affordableStocks.toFixed(this.precise);
+    return this.precise === 0 ? parseInt(affordableStocks) : affordableStocks.toFixed(this.precise);
   }
 }
 

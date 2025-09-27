@@ -77,15 +77,11 @@ class LiveStrategyManager {
         this.log.info(`Loading strategy: ${strategyName} for ${stockName} (${timeFrame})`);
 
         try {
-          // Create a dummy persist function for loaded strategies
-          const persistTradesFn = () => { };
-
           // Use the factory to create the strategy with validation
           const strategy = StrategyFactory.createStrategy(
             strategyName,
             stockName,
             timeFrame,
-            persistTradesFn,
             config,
             { ...state, id }
           );
@@ -252,12 +248,10 @@ class LiveStrategyManager {
 
       // Create new strategy instance with saved state
       const { id, config, state } = dbStrategy;
-      const persistTradesFn = () => { };
       const recoveredStrategy = StrategyFactory.createStrategy(
         strategyName,
         stockName,
         timeFrame,
-        persistTradesFn,
         config,
         { ...state, id }
       );

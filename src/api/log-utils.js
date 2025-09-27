@@ -1,4 +1,4 @@
-import pool from "../database/index.js";
+import pool from "../modules/database/index.js";
 
 /**
  * Utility functions for log management and retrieval

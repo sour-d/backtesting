@@ -3,6 +3,7 @@ import { EventEmitter } from "events";
 import dayjs from "dayjs";
 import dotenv from "dotenv";
 import { websocketClient } from "./client.js";
+import logger from "../logger/index.js";
 dotenv.config();
 
 export default class LiveQuoteProvider extends EventEmitter {
@@ -12,6 +13,8 @@ export default class LiveQuoteProvider extends EventEmitter {
 
   constructor(onTimeout, testnet = true) {
     super();
+
+    this.log = logger ? logger({ component: 'Websocket connection' }) : console;
     this.onTimeout = onTimeout;
     this.testnet = testnet;
     const wsClient = websocketClient();
@@ -40,29 +43,24 @@ export default class LiveQuoteProvider extends EventEmitter {
       });
     });
     wsClient.on("open", (data) => {
-      console.log("connection opened open:", data.wsKey);
+      this.log.info("WebSocket connection opened:", data.wsKey);
     });
     wsClient.on("response", (data) => {
-      console.log("log response: ", JSON.stringify(data, null, 2));
+      this.log.info("WebSocket response: ", JSON.stringify(data, null, 2));
     });
     wsClient.on("reconnect", ({ wsKey }) => {
-      console.log("ws automatically reconnecting.... ", wsKey);
+      this.log.info("WebSocket automatically reconnecting.... ", wsKey);
     });
-
-    // Note: This class still uses console.log for WebSocket events
-    // as these are system-level events that occur before any strategy-specific
-    // logger would be available. In a future update, we could inject a logger
-    // instance for these events.
     wsClient.on("reconnected", (data) => {
-      console.log("ws has reconnected ", data?.wsKey);
+      this.log.info("WebSocket has reconnected ", data?.wsKey);
     });
     wsClient.on("close", (data) => {
-      console.log("ws has been closed ", data?.wsKey);
+      this.log.info("WebSocket has been closed ", data?.wsKey);
       this.onTimeout();
     });
 
     wsClient.on("error", (err) => {
-      console.error("error", err);
+      this.log.error("WebSocket error", err);
     });
 
     this.wsClient = wsClient;
@@ -71,11 +69,13 @@ export default class LiveQuoteProvider extends EventEmitter {
   subscribe(symbol, timeFrame) {
     const topic = `kline.${timeFrame}.${symbol.toUpperCase()}`;
     this.wsClient.subscribeV5(topic, "linear");
+    this.log.info(`Subscribed to ${topic}`);
   }
 
   unsubscribe(symbol, timeFrame) {
     const topic = `kline.${timeFrame}.${symbol.toUpperCase()}`;
     this.wsClient.unsubscribeV5(topic, "linear");
+    this.log.info(`Unsubscribed from ${topic}`);
   }
 }
 

@@ -16,13 +16,12 @@ class StrategyFactory {
    * @param {string} strategyName - Name of the strategy class
    * @param {string} stockName - Stock symbol
    * @param {string} timeFrame - Time frame for the strategy
-   * @param {Function} persistTradesFn - Function to persist trades
    * @param {Object} config - Strategy configuration
    * @param {Object} state - Strategy state for restoration
    * @returns {Object} Strategy instance
    * @throws {Error} If strategy class not found or validation fails
    */
-  static createStrategy(strategyName, stockName, timeFrame, persistTradesFn, config = {}, state = {}) {
+  static createStrategy(strategyName, stockName, timeFrame, config = {}, state = {}) {
     // Find the strategy class
     const Strategy = strategies.find(strategy => strategy.name === strategyName);
 
@@ -41,7 +40,6 @@ class StrategyFactory {
       return new Strategy(
         stockName,
         timeFrame,
-        persistTradesFn,
         validatedConfig,
         state
       );

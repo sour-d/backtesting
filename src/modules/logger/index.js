@@ -33,56 +33,51 @@ export function clearLog() {
  */
 export default function logger({ component, stockName = '', timeFrame = '', strategyName = '' }) {
   const identifier = [component];
-  
+
   if (stockName) identifier.push(stockName);
   if (timeFrame) identifier.push(timeFrame);
   if (strategyName) identifier.push(strategyName);
-  
+
   const identifierStr = identifier.join('-');
-  
+
   /**
    * Log a message with specified level
    * @param {string} level - Log level (debug, info, warn, error)
    * @param {Array} args - Arguments to log
    * @private
    */
-  const _log = async (level, ...args) => {
+  const _log = async (level, message, data = {}) => {
     // Skip if log level is below minimum
     if (LOG_LEVELS[level] < LOG_LEVELS[DEFAULT_MIN_LEVEL]) {
       return;
     }
-    
+
+    if (process.env.SHOW_LOGS_IN_CONSOLE === 'true') {
+      console.log(message, Object.keys(data).length ? data : '');
+    }
+
     const timestamp = new Date().toISOString();
-    const logData = {
-      timestamp,
-      level,
-      component,
-      stockName,
-      timeFrame,
-      strategyName,
-      message: args.join(' ')
-    };
-    
+
     if (isProd) {
       try {
         await pool.query(
-          "INSERT INTO logs (identifier, level, data) VALUES ($1, $2, $3)",
-          [identifierStr, level, JSON.stringify(logData)]
+          "INSERT INTO logs (identifier, level, message, data) VALUES ($1, $2, $3, $4)",
+          [identifierStr, level, message, JSON.stringify(data)]
         );
       } catch (err) {
         console.error("Error inserting log into database", err);
       }
     } else {
       const prefix = `[${timestamp}] [${level.toUpperCase()}] [${identifierStr}]`;
-      console.log(prefix, ...args);
+      console.log(prefix, message, data);
     }
   };
-  
+
   // Return logger object with level-specific methods
   return {
-    debug: (...args) => _log('debug', ...args),
-    info: (...args) => _log('info', ...args),
-    warn: (...args) => _log('warn', ...args),
-    error: (...args) => _log('error', ...args)
+    debug: (message, data) => _log('debug', message, data),
+    info: (message, data) => _log('info', message, data),
+    warn: (message, data) => _log('warn', message, data),
+    error: (message, data) => _log('error', message, data)
   };
 }

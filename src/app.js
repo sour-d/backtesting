@@ -7,12 +7,12 @@ import * as dotenv from "dotenv";
 // import backtestRoutes from "./routes/backtest.routes";
 // import paperTradeRoutes from "./routes/paperTrade.routes";
 import fs from "fs";
-import startPingInInterval from "./modules/api/ping.js";
-import { StrategyList } from "./modules/api/routes/strategyList.js";
-import { Trade } from "./modules/api/routes/trade.js";
-import { Result } from "./modules/api/routes/result.js";
-import liveStrategiesList from "./modules/api/routes/liveStrategiesList.js";
-import logsRouter from "./modules/api/routes/logs.js";
+import startPingInInterval from "./api/ping.js";
+import { StrategyList } from "./api/routes/strategyList.js";
+import { Trade } from "./api/routes/trade.js";
+import { Result } from "./api/routes/result.js";
+import liveStrategiesList from "./api/routes/liveStrategiesList.js";
+import logsRouter from "./api/routes/logs.js";
 import logger from "./modules/logger/index.js";
 import ServiceProvider from "./modules/core-services/service-provider.js";
 

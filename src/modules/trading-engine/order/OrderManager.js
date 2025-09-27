@@ -1,3 +1,4 @@
+import { createTrade } from "../../database/trades.js";
 import broker from "../../exchange/index.js";
 import { createOrder as storeOrderDetails } from "../../database/orders.js";
 
@@ -27,15 +28,13 @@ function removeExtraZeroInFloat(float) {
 class OrderManager {
   /**
    * Constructor for the OrderManager class
-   * @param {string} stockName - The name of the stock to trade
    * @param {Function} logger - Logger function
    * @param {Object} positionManager - Position manager instance
    * @param {Object} riskManager - Risk manager instance
    * @param {Object} quoteStorage - Quote storage instance
    * @param {Object} state - Optional state to restore from persistence
    */
-  constructor(stockName, logger, positionManager, riskManager, quoteStorage, state = {}) {
-    this.stockName = stockName;
+  constructor(logger, positionManager, riskManager, quoteStorage, state = {}) {
     this.logger = logger;
     this.broker = new broker.Trade(this.stockName, this.logger);
     this.positionManager = positionManager;
@@ -83,10 +82,21 @@ class OrderManager {
     quantity = roundLikeSize(quantity, symbolInfo?.lotSizeFilter?.qtyStep);
 
     const limitPrice = isLimitOrder ? price : 0;
+    this.logger.info("Placing Order", {
+      quantity,
+      limitPrice,
+      tpPrice,
+      stopLoss,
+      side,
+      isLimitOrder,
+    });
     return await this.broker
       .placeOrder(quantity, limitPrice, tpPrice, stopLoss, side)
       .then((res) => {
-        if (!res || res.retMsg !== "OK") return;
+        if (!res || res.retMsg !== "OK") {
+          this.logger.error("Order placement failed", { response: res });
+          return false;
+        };
 
         const orderDetails = {
           orderId: res.result.orderId,
@@ -101,6 +111,7 @@ class OrderManager {
           side,
           status: "Pending",
         };
+        this.logger.info("Order placed successfully", orderDetails);
 
         this.positionManager.setCurrentPosition(orderDetails);
         storeOrderDetails(orderDetails);
@@ -121,15 +132,29 @@ class OrderManager {
     const { orderId, status } = currentPosition;
     if (status === "Filled") return true;
 
+    this.logger.info("Checking last order status", { orderId });
     return await this.broker.activeOrders().then(async (res) => {
       const currentOrderInfo = res.find(
         (orderInfo) => orderInfo.orderId === orderId
       );
       if (!currentOrderInfo?.orderId) {
         this.positionManager.updatePositionStatus("Filled");
-        this.logger.info("------ Last Order Filled ------", currentPosition);
+        this.logger.info("Last Order Filled", { orderId });
+
+        // Create a trade record
+        const trade = {
+          orderId: currentPosition.orderId,
+          strategyId: currentPosition.strategyId,
+          price: currentPosition.price, // Assuming fill price is order price
+          timestamp: new Date(), // Assuming fill time is now
+          qty: currentPosition.quantity,
+          side: currentPosition.side,
+        };
+        await createTrade(trade);
+
         return true;
       }
+      this.logger.info("Last Order Not Filled Yet", { orderId });
     });
   }
 

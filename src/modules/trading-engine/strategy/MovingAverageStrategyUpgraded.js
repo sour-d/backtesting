@@ -11,14 +11,12 @@ class MovingAverageStrategyUpgraded extends Strategy {
   constructor(
     stockName,
     timeFrame,
-    persistTradesFn,
     config = this.getDefaultConfig()
   ) {
     super(
       stockName,
       timeFrame,
       "MovingAverageStrategyUpgraded",
-      persistTradesFn,
       config
     );
     this.config = config;

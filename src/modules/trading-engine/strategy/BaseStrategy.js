@@ -10,7 +10,6 @@ import getInstrumentInfo from "../../exchange/instrument.js";
 class BaseStrategy {
   stock;
   trades;
-  persistTradesFn;
   stockName;
   logger;
   strategyName;
@@ -22,7 +21,6 @@ class BaseStrategy {
    * @param {string} stockName - The name of the stock to trade
    * @param {string} timeFrame - The time frame for the strategy
    * @param {string} strategyName - The name of the strategy
-   * @param {Function} persistTradesFn - Function to persist trade results
    * @param {Object} config - Configuration for the strategy
    * @param {Object} state - Current state of the strategy
    */
@@ -30,7 +28,6 @@ class BaseStrategy {
     stockName,
     timeFrame,
     strategyName,
-    persistTradesFn,
     config = {},
     state = {}
   ) {
@@ -57,8 +54,6 @@ class BaseStrategy {
       stockName,
       this.logger
     );
-
-    this.persistTradesFn = persistTradesFn;
   }
 
   /**
@@ -121,7 +116,7 @@ class BaseStrategy {
    * @returns {Promise<void>}
    */
   async trade() {
-    this.logger.info("-------- Got A Quote, Resuming Strategy ---------");
+    this.logger.info("Candle Received", { time: this.stock.now() });
 
     // Check if we have an open position
     const positionManager = this.getPositionManager();
@@ -150,10 +145,9 @@ class BaseStrategy {
    * @returns {Promise<void>}
    */
   async execute() {
-    this.logger.info("-------- Strategy Started ---------");
+    this.logger.info("Strategy Started Execution");
     
-    const symbolInfo = await getInstrumentInfo(this.stockName);
-    this.getPositionManager().setSymbolInfo(symbolInfo);
+    // const symbolInfo = await getInstrumentInfo(this.stockName);
   }
 
   /**

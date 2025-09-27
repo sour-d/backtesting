@@ -6,19 +6,6 @@ import { PositionManager } from "../position/PositionManager.js";
 import { RiskManager } from "../risk/RiskManager.js";
 import { BaseStrategy } from "./BaseStrategy.js";
 
-function float2int(value) {
-  return value | 0;
-}
-
-function removeExtraZeroInFloat(float) {
-  return Number(float.toFixed(8));
-}
-
-function roundLikeSize(value, size = 0.00001) {
-  size = Number(size);
-  return removeExtraZeroInFloat(value - removeExtraZeroInFloat(value % size));
-}
-
 /**
  * Strategy class that extends BaseStrategy and implements the strategy pattern
  * This class is maintained for backward compatibility
@@ -28,39 +15,34 @@ class Strategy extends BaseStrategy {
     stockName,
     timeFrame,
     strategyName,
-    persistTradesFn,
     config = Strategy.getDefaultConfig(),
     state = {}
   ) {
-    super(stockName, timeFrame, strategyName, persistTradesFn, config, state);
+    super(stockName, timeFrame, strategyName, config, state);
 
     // Initialize properties for backward compatibility
     this.id = state.id;
     this.capital = parseInt(config.capital);
     this.riskPercentage = parseFloat(config.riskPercentage);
     this.precise = parseInt(config.precise) || 0;
-    this.risk = this.capital * (this.riskPercentage / 100);
+    this.risk = this.capital * (this.riskPercentage / 100); // need to fix
 
     // Initialize broker
     this.broker = new broker.Trade(this.stockName, this.logger);
 
     // Initialize managers with state if available
     const riskManagerState = state.riskManager || {};
-    this._riskManager = new RiskManager(stockName, this.logger, config, riskManagerState);
+    this._riskManager = new RiskManager(this.logger, config, riskManagerState);
 
     const positionManagerState = state.positionManager || {};
-    this._positionManager = new PositionManager(this.id, stockName, this.logger, this.broker, positionManagerState);
+    this._positionManager = new PositionManager( this.logger, this.broker, this.id, positionManagerState);
 
     const orderManagerState = state.orderManager || {};
-    this._orderManager = new OrderManager(stockName, this.logger, this._positionManager, this._riskManager, this.stock, orderManagerState);
+    this._orderManager = new OrderManager( this.logger, this._positionManager, this._riskManager, this.stock, orderManagerState);
 
     // For backward compatibility
     if (state.currentPosition && !positionManagerState.currentPosition) {
       this._positionManager.setCurrentPosition(state.currentPosition);
-    }
-
-    if (state.symbolInfo && !positionManagerState.symbolInfo) {
-      this._positionManager.setSymbolInfo(state.symbolInfo);
     }
   }
 
@@ -79,7 +61,6 @@ class Strategy extends BaseStrategy {
 
   static getDefaultConfig() {
     return {
-      // capital: 100000,
       riskPercentage: 5,
     };
   }
@@ -163,14 +144,12 @@ class Strategy extends BaseStrategy {
   }
 
   async execute() {
-    this.logger.info("-------- Strategy Started ---------");
+    this.logger.info("Strategy Started Execution");
 
     try {
       this.symbolInfo = await getInstrumentInfo(this.stockName, this.logger);
-      this._positionManager.setSymbolInfo(this.symbolInfo);
-      this.logger.debug("Symbol info set in position manager", this.symbolInfo);
     } catch (error) {
-      this.logger.error("Failed to get instrument info", error);
+      this.logger.error("Failed to get symbol info", {symbol: this.symbol, error});
     }
   }
 

@@ -11,7 +11,7 @@ const getInstrumentInfo = async (symbol, loggerInstance) => {
   };
 
   const client = getRestClient();
-  log.info(`Fetching instrument info for ${symbol}`);
+  log.info('Fetching symbol info');
 
   return await client
     .getInstrumentsInfo({
@@ -20,14 +20,14 @@ const getInstrumentInfo = async (symbol, loggerInstance) => {
     })
     .then((response) => {
       if (response.retMsg !== "OK") {
-        log.warn(`Failed to get instrument info for ${symbol}`, response.retMsg);
+        log.warn('Failed to get symbol info', { symbol, response });
         return {};
       }
 
       return response.result.list[0];
     })
     .catch((error) => {
-      log.error(`Error fetching instrument info for ${symbol}`, error);
+      log.warn('Failed to get symbol info', { symbol, error });
       return {};
     });
 };

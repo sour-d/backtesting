@@ -26,57 +26,31 @@ function removeExtraZeroInFloat(float) {
 class PositionManager {
   /**
    * Constructor for the PositionManager class
-   * @param {string} strategyId - The ID of the strategy
-   * @param {string} stockName - The name of the stock
    * @param {Function} logger - Logger function
    * @param {Object} broker - Broker instance
    * @param {Object} state - Optional state to restore from persistence
    */
-  constructor(strategyId, stockName, logger, broker, state = {}) {
-    this.strategyId = strategyId;
-    this.stockName = stockName;
+  constructor(logger, broker, strategyId, state = {}) {
     this.logger = logger;
     this.broker = broker;
+    this.strategyId = strategyId;
     this.currentPosition = state.currentPosition || null;
-    this.symbolInfo = state.symbolInfo || null;
   }
-  
+
+  getStrategyId() {
+    return this.strategyId;
+  }
+
   /**
    * Convert the position manager to JSON for persistence
    * @returns {Object} JSON representation of the position manager
    */
   toJSON() {
     return {
-      strategyId: this.strategyId,
-      stockName: this.stockName,
       currentPosition: this.currentPosition,
-      symbolInfo: this.symbolInfo
     };
   }
 
-  /**
-   * Get the strategy ID
-   * @returns {string} The strategy ID
-   */
-  getStrategyId() {
-    return this.strategyId;
-  }
-
-  /**
-   * Set the symbol information
-   * @param {Object} symbolInfo - Information about the symbol
-   */
-  setSymbolInfo(symbolInfo) {
-    this.symbolInfo = symbolInfo;
-  }
-
-  /**
-   * Get the symbol information
-   * @returns {Object} The symbol information
-   */
-  getSymbolInfo() {
-    return this.symbolInfo;
-  }
 
   /**
    * Get the current position
@@ -122,7 +96,7 @@ class PositionManager {
       if (res.size === 0) {
         const { stopLoss } = this.currentPosition;
         this.logger.info(
-          `-------- Position already exited with Stop Loss ${stopLoss} ---------`
+          'Position already exited', { ...this.currentPosition, exitPrice: stopLoss }
         );
 
         this.clearPosition();
@@ -139,9 +113,12 @@ class PositionManager {
   async forceExit(side) {
     if (!this.currentPosition) return;
 
-    this.logger.info("inside Force Exit");
+    this.logger.info("Force Exiting Position", this.currentPosition);
     return await this.broker.exitPosition(side).then((res) => {
-      if (!res) return;
+      if (!res) {
+        this.logger.error("Failed to exit position", this.currentPosition);
+        return;
+      }
 
       this.clearPosition();
     });
@@ -159,8 +136,15 @@ class PositionManager {
 
     if (this.currentPosition.stopLoss === stopLoss) return;
 
+    this.logger.info("Updating Stop Loss", {
+      currentPosition: this.currentPosition,
+      newStopLoss: stopLoss,
+    });
     return await this.broker.modifyPosition(stopLoss).then((res) => {
-      if (!res) return;
+      if (!res) {
+        this.logger.error("Failed to update stop loss", this.currentPosition);
+        return;
+      }
       this.currentPosition.stopLoss = stopLoss;
     });
   }
