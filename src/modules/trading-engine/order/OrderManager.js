@@ -67,7 +67,7 @@ class OrderManager {
 
         const orderDetails = {
           orderId: res.result.orderId,
-          strategyId: this.positionManager.getStrategyId(),
+          strategyId: this.symbol.getStrategyId(),
           price,
           timestamp: new Date().getTime(),
           quantity: quantity,

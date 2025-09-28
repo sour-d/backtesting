@@ -29,7 +29,7 @@ class Strategy extends BaseStrategy {
     this.risk = this.capital * (this.riskPercentage / 100); // need to fix
 
     // symbol info
-    this.symbol = new Symbol(this.stockName);
+    this.symbol = new Symbol(this.stockName, this.id);
 
     // Initialize broker
     this.broker = new broker.Trade(this.stockName, this.logger);
@@ -39,7 +39,7 @@ class Strategy extends BaseStrategy {
     this._riskManager = new RiskManager(this.logger, config, riskManagerState);
 
     const positionManagerState = state.positionManager || {};
-    this._positionManager = new PositionManager(this.logger, this.symbol, this.id, positionManagerState);
+    this._positionManager = new PositionManager(this.logger, this.symbol, positionManagerState);
 
     const orderManagerState = state.orderManager || {};
     this._orderManager = new OrderManager(this.logger, this._positionManager, this._riskManager, this.symbol, orderManagerState);

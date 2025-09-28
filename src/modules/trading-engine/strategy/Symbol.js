@@ -1,8 +1,9 @@
 import getInstrumentInfo from "../../exchange/instrument.js";
 
 class Symbol {
-  constructor(name) {
+  constructor(name, strategyId = null) {
     this.name = name;
+    this.strategyId = strategyId;
     try {
       this.info = getInstrumentInfo(name);
     } catch (error) {
@@ -23,6 +24,10 @@ class Symbol {
 
   getName() {
     return this.name;
+  }
+
+  getStrategyId() {
+    return this.strategyId;
   }
 }
 

@@ -11,10 +11,9 @@ function removeExtraZeroInFloat(float) {
 }
 
 class PositionManager {
-  constructor(logger, symbol, strategyId, state = {}) {
+  constructor(logger, symbol, state = {}) {
     this.logger = logger;
     this.symbol = symbol;
-    this.strategyId = strategyId;
     this.currentPosition = state.currentPosition || null;
     this.broker = new broker.Trade(this.symbol, this.logger);
   }
