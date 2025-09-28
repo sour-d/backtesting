@@ -1,7 +1,5 @@
-import { Trades } from "../outcome/Trades.js";
 import { LiveQuoteStorage } from "../quoteStorage/LiveQuoteStorage.js";
 import logger from "../../logger/index.js";
-import getInstrumentInfo from "../../exchange/instrument.js";
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -10,7 +8,6 @@ import { v4 as uuidv4 } from 'uuid';
  */
 class BaseStrategy {
   stock;
-  trades;
   stockName;
   logger;
   strategyName;
@@ -28,24 +25,18 @@ class BaseStrategy {
   constructor(
     stockName,
     timeFrame,
-    strategyName,
-    config = {},
     state = {}
   ) {
     // Generate UUID immediately if not provided in state (for existing strategies)
     this.id = state.id || uuidv4();
     this.stockName = stockName;
-    this.strategyName = strategyName;
     this.timeFrame = timeFrame;
-
-    this.trades = state.trades ? Trades.fromJSON(state.trades) : new Trades(this);
 
     // Create a structured logger with component and strategy information
     this.logger = logger({
       component: 'Strategy',
       stockName: this.stockName,
       timeFrame: this.timeFrame,
-      strategyName: this.strategyName
     });
 
     this.stock = new LiveQuoteStorage(
@@ -68,7 +59,6 @@ class BaseStrategy {
       stockName: this.stockName,
       strategyName: this.strategyName,
       timeFrame: this.timeFrame,
-      trades: this.trades.toJSON(),
     };
   }
 

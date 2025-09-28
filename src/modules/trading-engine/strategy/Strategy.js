@@ -14,14 +14,11 @@ class Strategy extends BaseStrategy {
   constructor(
     stockName,
     timeFrame,
-    strategyName,
     config = Strategy.getDefaultConfig(),
     state = {}
   ) {
-    super(stockName, timeFrame, strategyName, config, state);
+    super(stockName, timeFrame, state);
 
-    // Initialize properties for backward compatibility
-    // Note: this.id is already set in BaseStrategy constructor with UUID
     this.capital = parseInt(config.capital);
     this.riskPercentage = parseFloat(config.riskPercentage);
     this.precise = parseInt(config.precise) || 0;

@@ -28,15 +28,13 @@ export function clearLog() {
  * @param {string} params.component - Component name (e.g., 'LiveStrategyManager')
  * @param {string} [params.stockName] - Optional stock symbol
  * @param {string} [params.timeFrame] - Optional time frame
- * @param {string} [params.strategyName] - Optional strategy name
  * @returns {Object} Logger object with level-specific methods
  */
-export default function logger({ component, stockName = '', timeFrame = '', strategyName = '' }) {
+export default function logger({ component, stockName = '', timeFrame = '' }) {
   const identifier = [component];
 
   if (stockName) identifier.push(stockName);
   if (timeFrame) identifier.push(timeFrame);
-  if (strategyName) identifier.push(strategyName);
 
   const identifierStr = identifier.join('-');
 

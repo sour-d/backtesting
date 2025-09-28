@@ -9,15 +9,17 @@ class MovingAverageStrategy extends Strategy {
   constructor(
     stockName,
     timeFrame,
-    config = this.getDefaultConfig()
+    config = this.getDefaultConfig(),
+    state
   ) {
     super(
       stockName,
       timeFrame,
-      "MovingAverageStrategy",
-      config
+      config,
+      state
     );
     this.config = config;
+    this.strategyName = "MovingAverageStrategy";
   }
 
   static getDefaultConfig() {

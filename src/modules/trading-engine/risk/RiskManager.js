@@ -7,8 +7,6 @@ class RiskManager {
     this.riskPercentage = state.riskPercentage || parseFloat(config.riskPercentage) || 5;
     this.precise = state.precise || parseInt(config.precise) || 0;
     this.risk = this.capital * (this.riskPercentage / 100);
-
-    this.logger.info("restarting risk manager", { state });
   }
 
   toJSON() {

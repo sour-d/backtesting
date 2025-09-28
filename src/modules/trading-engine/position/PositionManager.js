@@ -16,7 +16,6 @@ class PositionManager {
     this.symbol = symbol;
     this.currentPosition = state.currentPosition || null;
     this.broker = new broker.Trade(this.symbol, this.logger);
-    this.logger.info("restarting position manager", { state });
   }
 
   toJSON() {
