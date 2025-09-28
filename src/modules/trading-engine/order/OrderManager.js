@@ -13,11 +13,12 @@ function removeExtraZeroInFloat(float) {
 }
 
 class OrderManager {
-  constructor(logger, positionManager, riskManager, state = {}) {
+  constructor(logger, positionManager, riskManager, symbol, state = {}) {
     this.logger = logger;
     this.broker = new broker.Trade(this.stockName, this.logger);
     this.positionManager = positionManager;
     this.riskManager = riskManager;
+    this.symbol = symbol;
   }
 
   toJSON() {
@@ -28,7 +29,7 @@ class OrderManager {
     if (await this.isLastOrderFilled()) return;
     await this.riskManager.updateCapital();
 
-    const symbolInfo = this.positionManager.getSymbolInfo();
+    const symbolInfo = this.symbol?.getInfo();
     price = roundLikeSize(price, symbolInfo?.priceFilter?.tickSize);
     tpPrice = roundLikeSize(tpPrice, symbolInfo?.priceFilter?.tickSize);
 

@@ -42,7 +42,7 @@ class Strategy extends BaseStrategy {
     this._positionManager = new PositionManager(this.logger, this.symbol, this.id, positionManagerState);
 
     const orderManagerState = state.orderManager || {};
-    this._orderManager = new OrderManager(this.logger, this._positionManager, this._riskManager, orderManagerState);
+    this._orderManager = new OrderManager(this.logger, this._positionManager, this._riskManager, this.symbol, orderManagerState);
 
     // For backward compatibility
     if (state.currentPosition && !positionManagerState.currentPosition) {
