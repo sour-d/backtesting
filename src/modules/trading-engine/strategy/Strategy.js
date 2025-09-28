@@ -27,6 +27,9 @@ class Strategy extends BaseStrategy {
     this.precise = parseInt(config.precise) || 0;
     this.risk = this.capital * (this.riskPercentage / 100); // need to fix
 
+    // symbol info
+    this.symbol = new Symbol(this.stockName);
+
     // Initialize broker
     this.broker = new broker.Trade(this.stockName, this.logger);
 
@@ -35,10 +38,10 @@ class Strategy extends BaseStrategy {
     this._riskManager = new RiskManager(this.logger, config, riskManagerState);
 
     const positionManagerState = state.positionManager || {};
-    this._positionManager = new PositionManager( this.logger, this.broker, this.id, positionManagerState);
+    this._positionManager = new PositionManager(this.logger, this.symbol, this.id, positionManagerState);
 
     const orderManagerState = state.orderManager || {};
-    this._orderManager = new OrderManager( this.logger, this._positionManager, this._riskManager, this.stock, orderManagerState);
+    this._orderManager = new OrderManager(this.logger, this._positionManager, this._riskManager, orderManagerState);
 
     // For backward compatibility
     if (state.currentPosition && !positionManagerState.currentPosition) {
@@ -46,10 +49,6 @@ class Strategy extends BaseStrategy {
     }
   }
 
-  /**
-   * Convert the strategy to JSON for persistence
-   * @returns {Object} JSON representation of the strategy
-   */
   toJSON() {
     return {
       ...super.toJSON(),
@@ -145,12 +144,6 @@ class Strategy extends BaseStrategy {
 
   async execute() {
     this.logger.info("Strategy Started Execution");
-
-    try {
-      this.symbolInfo = await getInstrumentInfo(this.stockName, this.logger);
-    } catch (error) {
-      this.logger.error("Failed to get symbol info", {symbol: this.symbol, error});
-    }
   }
 
   // Implementation of BaseStrategy methods for manager access

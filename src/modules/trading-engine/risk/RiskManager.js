@@ -1,15 +1,6 @@
 import broker from "../../exchange/index.js";
 
-/**
- * RiskManager class to handle risk calculations and position sizing
- */
 class RiskManager {
-  /**
-   * Constructor for the RiskManager class
-   * @param {Function} logger - Logger function
-   * @param {Object} config - Configuration for risk management
-   * @param {Object} state - Optional state to restore from persistence
-   */
   constructor(logger, config = {}, state = {}) {
     this.logger = logger;
     this.capital = state.capital || parseInt(config.capital) || 0;
@@ -18,10 +9,6 @@ class RiskManager {
     this.risk = this.capital * (this.riskPercentage / 100);
   }
 
-  /**
-   * Convert the risk manager to JSON for persistence
-   * @returns {Object} JSON representation of the risk manager
-   */
   toJSON() {
     return {
       capital: this.capital,
@@ -31,10 +18,6 @@ class RiskManager {
     };
   }
 
-  /**
-   * Update the capital from the broker
-   * @returns {number} The updated capital
-   */
   updateCapital() {
     broker.getBalance().then((res) => {
       this.capital = res?.bal?.available ?? 0;
@@ -45,54 +28,28 @@ class RiskManager {
     return this.capital;
   }
 
-  /**
-   * Set the capital manually
-   * @param {number} capital - The capital to set
-   */
   setCapital(capital) {
     this.capital = parseInt(capital);
     this.risk = this.capital * (this.riskPercentage / 100);
   }
 
-  /**
-   * Set the risk percentage
-   * @param {number} riskPercentage - The risk percentage to set
-   */
   setRiskPercentage(riskPercentage) {
     this.riskPercentage = parseFloat(riskPercentage);
     this.risk = this.capital * (this.riskPercentage / 100);
   }
 
-  /**
-   * Get the current capital
-   * @returns {number} The current capital
-   */
   getCapital() {
     return this.capital;
   }
 
-  /**
-   * Get the current risk percentage
-   * @returns {number} The current risk percentage
-   */
   getRiskPercentage() {
     return this.riskPercentage;
   }
 
-  /**
-   * Get the current risk amount
-   * @returns {number} The current risk amount
-   */
   getRisk() {
     return this.risk;
   }
 
-  /**
-   * Calculate the number of stocks that can be bought based on risk and capital
-   * @param {number} riskForOneStock - The risk per stock
-   * @param {number} buyingPrice - The price to buy at
-   * @returns {number} The number of stocks that can be bought
-   */
   stocksCanBeBought(riskForOneStock, buyingPrice) {
     const maxStocksByCapital = parseFloat(this.capital / buyingPrice);
     const maxStocksByRisk = parseFloat(this.risk / riskForOneStock);
