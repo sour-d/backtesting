@@ -15,10 +15,10 @@ function removeExtraZeroInFloat(float) {
 class OrderManager {
   constructor(logger, positionManager, riskManager, symbol, state = {}) {
     this.logger = logger;
-    this.broker = new broker.Trade(this.stockName, this.logger);
+    this.symbol = symbol;
+    this.broker = new broker.Trade(this.symbol.name, this.logger);
     this.positionManager = positionManager;
     this.riskManager = riskManager;
-    this.symbol = symbol;
   }
 
   toJSON() {

@@ -22,7 +22,7 @@ class Trade {
   }
 
   modifyPosition = async (sl) => {
-    this.logger.info("-------- Modifying Stop Loss ---------", sl);
+    this.logger.info("Modifying Stop Loss", {stoploss: sl});
     return this.clientInstance
       .setTradingStop({
         category: "linear",
@@ -31,11 +31,11 @@ class Trade {
         positionIdx: 0,
       })
       .then((response) => {
-        this.logger.info("-------- Modified Stop Loss Response ---------", response);
+        this.logger.info("Modifying Stop Loss successful", response);
         return response;
       })
       .catch((error) => {
-        this.logger.error("Error modifying position stop loss", error);
+        this.logger.error("Modifying Stop Loss failed", error);
       });
   };
 
@@ -192,6 +192,7 @@ class Trade {
       ...(tp ? { takeProfit: tp.toString() } : {}),
       ...(sl ? { stopLoss: sl.toString() } : {}),
       side,
+      total: quantity * (price || 0),
     });
     return this.clientInstance
       .submitOrder({
