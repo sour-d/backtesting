@@ -2,6 +2,7 @@ import { Trades } from "../outcome/Trades.js";
 import { LiveQuoteStorage } from "../quoteStorage/LiveQuoteStorage.js";
 import logger from "../../logger/index.js";
 import getInstrumentInfo from "../../exchange/instrument.js";
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * BaseStrategy abstract class that defines the core functionality and interface
@@ -31,13 +32,14 @@ class BaseStrategy {
     config = {},
     state = {}
   ) {
-    this.id = state.id;
+    // Generate UUID immediately if not provided in state (for existing strategies)
+    this.id = state.id || uuidv4();
     this.stockName = stockName;
     this.strategyName = strategyName;
     this.timeFrame = timeFrame;
 
     this.trades = state.trades ? Trades.fromJSON(state.trades) : new Trades(this);
-    
+
     // Create a structured logger with component and strategy information
     this.logger = logger({
       component: 'Strategy',
@@ -45,7 +47,7 @@ class BaseStrategy {
       timeFrame: this.timeFrame,
       strategyName: this.strategyName
     });
-    
+
     this.stock = new LiveQuoteStorage(
       () => this.trade(),
       200,
@@ -121,7 +123,7 @@ class BaseStrategy {
     // Check if we have an open position
     const positionManager = this.getPositionManager();
     const currentPosition = positionManager.getCurrentPosition();
-    
+
     if (currentPosition) {
       await positionManager.checkPosition();
 
@@ -146,7 +148,7 @@ class BaseStrategy {
    */
   async execute() {
     this.logger.info("Strategy Started Execution");
-    
+
     // const symbolInfo = await getInstrumentInfo(this.stockName);
   }
 

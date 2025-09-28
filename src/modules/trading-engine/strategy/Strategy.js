@@ -1,6 +1,5 @@
 import _ from "lodash";
 import broker from "../../exchange/index.js";
-import getInstrumentInfo from "../../exchange/instrument.js";
 import { OrderManager } from "../order/OrderManager.js";
 import { PositionManager } from "../position/PositionManager.js";
 import { RiskManager } from "../risk/RiskManager.js";
@@ -22,7 +21,7 @@ class Strategy extends BaseStrategy {
     super(stockName, timeFrame, strategyName, config, state);
 
     // Initialize properties for backward compatibility
-    this.id = state.id;
+    // Note: this.id is already set in BaseStrategy constructor with UUID
     this.capital = parseInt(config.capital);
     this.riskPercentage = parseFloat(config.riskPercentage);
     this.precise = parseInt(config.precise) || 0;

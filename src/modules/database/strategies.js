@@ -2,21 +2,21 @@ import pool from "./index.js";
 
 /**
  * Create a new strategy in the database
- * @param {Object} strategy - Strategy object with strategyName, stockName, timeFrame, config, and state
+ * @param {Object} strategy - Strategy object with id, strategyName, stockName, timeFrame, config, and state
  * @returns {Promise<Object>} The created strategy record
  */
 export const createStrategy = async (strategy) => {
-  const { strategyName, stockName, timeFrame, config, state } = strategy;
+  const { id, strategyName, stockName, timeFrame, config, state } = strategy;
   const res = await pool.query(
-    'INSERT INTO strategies ("strategyName", "stockName", "timeFrame", config, state) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-    [strategyName, stockName, timeFrame, config, state]
+    'INSERT INTO strategies (id, "strategyName", "stockName", "timeFrame", config, state) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+    [id, strategyName, stockName, timeFrame, config, state]
   );
   return res.rows[0];
 };
 
 /**
  * Update the state of a strategy
- * @param {number} id - The ID of the strategy to update
+ * @param {string} id - The UUID of the strategy to update
  * @param {Object} state - The new state object
  * @returns {Promise<Object>} The updated strategy record
  */
@@ -39,7 +39,7 @@ export const getAllStrategies = async () => {
 
 /**
  * Get a strategy by its ID
- * @param {number} id - The ID of the strategy to retrieve
+ * @param {string} id - The UUID of the strategy to retrieve
  * @returns {Promise<Object|null>} The strategy record or null if not found
  */
 export const getStrategyById = async (id) => {
@@ -77,7 +77,7 @@ export const getSpecificStrategy = async (strategyName, stockName, timeFrame) =>
 
 /**
  * Delete a strategy by its ID
- * @param {number} id - The ID of the strategy to delete
+ * @param {string} id - The UUID of the strategy to delete
  * @returns {Promise<boolean>} True if deleted, false if not found
  */
 export const deleteStrategy = async (id) => {

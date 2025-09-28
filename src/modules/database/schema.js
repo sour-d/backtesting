@@ -29,9 +29,12 @@ const init = async () => {
       CREATE INDEX IF NOT EXISTS idx_logs_timestamp ON logs(timestamp);
     `);
 
+    // Enable UUID extension if not already enabled
+    await pool.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
+
     await pool.query(`
       CREATE TABLE IF NOT EXISTS strategies (
-        id SERIAL PRIMARY KEY,
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         "strategyName" VARCHAR(255) NOT NULL,
         "stockName" VARCHAR(255) NOT NULL,
         "timeFrame" VARCHAR(255) NOT NULL,
@@ -47,7 +50,7 @@ const init = async () => {
       CREATE TABLE IF NOT EXISTS orders (
         id SERIAL PRIMARY KEY,
         "orderId" VARCHAR(255) NOT NULL UNIQUE,
-        "strategyId" INTEGER NOT NULL,
+        "strategyId" UUID NOT NULL,
         price NUMERIC,
         timestamp TIMESTAMPTZ,
         qty NUMERIC,
@@ -69,7 +72,7 @@ const init = async () => {
       CREATE TABLE IF NOT EXISTS trades (
         id SERIAL PRIMARY KEY,
         "orderId" VARCHAR(255) NOT NULL,
-        "strategyId" INTEGER NOT NULL,
+        "strategyId" UUID NOT NULL,
         price NUMERIC,
         timestamp TIMESTAMPTZ,
         qty NUMERIC,
