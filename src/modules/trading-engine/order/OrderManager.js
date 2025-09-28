@@ -69,7 +69,7 @@ class OrderManager {
           orderId: res.result.orderId,
           strategyId: this.symbol.getStrategyId(),
           price,
-          timestamp: new Date().getTime(),
+          timestamp: new Date(),
           quantity: quantity,
           risk,
           stoploss: stopLoss,
