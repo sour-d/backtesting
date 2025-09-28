@@ -15,7 +15,7 @@ class PositionManager {
     this.logger = logger;
     this.symbol = symbol;
     this.currentPosition = state.currentPosition || null;
-    this.broker = new broker.Trade(this.symbol, this.logger);
+    this.broker = new broker.Trade(this.symbol.name, this.logger);
   }
 
   toJSON() {

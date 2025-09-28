@@ -258,10 +258,10 @@ class Trade {
   };
 }
 
-// const trade = new Trade("SOLUSDT");
+// const trade = new Trade("GALAUSDT");
 // console.log(
 //   await trade.placeOrder(1, 500.0482432892432, 0, 480.024275500000000002, "Buy")
 // );
-// console.log(await trade.modifyPosition(2700));
+// console.log(await trade.modifyPosition(0.01367));
 
 export default Trade;
