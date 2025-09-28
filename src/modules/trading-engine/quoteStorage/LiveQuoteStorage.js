@@ -105,7 +105,6 @@ export class LiveQuoteStorage extends ExistingQuoteStorage {
       });
       this.currentQuoteIndex++;
 
-      this.logger.info(`Received new live quote for ${this.symbol} on time frame ${this.timeFrame} at ${data.time}`);
       this.listener();
     } catch (error) {
       this.logger.error(`Error processing quote for ${topic}`, error);

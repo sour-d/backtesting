@@ -29,7 +29,7 @@ class OrderManager {
     if (await this.isLastOrderFilled()) return;
     await this.riskManager.updateCapital();
 
-    const symbolInfo = this.symbol?.getInfo();
+    const symbolInfo = await this.symbol?.getInfo();
     price = roundLikeSize(price, symbolInfo?.priceFilter?.tickSize);
     tpPrice = roundLikeSize(tpPrice, symbolInfo?.priceFilter?.tickSize);
 
@@ -55,6 +55,7 @@ class OrderManager {
       stopLoss,
       side,
       isLimitOrder,
+      symbolInfo
     });
     return await this.broker
       .placeOrder(quantity, limitPrice, tpPrice, stopLoss, side)

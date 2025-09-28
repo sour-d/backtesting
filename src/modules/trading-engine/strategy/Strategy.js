@@ -124,7 +124,7 @@ class Strategy extends BaseStrategy {
 
   // Implementation of BaseStrategy methods
   async trade() {
-    this.logger.info("-------- Got A Quote, Resuming Strategy ---------");
+    this.logger.info("Resuming Strategy onQuote");
 
     this.updateCapital();
     this.currentPosition = this._positionManager.getCurrentPosition();
