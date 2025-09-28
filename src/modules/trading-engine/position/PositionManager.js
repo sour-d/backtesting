@@ -1,4 +1,5 @@
 import { updateOrderStatus } from "../../database/orders.js";
+import broker from "../../exchange/index.js";
 
 function roundLikeSize(value, size = 0.00001) {
   size = Number(size);
