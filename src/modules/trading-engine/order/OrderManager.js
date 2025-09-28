@@ -48,15 +48,6 @@ class OrderManager {
     quantity = roundLikeSize(quantity, symbolInfo?.lotSizeFilter?.qtyStep);
 
     const limitPrice = isLimitOrder ? price : 0;
-    this.logger.info("Placing Order", {
-      quantity,
-      limitPrice,
-      tpPrice,
-      stopLoss,
-      side,
-      isLimitOrder,
-      symbolInfo
-    });
     return await this.broker
       .placeOrder(quantity, limitPrice, tpPrice, stopLoss, side)
       .then((res) => {

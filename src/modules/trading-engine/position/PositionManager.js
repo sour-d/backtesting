@@ -72,24 +72,24 @@ class PositionManager {
     });
   }
 
-  async updateStopLoss(stopLoss) {
+  async updateStopLoss(stoploss) {
     if (!this.currentPosition) return;
 
     const symbolInfo = await this.symbol?.getInfo();
-    stopLoss = roundLikeSize(stopLoss, symbolInfo?.priceFilter?.tickSize);
+    stoploss = roundLikeSize(stoploss, symbolInfo?.priceFilter?.tickSize);
 
-    if (this.currentPosition.stopLoss === stopLoss) return;
+    if (this.currentPosition.stopLoss === stoploss) return;
 
     this.logger.info("Updating Stop Loss", {
       currentPosition: this.currentPosition,
-      newStopLoss: stopLoss,
+      newStopLoss: stoploss,
     });
-    return await this.broker.modifyPosition(stopLoss).then((res) => {
+    return await this.broker.modifyPosition(stoploss).then((res) => {
       if (!res) {
         this.logger.error("Failed to update stop loss", this.currentPosition);
         return;
       }
-      this.currentPosition.stopLoss = stopLoss;
+      this.currentPosition.stoploss = stoploss;
     });
   }
 }

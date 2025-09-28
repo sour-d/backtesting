@@ -7,7 +7,7 @@ export const createOrder = async (order) => {
     strategyId,
     price,
     timestamp,
-    qty,
+    quantity: qty,
     risk,
     stoploss,
     takeprofit,
