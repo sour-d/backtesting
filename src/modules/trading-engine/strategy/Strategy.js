@@ -5,6 +5,7 @@ import { OrderManager } from "../order/OrderManager.js";
 import { PositionManager } from "../position/PositionManager.js";
 import { RiskManager } from "../risk/RiskManager.js";
 import { BaseStrategy } from "./BaseStrategy.js";
+import Symbol from "./Symbol.js";
 
 /**
  * Strategy class that extends BaseStrategy and implements the strategy pattern

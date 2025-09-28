@@ -1,4 +1,4 @@
-const { default: getInstrumentInfo } = require("../../exchange/instrument");
+import getInstrumentInfo from "../../exchange/instrument.js";
 
 class Symbol {
   constructor(name) {
