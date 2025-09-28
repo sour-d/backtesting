@@ -19,6 +19,8 @@ class OrderManager {
     this.broker = new broker.Trade(this.symbol.name, this.logger);
     this.positionManager = positionManager;
     this.riskManager = riskManager;
+
+    this.logger.info("restarting order manager", { state });
   }
 
   toJSON() {

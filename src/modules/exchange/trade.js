@@ -15,7 +15,7 @@ class Trade {
       debug: console.log,
       info: console.log,
       warn: console.warn,
-      error: console.error
+      error: console.error,
     };
 
     this.clientInstance = getRestClient();
@@ -29,11 +29,20 @@ class Trade {
         stopLoss: sl.toString(),
         symbol: this.symbol,
         positionIdx: 0,
-        tpslMode: "Full"
+        tpslMode: "Full",
       })
       .then((response) => {
-        if (response.retMsg) {
-          this.logger.error("Modifying Stop Loss failed", error);
+        if (response.retMsg !== "OK") {
+          this.logger.error("Modifying Stop Loss failed", {
+            res: response,
+            request: {
+              category: "linear",
+              stopLoss: sl.toString(),
+              symbol: this.symbol,
+              positionIdx: 0,
+              tpslMode: "Full"
+            },
+          });
           return;
         }
         this.logger.info("Modifying Stop Loss successful", response);
@@ -96,7 +105,12 @@ class Trade {
         stopLoss: sl.toString(),
       })
       .then((response) => {
-        this.logger.info("Trigger order placed successfully", { quantity, trigger, sl, side });
+        this.logger.info("Trigger order placed successfully", {
+          quantity,
+          trigger,
+          sl,
+          side,
+        });
         return response;
       })
       .catch((error) => {
@@ -130,10 +144,7 @@ class Trade {
         };
       })
       .catch((error) => {
-        this.logger.error(
-          "Error in fetching open positions",
-          error
-        );
+        this.logger.error("Error in fetching open positions", error);
       });
   };
 
@@ -183,10 +194,7 @@ class Trade {
         return response.result.list;
       })
       .catch((error) => {
-        this.logger.error(
-          "Error in fetching active orders",
-          error
-        );
+        this.logger.error("Error in fetching active orders", error);
       });
   };
 
@@ -197,7 +205,7 @@ class Trade {
       tpPrice: tp,
       stopLoss: sl,
       side,
-      type: price ? "Limit" : "Market"
+      type: price ? "Limit" : "Market",
     });
     return this.clientInstance
       .submitOrder({
