@@ -115,6 +115,9 @@ class Strategy extends BaseStrategy {
     this.currentPosition = this._positionManager.getCurrentPosition();
     this.currentPosition && (await this.checkPositionStatus());
 
+    if (this.currentPosition) {
+      this.logger.info("Square off condition Check");
+    }
     if (this.currentPosition?.side === "Buy") {
       await this.longSquareOff();
       return;

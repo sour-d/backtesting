@@ -63,7 +63,6 @@ class MovingAverageStrategy extends Strategy {
 
     if (!today || !yesterday) return;
     const ma20high_yesterday = yesterday.ma20high;
-    this.logger.info("Long Square off check", { today, ma20high_yesterday });
     if (ma20high_yesterday > today.low && today.body < 0) {
       await this.updateStopLoss(ma20high_yesterday);
     }
@@ -73,7 +72,6 @@ class MovingAverageStrategy extends Strategy {
     const today = this.stock.now();
     const yesterday = this.stock.prev();
 
-    this.logger.info("Sell Condition Check", { today, yesterday });
     if (!today || !yesterday) return;
 
     if (
@@ -103,7 +101,6 @@ class MovingAverageStrategy extends Strategy {
 
     if (!today || !yesterday) return;
     const ma20low_yesterday = yesterday.ma20low;
-    this.logger.info("Short Square off check", { today, ma20low_yesterday });
     if (today.high > ma20low_yesterday && today.body > 0) {
       await this.updateStopLoss(ma20low_yesterday);
     }
