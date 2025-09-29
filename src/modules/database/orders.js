@@ -9,14 +9,12 @@ export const createOrder = async (order) => {
     timestamp,
     quantity: qty,
     risk,
-    stoploss,
-    takeprofit,
     orderType,
     side,
     status,
   } = order;
   const res = await pool.query(
-    'INSERT INTO orders ("orderId", "strategyId", price, timestamp, qty, risk, stoploss, takeprofit, "orderType", side, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
+    'INSERT INTO orders ("orderId", "strategyId", price, timestamp, qty, risk, "orderType", side, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
     [
       orderId,
       strategyId,
@@ -24,8 +22,6 @@ export const createOrder = async (order) => {
       timestamp,
       qty,
       risk,
-      stoploss,
-      takeprofit,
       orderType,
       side,
       status,

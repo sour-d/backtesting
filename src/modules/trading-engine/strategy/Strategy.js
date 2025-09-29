@@ -62,11 +62,6 @@ class Strategy extends BaseStrategy {
   }
 
   // Delegate to RiskManager
-  updateCapital() {
-    return this._riskManager.updateCapital();
-  }
-
-  // Delegate to RiskManager
   stocksCanBeBought(riskForOneStock, buyingPrice) {
     return this._riskManager.stocksCanBeBought(riskForOneStock, buyingPrice);
   }
@@ -98,33 +93,27 @@ class Strategy extends BaseStrategy {
     return this._orderManager.cancelLastOrder();
   }
 
-  // Delegate to OrderManager
   async placeOrder(risk, price, tpPrice, side = "Buy", isLimitOrder = false) {
     return this._orderManager.placeOrder(risk, price, tpPrice, side, isLimitOrder);
   }
 
-  // Delegate to PositionManager
   async updateStopLoss(stopLoss) {
     return this._positionManager.updateStopLoss(stopLoss);
   }
 
-  // Delegate to PositionManager
-  async checkPosition() {
-    return this._positionManager.checkPosition();
+  async checkPositionStatus(slient = false) {
+    return this._positionManager.checkPositionStatus(slient);
   }
 
-  // Delegate to PositionManager
   async forceExit(side) {
     return this._positionManager.forceExit(side);
   }
 
-  // Implementation of BaseStrategy methods
   async trade() {
     this.logger.info("Resuming Strategy onQuote");
 
-    this.updateCapital();
     this.currentPosition = this._positionManager.getCurrentPosition();
-    this.currentPosition && (await this.checkPosition());
+    this.currentPosition && (await this.checkPositionStatus());
 
     if (this.currentPosition?.side === "Buy") {
       await this.longSquareOff();
@@ -135,15 +124,26 @@ class Strategy extends BaseStrategy {
       return;
     }
 
+
+    this.logger.info("Buy and sell Condition check");
     if (await this.buy()) return;
     if (await this.sell()) return;
   }
 
   async execute() {
     this.logger.info("Strategy Started Execution");
+
+    this.intervalId = setInterval(async () => {
+      await this.checkPositionStatus(true);
+    }, 30000);
   }
 
-  // Implementation of BaseStrategy methods for manager access
+  stop() {
+    this.logger.info("Strategy Stopped");
+    this.stock.stop();
+    clearInterval(this.intervalId);
+  }
+
   getPositionManager() {
     return this._positionManager;
   }

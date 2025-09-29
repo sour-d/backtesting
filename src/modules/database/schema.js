@@ -55,8 +55,6 @@ const init = async () => {
         timestamp TIMESTAMPTZ,
         qty NUMERIC,
         risk NUMERIC,
-        stoploss NUMERIC,
-        takeprofit NUMERIC,
         "orderType" VARCHAR(255),
         side VARCHAR(255),
         status VARCHAR(255) DEFAULT 'pending',

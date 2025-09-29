@@ -22,7 +22,6 @@ class Trade {
   }
 
   modifyPosition = async (sl) => {
-    this.logger.info("Modifying Stop Loss", { stoploss: sl });
     return this.clientInstance
       .setTradingStop({
         category: "linear",
@@ -33,19 +32,8 @@ class Trade {
       })
       .then((response) => {
         if (response.retMsg !== "OK") {
-          this.logger.error("Modifying Stop Loss failed", {
-            res: response,
-            request: {
-              category: "linear",
-              stopLoss: sl.toString(),
-              symbol: this.symbol,
-              positionIdx: 0,
-              tpslMode: "Full"
-            },
-          });
           return;
         }
-        this.logger.info("Modifying Stop Loss successful", response);
         return response;
       })
       .catch((error) => {

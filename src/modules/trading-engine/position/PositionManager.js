@@ -1,4 +1,4 @@
-import { updateOrderStatus } from "../../database/orders.js";
+import { createOrder, updateOrderStatus } from "../../database/orders.js";
 import broker from "../../exchange/index.js";
 
 function roundLikeSize(value, size = 0.00001) {
@@ -42,16 +42,26 @@ class PositionManager {
     updateOrderStatus(this.currentPosition.orderId, status);
   }
 
-  async checkPosition() {
+  async checkPositionStatus(slient = false) { // move to order manager
     if (!this.currentPosition) return;
 
+    !slient && this.logger.info("Checking active Position", this.currentPosition);
     return await this.broker.openPositions().then((res) => {
       if (res.size === 0) {
-        const { stopLoss } = this.currentPosition;
-        this.logger.info(
-          'Position already exited', { ...this.currentPosition, exitPrice: stopLoss }
-        );
-
+        const orderDetails = {
+          orderId: this.currentPosition.orderId,
+          strategyId: this.symbol.getStrategyId(),
+          price: this.currentPosition.stopLoss,
+          timestamp: new Date(),
+          quantity: this.currentPosition.quantity,
+          risk: this.currentPosition.risk,
+          orderType: "Market",
+          side: this.currentPosition.side === "Buy" ? "Sell" : "Buy",
+          status: "Filled",
+        };
+        this.logger.info('Position already exited', orderDetails);
+        createOrder(orderDetails);
+        // this.riskManager.setCapital(this.riskManager.getCapital() + price * quantity);
         this.clearPosition();
         return;
       }
@@ -86,9 +96,10 @@ class PositionManager {
     });
     return await this.broker.modifyPosition(stoploss).then((res) => {
       if (!res) {
-        this.logger.error("Failed to update stop loss", this.currentPosition);
+        this.logger.error("Updating stop loss Failed", this.currentPosition);
         return;
       }
+      this.logger.info("Updating Stop Loss successful", res);
       this.currentPosition.stoploss = stoploss;
     });
   }

@@ -34,7 +34,6 @@ class MovingAverageStrategy extends Strategy {
   async buy() {
     const today = this.stock.now();
     const yesterday = this.stock.prev();
-    this.logger.info("Buy Condition check", { today, yesterday });
     if (!today || !yesterday) return;
 
     if (

@@ -18,18 +18,8 @@ class RiskManager {
     };
   }
 
-  updateCapital() {
-    broker.getBalance().then((res) => {
-      this.capital = res?.bal?.available ?? 0;
-      this.logger.info("Fetched Capital", res);
-    }).catch((err) => {
-      this.logger.error("Failed to fetch capital", err);
-    });
-    return this.capital;
-  }
-
   setCapital(capital) {
-    this.capital = parseInt(capital);
+    this.capital = capital;
     this.risk = this.capital * (this.riskPercentage / 100);
   }
 
@@ -63,11 +53,10 @@ class RiskManager {
       price: buyingPrice,
       capital: this.capital,
       risk: this.risk,
-      quantity: affordableStocks.toFixed(this.precise),
-      quantity_raw: affordableStocks
+      quantity: affordableStocks,
     });
 
-    return this.precise === 0 ? parseInt(affordableStocks) : affordableStocks.toFixed(this.precise);
+    return affordableStocks;
   }
 }
 

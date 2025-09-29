@@ -1,6 +1,6 @@
 import { createTrade } from "../../database/trades.js";
 import broker from "../../exchange/index.js";
-import { createOrder as storeOrderDetails } from "../../database/orders.js";
+import { createOrder as storeOrderDetails, updateOrderStatus } from "../../database/orders.js";
 import { error } from "console";
 
 function roundLikeSize(value, size = 0.00001) {
@@ -27,7 +27,6 @@ class OrderManager {
 
   async placeOrder(risk, price, tpPrice, side = "Buy", isLimitOrder = false) {
     if (await this.isLastOrderFilled()) return;
-    await this.riskManager.updateCapital();
 
     const symbolInfo = await this.symbol?.getInfo();
     price = roundLikeSize(price, symbolInfo?.priceFilter?.tickSize);
@@ -63,8 +62,6 @@ class OrderManager {
           timestamp: new Date(),
           quantity: quantity,
           risk,
-          stoploss: stopLoss,
-          takeprofit: tpPrice,
           orderType: isLimitOrder ? "Limit" : "Market",
           side,
           status: "Pending",
@@ -73,8 +70,7 @@ class OrderManager {
 
         this.positionManager.setCurrentPosition(orderDetails);
         storeOrderDetails(orderDetails);
-
-        this.riskManager.updateCapital();
+        // this.riskManager.setCapital(this.riskManager.getCapital() - quantity * price);
         return true;
       });
   }
@@ -86,7 +82,7 @@ class OrderManager {
     const { orderId, status } = currentPosition;
     if (status === "Filled") return true;
 
-    this.logger.info("Checking last order status", { orderId });
+    this.logger.info("Last order status check", { orderId });
     return await this.broker.activeOrders().then(async (res) => {
       const currentOrderInfo = res.find(
         (orderInfo) => orderInfo.orderId === orderId
@@ -94,21 +90,11 @@ class OrderManager {
       if (!currentOrderInfo?.orderId) {
         this.positionManager.updatePositionStatus("Filled");
         this.logger.info("Last Order Filled", { orderId });
-
-        // Create a trade record
-        const trade = {
-          orderId: currentPosition.orderId,
-          strategyId: currentPosition.strategyId,
-          price: currentPosition.price,
-          timestamp: new Date(),
-          qty: currentPosition.quantity,
-          side: currentPosition.side,
-        };
-        await createTrade(trade);
-
+        const { price, quantity } = currentPosition;
+        await updateOrderStatus(orderId, "Filled");
         return true;
       }
-      this.logger.info("Last Order Not Filled Yet", { orderId });
+      this.logger.info("Last Order still in orderbook", { orderId });
     });
   }
 
