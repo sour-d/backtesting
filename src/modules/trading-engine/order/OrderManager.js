@@ -1,7 +1,5 @@
-import { createTrade } from "../../database/trades.js";
 import broker from "../../exchange/index.js";
 import { createOrder as storeOrderDetails, updateOrderStatus } from "../../database/orders.js";
-import { error } from "console";
 
 function roundLikeSize(value, size = 0.00001) {
   size = Number(size);
@@ -65,6 +63,7 @@ class OrderManager {
           orderType: isLimitOrder ? "Limit" : "Market",
           side,
           status: "Pending",
+          stopLoss
         };
         this.logger.info("Placing Order successful", orderDetails);
 

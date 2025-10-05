@@ -28,7 +28,6 @@ class MovingAverageStrategyUpgraded extends Strategy {
       riskPercentage: 5,
       limitPriceGap: 0.0003,
       takeProfitFactor: 1.2,
-      precise: 0
     };
   }
 

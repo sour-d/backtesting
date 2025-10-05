@@ -32,6 +32,7 @@ class Trade {
       })
       .then((response) => {
         if (response.retMsg !== "OK") {
+          this.logger.error("Modifying Stop Loss failed", response);
           return;
         }
         return response;

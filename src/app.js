@@ -18,6 +18,33 @@ import ServiceProvider from "./modules/core-services/service-provider.js";
 
 const app = express();
 
+// Initialize error logger
+const serverLogger = logger ? logger({ component: 'Server' }) : console;
+
+// Global error handlers to prevent server crashes
+process.on('uncaughtException', (error) => {
+  serverLogger.error('Uncaught Exception - Server crash prevented', {
+    error: error.message,
+    stack: error.stack,
+    timestamp: new Date().toISOString()
+  });
+  console.error('Uncaught Exception:', error);
+  // In production, you might want to exit gracefully
+  // process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  serverLogger.error('Unhandled Promise Rejection - Server crash prevented', {
+    reason: reason instanceof Error ? reason.message : String(reason),
+    stack: reason instanceof Error ? reason.stack : undefined,
+    promise: promise,
+    timestamp: new Date().toISOString()
+  });
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  // In production, you might want to exit gracefully
+  // process.exit(1);
+});
+
 dotenv.config();
 
 // middlewares
@@ -115,17 +142,57 @@ app.get("/live/log", (req, res) => {
 
 app.get("/ping", (req, res) => res.send("pong"));
 
+// Global error handling middleware - must be added after all routes
+app.use((error, req, res, next) => {
+  serverLogger.error('Express route error caught', {
+    error: error.message,
+    stack: error.stack,
+    url: req.url,
+    method: req.method,
+    userAgent: req.get('User-Agent'),
+    ip: req.ip,
+    timestamp: new Date().toISOString()
+  });
+
+  console.error('Express Error:', error);
+
+  // Send error response to client
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+  });
+});
+
 // app.use(express.static("public"));
 
 const config = {
-  port: Number(process.env.PORT) || 3000,
+  port: Number(process.env.PORT) || 3005,
 };
 
-app.listen(config.port, () => {
-  process.env.KEEP_ALIVE && startPingInInterval();
-  ServiceProvider.getInstance().liveStrategyManager.loadStrategies();
+// Wrap server startup in try-catch to handle initialization errors
+try {
+  app.listen(config.port, () => {
+    try {
+      process.env.KEEP_ALIVE && startPingInInterval();
+      ServiceProvider.getInstance().liveStrategyManager.loadStrategies();
 
-  // Use logger if available, otherwise use console.log
-  const serverLogger = logger ? logger({ component: 'Server' }) : console;
-  serverLogger.info(`Server running on http://localhost:${config.port}/`);
-});
+      serverLogger.info(`Server running on http://localhost:${config.port}/`);
+    } catch (initError) {
+      serverLogger.error('Server initialization error', {
+        error: initError.message,
+        stack: initError.stack,
+        timestamp: new Date().toISOString()
+      });
+      console.error('Server initialization failed:', initError);
+    }
+  });
+} catch (serverError) {
+  errorLogger.error('Server startup error', {
+    error: serverError.message,
+    stack: serverError.stack,
+    port: config.port,
+    timestamp: new Date().toISOString()
+  });
+  console.error('Failed to start server:', serverError);
+  process.exit(1);
+}

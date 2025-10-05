@@ -1,4 +1,4 @@
-import pool from "../modules/database/index.js";
+import supabase from "../modules/database/index.js";
 
 /**
  * Utility functions for log management and retrieval
@@ -28,65 +28,59 @@ export async function getLogs(filters = {}, limit = 100) {
     endTime
   } = filters;
 
-  let query = "SELECT * FROM logs WHERE 1=1";
-  const params = [];
-  let paramIndex = 1;
-
-  // Build identifier pattern for filtering
-  if (component) {
-    const identifierPattern = `${component}%`;
-    query += ` AND identifier LIKE $${paramIndex++}`;
-    params.push(identifierPattern);
-  }
-
-  // Filter by specific stock
-  if (stockName) {
-    query += ` AND data->>'stockName' = $${paramIndex++}`;
-    params.push(stockName);
-  }
-
-  // Filter by strategy name
-  if (strategyName) {
-    query += ` AND data->>'strategyName' = $${paramIndex++}`;
-    params.push(strategyName);
-  }
-
-  // Filter by time frame
-  if (timeFrame) {
-    query += ` AND data->>'timeFrame' = $${paramIndex++}`;
-    params.push(timeFrame);
-  }
-
-  // Filter by minimum log level
-  if (level) {
-    const levels = ['debug', 'info', 'warn', 'error'];
-    const minLevelIndex = levels.indexOf(level);
-
-    if (minLevelIndex >= 0) {
-      const allowedLevels = levels.slice(minLevelIndex);
-      query += ` AND level = ANY($${paramIndex++}::varchar[])`;
-      params.push(allowedLevels);
-    }
-  }
-
-  // Filter by time range
-  if (startTime) {
-    query += ` AND timestamp >= $${paramIndex++}`;
-    params.push(startTime);
-  }
-
-  if (endTime) {
-    query += ` AND timestamp <= $${paramIndex++}`;
-    params.push(endTime);
-  }
-
-  // Order by timestamp descending and limit results
-  query += ` ORDER BY timestamp DESC LIMIT $${paramIndex++}`;
-  params.push(limit);
-
   try {
-    const result = await pool.query(query, params);
-    return result.rows;
+    let query = supabase.from('logs').select('*');
+
+    // Filter by component (identifier pattern)
+    if (component) {
+      query = query.ilike('identifier', `${component}%`);
+    }
+
+    // Filter by stock name in data JSON
+    if (stockName) {
+      query = query.eq('data->stockName', stockName);
+    }
+
+    // Filter by strategy name in data JSON
+    if (strategyName) {
+      query = query.eq('data->strategyName', strategyName);
+    }
+
+    // Filter by time frame in data JSON
+    if (timeFrame) {
+      query = query.eq('data->timeFrame', timeFrame);
+    }
+
+    // Filter by minimum log level
+    if (level) {
+      const levels = ['debug', 'info', 'warn', 'error'];
+      const minLevelIndex = levels.indexOf(level.toLowerCase());
+      if (minLevelIndex >= 0) {
+        const allowedLevels = levels.slice(minLevelIndex);
+        query = query.in('level', allowedLevels);
+      }
+    }
+
+    // Filter by time range
+    if (startTime) {
+      query = query.gte('timestamp', startTime.toISOString());
+    }
+
+    if (endTime) {
+      query = query.lte('timestamp', endTime.toISOString());
+    }
+
+    // Order by timestamp descending and limit results
+    query = query.order('timestamp', { ascending: false }).limit(limit);
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error retrieving logs:', error);
+      return [];
+    }
+
+    return data || [];
   } catch (error) {
     console.error('Error retrieving logs:', error);
     return [];

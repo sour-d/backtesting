@@ -5,7 +5,6 @@ class RiskManager {
     this.logger = logger;
     this.capital = state.capital || parseInt(config.capital) || 0;
     this.riskPercentage = state.riskPercentage || parseFloat(config.riskPercentage) || 5;
-    this.precise = state.precise || parseInt(config.precise) || 0;
     this.risk = this.capital * (this.riskPercentage / 100);
   }
 
@@ -13,7 +12,6 @@ class RiskManager {
     return {
       capital: this.capital,
       riskPercentage: this.riskPercentage,
-      precise: this.precise,
       risk: this.risk
     };
   }

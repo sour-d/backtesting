@@ -1,4 +1,4 @@
-import pool from "../database/index.js";
+import supabase from "../database/index.js";
 
 const isProd = process.env.ENV === "prod";
 
@@ -16,9 +16,14 @@ const DEFAULT_MIN_LEVEL = isProd ? 'info' : 'debug';
 /**
  * Clear all logs from the database
  */
-export function clearLog() {
+export async function clearLog() {
   if (isProd) {
-    pool.query("TRUNCATE TABLE logs");
+    try {
+      await supabase.from('logs').delete().neq('id', 0); // Delete all rows
+      console.log('Logs cleared successfully');
+    } catch (error) {
+      console.error('Error clearing logs:', error);
+    }
   }
 }
 
@@ -58,10 +63,18 @@ export default function logger({ component, stockName = '', timeFrame = '' }) {
 
     if (isProd) {
       try {
-        await pool.query(
-          "INSERT INTO logs (identifier, level, message, data) VALUES ($1, $2, $3, $4)",
-          [identifierStr, level, message, JSON.stringify(data)]
-        );
+        const { error } = await supabase
+          .from('logs')
+          .insert([{
+            identifier: identifierStr,
+            level,
+            message,
+            data: data
+          }]);
+
+        if (error) {
+          console.error("Error inserting log into database:", error);
+        }
       } catch (err) {
         console.error("Error inserting log into database", err);
       }

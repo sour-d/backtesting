@@ -27,7 +27,6 @@ class MovingAverageStrategy extends Strategy {
       capital: 100,
       riskPercentage: 5,
       limitPriceGap: 0.0003,
-      precise: 0
     };
   }
 

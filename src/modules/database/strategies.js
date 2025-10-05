@@ -1,4 +1,4 @@
-import pool from "./index.js";
+import supabase from "./index.js";
 
 /**
  * Create a new strategy in the database
@@ -7,11 +7,25 @@ import pool from "./index.js";
  */
 export const createStrategy = async (strategy) => {
   const { id, strategyName, stockName, timeFrame, config, state } = strategy;
-  const res = await pool.query(
-    'INSERT INTO strategies (id, "strategyName", "stockName", "timeFrame", config, state) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-    [id, strategyName, stockName, timeFrame, config, state]
-  );
-  return res.rows[0];
+
+  const { data, error } = await supabase
+    .from('strategies')
+    .insert([{
+      id,
+      strategyName,
+      stockName,
+      timeFrame,
+      config,
+      state
+    }])
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Error creating strategy: ${error.message}`);
+  }
+
+  return data;
 };
 
 /**
@@ -21,11 +35,21 @@ export const createStrategy = async (strategy) => {
  * @returns {Promise<Object>} The updated strategy record
  */
 export const updateStrategyState = async (id, state) => {
-  const res = await pool.query(
-    'UPDATE strategies SET state = $1, "updatedAt" = NOW() WHERE id = $2 RETURNING *',
-    [state, id]
-  );
-  return res.rows[0];
+  const { data, error } = await supabase
+    .from('strategies')
+    .update({
+      state,
+      updatedAt: new Date().toISOString()
+    })
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Error updating strategy state: ${error.message}`);
+  }
+
+  return data;
 };
 
 /**
@@ -33,8 +57,15 @@ export const updateStrategyState = async (id, state) => {
  * @returns {Promise<Array>} Array of strategy records
  */
 export const getAllStrategies = async () => {
-  const res = await pool.query('SELECT * FROM strategies');
-  return res.rows;
+  const { data, error } = await supabase
+    .from('strategies')
+    .select('*');
+
+  if (error) {
+    throw new Error(`Error getting all strategies: ${error.message}`);
+  }
+
+  return data;
 };
 
 /**
@@ -43,8 +74,17 @@ export const getAllStrategies = async () => {
  * @returns {Promise<Object|null>} The strategy record or null if not found
  */
 export const getStrategyById = async (id) => {
-  const res = await pool.query('SELECT * FROM strategies WHERE id = $1', [id]);
-  return res.rows[0] || null;
+  const { data, error } = await supabase
+    .from('strategies')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+    throw new Error(`Error getting strategy by ID: ${error.message}`);
+  }
+
+  return data;
 };
 
 /**
@@ -53,11 +93,16 @@ export const getStrategyById = async (id) => {
  * @returns {Promise<Array>} Array of matching strategy records
  */
 export const getStrategiesByName = async (strategyName) => {
-  const res = await pool.query(
-    'SELECT * FROM strategies WHERE "strategyName" = $1',
-    [strategyName]
-  );
-  return res.rows;
+  const { data, error } = await supabase
+    .from('strategies')
+    .select('*')
+    .eq('strategyName', strategyName);
+
+  if (error) {
+    throw new Error(`Error getting strategies by name: ${error.message}`);
+  }
+
+  return data;
 };
 
 /**
@@ -68,11 +113,19 @@ export const getStrategiesByName = async (strategyName) => {
  * @returns {Promise<Object|null>} The strategy record or null if not found
  */
 export const getSpecificStrategy = async (strategyName, stockName, timeFrame) => {
-  const res = await pool.query(
-    'SELECT * FROM strategies WHERE "strategyName" = $1 AND "stockName" = $2 AND "timeFrame" = $3',
-    [strategyName, stockName, timeFrame]
-  );
-  return res.rows[0] || null;
+  const { data, error } = await supabase
+    .from('strategies')
+    .select('*')
+    .eq('strategyName', strategyName)
+    .eq('stockName', stockName)
+    .eq('timeFrame', timeFrame)
+    .single();
+
+  if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+    throw new Error(`Error getting specific strategy: ${error.message}`);
+  }
+
+  return data;
 };
 
 /**
@@ -81,6 +134,15 @@ export const getSpecificStrategy = async (strategyName, stockName, timeFrame) =>
  * @returns {Promise<boolean>} True if deleted, false if not found
  */
 export const deleteStrategy = async (id) => {
-  const res = await pool.query('DELETE FROM strategies WHERE id = $1 RETURNING id', [id]);
-  return res.rowCount > 0;
+  const { data, error } = await supabase
+    .from('strategies')
+    .delete()
+    .eq('id', id)
+    .select();
+
+  if (error) {
+    throw new Error(`Error deleting strategy: ${error.message}`);
+  }
+
+  return data && data.length > 0;
 };

@@ -14,7 +14,7 @@ export async function Trade(req, res) {
   const strategy = new Strategy(
     stockName,
     timeFrame,
-    { ...config, capital: parseInt(config.capital), precise: parseInt(config.precise), }
+    { ...config, capital: parseInt(config.capital), }
   );
 
   await ServiceProvider.getInstance().liveStrategyManager.addStrategy(strategy);

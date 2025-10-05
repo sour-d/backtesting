@@ -21,7 +21,6 @@ class Strategy extends BaseStrategy {
 
     this.capital = parseInt(config.capital);
     this.riskPercentage = parseFloat(config.riskPercentage);
-    this.precise = parseInt(config.precise) || 0;
     this.risk = this.capital * (this.riskPercentage / 100); // need to fix
 
     // symbol info

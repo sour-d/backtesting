@@ -1,5 +1,5 @@
 
-import pool from "./index.js";
+import supabase from "./index.js";
 
 export const createOrder = async (order) => {
   const {
@@ -12,10 +12,12 @@ export const createOrder = async (order) => {
     orderType,
     side,
     status,
+    stopLoss: stoploss
   } = order;
-  const res = await pool.query(
-    'INSERT INTO orders ("orderId", "strategyId", price, timestamp, qty, risk, "orderType", side, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
-    [
+
+  const { data, error } = await supabase
+    .from('orders')
+    .insert([{
       orderId,
       strategyId,
       price,
@@ -25,23 +27,46 @@ export const createOrder = async (order) => {
       orderType,
       side,
       status,
-    ]
-  );
-  return res.rows[0];
+      stoploss
+    }])
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Error creating order: ${error.message}`);
+  }
+
+  return data;
 };
 
 export const updateOrderStatus = async (orderId, status) => {
-  const res = await pool.query(
-    'UPDATE orders SET status = $1, "updatedAt" = NOW() WHERE "orderId" = $2 RETURNING *',
-    [status, orderId]
-  );
-  return res.rows[0];
+  const { data, error } = await supabase
+    .from('orders')
+    .update({
+      status,
+      updatedAt: new Date().toISOString()
+    })
+    .eq('orderId', orderId)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Error updating order status: ${error.message}`);
+  }
+
+  return data;
 };
 
 export const getOrderByOrderId = async (orderId) => {
-  const res = await pool.query(
-    'SELECT * FROM orders WHERE "orderId" = $1',
-    [orderId]
-  );
-  return res.rows[0];
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('orderId', orderId)
+    .single();
+
+  if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+    throw new Error(`Error getting order: ${error.message}`);
+  }
+
+  return data;
 };

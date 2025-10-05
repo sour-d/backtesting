@@ -1,18 +1,20 @@
-import pool from "./index.js";
+import supabase from "./index.js";
 import * as dotenv from "dotenv";
 
 dotenv.config();
 
 const clearDb = async () => {
   try {
-    await pool.query('TRUNCATE TABLE orders RESTART IDENTITY CASCADE;');
-    await pool.query('TRUNCATE TABLE strategies RESTART IDENTITY CASCADE;');
-    await pool.query('TRUNCATE TABLE logs RESTART IDENTITY CASCADE;');
+    // Clear tables using Supabase
+    await supabase.from('orders').delete().neq('id', 0); // Delete all rows
+    await supabase.from('trades').delete().neq('id', 0); // Delete all rows  
+    await supabase.from('strategies').delete().neq('id', 0); // Delete all rows
+    await supabase.from('logs').delete().neq('id', 0); // Delete all rows
+
     console.log("Database cleared successfully");
   } catch (err) {
     console.error("Error clearing database", err);
   }
-  pool.end();
 };
 
 clearDb();

@@ -96,7 +96,7 @@ class PositionManager {
     });
     return await this.broker.modifyPosition(stoploss).then((res) => {
       if (!res) {
-        this.logger.error("Updating stop loss Failed", this.currentPosition);
+        // this.logger.error("Updating stop loss Failed", this.currentPosition);
         return;
       }
       this.logger.info("Updating Stop Loss successful", res);
