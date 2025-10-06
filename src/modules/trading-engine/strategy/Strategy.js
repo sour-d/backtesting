@@ -136,7 +136,7 @@ class Strategy extends BaseStrategy {
     this.logger.info("Strategy Started Execution");
 
     this.intervalId = setInterval(async () => {
-      await this.checkPositionStatus(true);
+      await this.checkPositionStatus(false);
     }, 30000);
   }
 

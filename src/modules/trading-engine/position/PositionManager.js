@@ -57,9 +57,9 @@ class PositionManager {
           risk: this.currentPosition.risk,
           orderType: "Market",
           side: this.currentPosition.side === "Buy" ? "Sell" : "Buy",
-          status: "Filled",
+          status: "Exited",
         };
-        this.logger.info('Position already exited', orderDetails);
+        this.logger.info('Position already exited', { orderDetails, res });
         createOrder(orderDetails);
         // this.riskManager.setCapital(this.riskManager.getCapital() + price * quantity);
         this.clearPosition();

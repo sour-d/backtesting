@@ -115,6 +115,7 @@ class Trade {
       })
       .then((response) => {
         const data = response.result.list[0];
+        this.logger.info("Open positions fetched successfully", response);
         return {
           symbol: data.symbol,
           side: data.side,
@@ -252,5 +253,6 @@ class Trade {
 //   await trade.placeOrder(1, 500.0482432892432, 0, 480.024275500000000002, "Buy")
 // );
 // console.log(await trade.modifyPosition(0.01367));
+// console.log(await trade.openPositions());
 
 export default Trade;
