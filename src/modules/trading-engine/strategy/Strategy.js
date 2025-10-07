@@ -100,8 +100,8 @@ class Strategy extends BaseStrategy {
     return this._positionManager.updateStopLoss(stopLoss);
   }
 
-  async checkPositionStatus(slient = false) {
-    return this._positionManager.checkPositionStatus(slient);
+  async checkPositionStatus(sideJob = false) {
+    return this._positionManager.checkPositionStatus(sideJob);
   }
 
   async forceExit(side) {
@@ -132,12 +132,12 @@ class Strategy extends BaseStrategy {
     if (await this.sell()) return;
   }
 
-  async execute() {
+  execute() {
     this.logger.info("Strategy Started Execution");
 
-    this.intervalId = setInterval(async () => {
-      await this.checkPositionStatus(false);
-    }, 30000);
+    this.intervalId = setInterval(() => {
+      this.checkPositionStatus(true);
+    }, 300000);
   }
 
   stop() {

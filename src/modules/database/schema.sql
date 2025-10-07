@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS strategies (
 -- Create orders table
 CREATE TABLE IF NOT EXISTS orders (
   id SERIAL PRIMARY KEY,
-  "orderId" VARCHAR(255) UNIQUE NOT NULL,
+  "orderId" VARCHAR(255) NOT NULL,
   "strategyId" UUID REFERENCES strategies(id) ON DELETE CASCADE,
   price DECIMAL(20, 8),
   timestamp TIMESTAMPTZ NOT NULL,

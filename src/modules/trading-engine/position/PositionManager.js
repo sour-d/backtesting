@@ -42,10 +42,10 @@ class PositionManager {
     updateOrderStatus(this.currentPosition.orderId, status);
   }
 
-  async checkPositionStatus(slient = false) { // move to order manager
+  async checkPositionStatus(sideJob = false) { // move to order manager
     if (!this.currentPosition) return;
 
-    !slient && this.logger.info("Checking active Position", this.currentPosition);
+    this.logger.info(`${sideJob ? 'SIDE_JOB::' : ''} Checking active Position`, this.currentPosition);
     return await this.broker.openPositions().then((res) => {
       if (res.size === 0) {
         const orderDetails = {
@@ -59,7 +59,7 @@ class PositionManager {
           side: this.currentPosition.side === "Buy" ? "Sell" : "Buy",
           status: "Exited",
         };
-        this.logger.info('Position already exited', { orderDetails, res });
+        this.logger.info(`${sideJob ? 'SIDE_JOB::' : ''} Position already exited`, { orderDetails, res });
         createOrder(orderDetails);
         // this.riskManager.setCapital(this.riskManager.getCapital() + price * quantity);
         this.clearPosition();

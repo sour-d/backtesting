@@ -115,7 +115,7 @@ class Trade {
       })
       .then((response) => {
         const data = response.result.list[0];
-        this.logger.info("Open positions fetched successfully", response);
+        // this.logger.info("Open positions fetched successfully", response);
         return {
           symbol: data.symbol,
           side: data.side,
