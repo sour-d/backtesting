@@ -39,7 +39,7 @@ class PositionManager {
   updatePositionStatus(status) {
     if (!this.currentPosition) return;
     this.currentPosition.status = status;
-    updateOrderStatus(this.currentPosition.orderId, status);
+    // updateOrderStatus(this.currentPosition.orderId, status);
   }
 
   async checkPositionStatus(sideJob = false) { // move to order manager

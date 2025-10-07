@@ -62,7 +62,7 @@ class OrderManager {
           risk,
           orderType: isLimitOrder ? "Limit" : "Market",
           side,
-          status: "Pending",
+          status: "Entry",
           stopLoss
         };
         this.logger.info("Placing Order successful", orderDetails);
@@ -89,8 +89,8 @@ class OrderManager {
       if (!currentOrderInfo?.orderId) {
         this.positionManager.updatePositionStatus("Filled");
         this.logger.info("Last Order Filled", { orderId });
-        const { price, quantity } = currentPosition;
-        await updateOrderStatus(orderId, "Filled");
+        // const { price, quantity } = currentPosition;
+        // await updateOrderStatus(orderId, "Filled");
         return true;
       }
       this.logger.info("Last Order still in orderbook", { orderId });
