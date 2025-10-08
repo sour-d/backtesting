@@ -137,7 +137,7 @@ class Strategy extends BaseStrategy {
 
     this.intervalId = setInterval(() => {
       this.checkPositionStatus(true);
-    }, 300000);
+    }, 30 * 60 * 1000);
   }
 
   stop() {
