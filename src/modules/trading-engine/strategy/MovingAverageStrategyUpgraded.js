@@ -20,6 +20,7 @@ class MovingAverageStrategyUpgraded extends Strategy {
       config
     );
     this.config = config;
+    this.strategyName = "MovingAverageStrategyUpgraded";
   }
 
   static getDefaultConfig() {
