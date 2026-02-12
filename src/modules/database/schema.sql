@@ -56,3 +56,21 @@ CREATE TABLE IF NOT EXISTS orders (
 CREATE INDEX IF NOT EXISTS idx_orders_strategy_id ON orders("strategyId");
 CREATE INDEX IF NOT EXISTS idx_orders_timestamp ON orders(timestamp);
 CREATE INDEX IF NOT EXISTS idx_orders_order_id ON orders("orderId");
+
+-- Create trades table
+CREATE TABLE IF NOT EXISTS trades (
+  id SERIAL PRIMARY KEY,
+  "orderId" VARCHAR(255) NOT NULL,
+  "strategyId" UUID REFERENCES strategies(id) ON DELETE CASCADE,
+  price DECIMAL(20, 8),
+  timestamp TIMESTAMPTZ NOT NULL,
+  qty DECIMAL(20, 8),
+  side VARCHAR(10),
+  "createdAt" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Create indexes for trades
+CREATE INDEX IF NOT EXISTS idx_trades_strategy_id ON trades("strategyId");
+CREATE INDEX IF NOT EXISTS idx_trades_order_id ON trades("orderId");
+CREATE INDEX IF NOT EXISTS idx_trades_timestamp ON trades(timestamp);
