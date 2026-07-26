@@ -33,7 +33,14 @@ class MovingAverageStrategy_v2 extends Strategy {
     const today = this.stock.now();
     const yesterday = this.stock.prev();
 
-    this.logger.info("buy condition", { today, yesterday });
+    this.logger.info("buy condition", { 
+      todayClose: today?.close, 
+      todayMa50high: today?.ma50high, 
+      todayBody: today?.body, 
+      yesterdayBody: yesterday?.body, 
+      todaySuperTrend: today?.superTrendDirection,
+      todayMa200close: today?.ma200close
+    });
 
     if (!today || !yesterday) return false;
 
